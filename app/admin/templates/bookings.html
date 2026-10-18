@@ -1,0 +1,649 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<style>
+    /* ================================
+       BOOKINGS PAGE
+    ================================= */
+
+    .bookings-page {
+        width: 100%;
+        padding: 25px;
+        box-sizing: border-box;
+    }
+
+    .bookings-header {
+        margin-bottom: 25px;
+    }
+
+    .bookings-header h2 {
+        margin: 0 0 8px;
+        font-size: 28px;
+        font-weight: 700;
+        color: #222;
+    }
+
+    .bookings-header p {
+        margin: 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    /* ================================
+       TABLE CONTAINER
+    ================================= */
+
+    .bookings-table-container {
+        width: 100%;
+        overflow-x: auto;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid #e5e5e5;
+    }
+
+    .bookings-table {
+        width: 100%;
+        min-width: 1250px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+
+    /* ================================
+       TABLE HEADER
+    ================================= */
+
+    .bookings-table thead {
+        background: #b30000;
+        color: #fff;
+    }
+
+    .bookings-table th {
+        padding: 15px 14px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    /* ================================
+       TABLE BODY
+    ================================= */
+
+    .bookings-table td {
+        padding: 15px 14px;
+        border-bottom: 1px solid #eee;
+        color: #333;
+        font-size: 14px;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .bookings-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .bookings-table tbody tr:hover {
+        background-color: #fff9f9;
+    }
+
+    .bookings-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* ================================
+       CLIENT INFORMATION
+    ================================= */
+
+    .client-info strong {
+        display: block;
+        color: #222;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .client-info small {
+        display: block;
+        color: #777;
+        font-size: 12px;
+        word-break: break-word;
+    }
+
+    /* ================================
+       CAR
+    ================================= */
+
+    .car-name {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .car-removed {
+        color: #999;
+        font-style: italic;
+    }
+
+    /* ================================
+       DATE
+    ================================= */
+
+    .booking-dates {
+        white-space: nowrap;
+        color: #444;
+    }
+
+    .date-arrow {
+        color: #b30000;
+        font-weight: bold;
+        margin: 0 5px;
+    }
+
+    /* ================================
+       AMOUNT
+    ================================= */
+
+    .amount-badge {
+        display: inline-block;
+        padding: 7px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+
+    .amount-paid {
+        background: #dff5e5;
+        color: #187a36;
+    }
+
+    .amount-unpaid {
+        background: #fff1cc;
+        color: #856404;
+    }
+
+    .amount-na {
+        background: #eee;
+        color: #777;
+    }
+
+    /* ================================
+       STATUS BADGES
+    ================================= */
+
+    .status,
+    .payment-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 85px;
+        padding: 7px 11px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: capitalize;
+        white-space: nowrap;
+    }
+
+    /* Booking statuses */
+
+    .status.pending {
+        background: #fff1cc;
+        color: #856404;
+    }
+
+    .status.approved {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .status.active {
+        background: #dff5e5;
+        color: #187a36;
+    }
+
+    .status.completed {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .status.cancelled {
+        background: #fde2e2;
+        color: #b91c1c;
+    }
+
+    
+
+    .payment-status.paid {
+        background: #dff5e5;
+        color: #187a36;
+    }
+
+    .payment-status.unpaid,
+    .payment-status.not-paid {
+        background: #fff1cc;
+        color: #856404;
+    }
+
+    /* ================================
+       ACTIONS
+    ================================= */
+
+    .actions {
+        min-width: 280px;
+        vertical-align: middle !important;
+    }
+
+    .action-buttons {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        align-items: center;
+        width: 100%;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 32px;
+        padding: 6px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid transparent;
+        white-space: nowrap;
+        cursor: pointer;
+        box-sizing: border-box;
+        transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        opacity: 0.9;
+    }
+
+    /* Button colors */
+
+    .btn-view {
+        background: #17a2b8;
+        color: #fff;
+    }
+
+    .btn-pay {
+        background: #28a745;
+        color: #fff;
+    }
+
+    .btn-approve {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .btn-activate {
+        background: #ffc107;
+        color: #222;
+    }
+
+    .btn-complete {
+        background: #198754;
+        color: #fff;
+    }
+
+    .btn-cancel {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    .btn-edit {
+        background: #6c757d;
+        color: #fff;
+    }
+
+    .btn-delete {
+        background: #fff;
+        color: #dc3545;
+        border-color: #dc3545;
+    }
+
+    .btn-delete:hover {
+        background: #dc3545;
+        color: #fff;
+    }
+
+    /* ================================
+       EMPTY STATE
+    ================================= */
+
+    .empty-bookings {
+        text-align: center !important;
+        padding: 50px 20px !important;
+        color: #888 !important;
+    }
+
+    .empty-bookings strong {
+        display: block;
+        color: #555;
+        font-size: 16px;
+        margin-bottom: 6px;
+    }
+
+    /* ================================
+       RESPONSIVE
+    ================================= */
+
+    @media (max-width: 900px) {
+
+        .bookings-page {
+            padding: 15px;
+        }
+
+        .bookings-header h2 {
+            font-size: 23px;
+        }
+
+        .bookings-table-container {
+            border-radius: 8px;
+        }
+
+        /*
+         * Keep the table readable on smaller screens.
+         * User can scroll horizontally instead of
+         * squeezing columns and overlapping buttons.
+         */
+        .bookings-table {
+            min-width: 1150px;
+        }
+    }
+
+</style>
+<div class="bookings-page">
+<!-- PAGE HEADER -->
+<div class="bookings-header">
+    <h2>Bookings Management</h2>
+    <p>View, manage and update customer car hire bookings.</p>
+</div>
+
+
+<!-- BOOKINGS TABLE -->
+<div class="bookings-table-container">
+
+    <table class="bookings-table">
+
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Phone</th>
+                <th>Vehicle</th>
+                <th>Hire Period</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Booked On</th>
+                <th>Payment</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+
+
+        <tbody>
+
+            {% for b in bookings %}
+
+            <tr>
+
+                <!-- CLIENT -->
+                <td>
+                    <div class="client-info">
+
+                        <strong>
+                            {{ b.client_name }}
+                        </strong>
+
+                        <small>
+                            {{ b.client_email }}
+                        </small>
+
+                    </div>
+                </td>
+
+
+                <!-- PHONE -->
+                <td>
+                    {{ b.client_phone }}
+                </td>
+
+
+                <!-- VEHICLE -->
+                <td>
+
+                    {% if b.car %}
+
+                        <span class="car-name">
+                            {{ b.car.name }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="car-removed">
+                            Car removed
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- HIRE PERIOD -->
+                <td>
+
+                    <div class="booking-dates">
+
+                        {{ b.pickup_date }}
+
+                        <span class="date-arrow">
+                            →
+                        </span>
+
+                        {{ b.dropoff_date }}
+
+                    </div>
+
+                </td>
+
+
+                <!-- AMOUNT -->
+                <td>
+
+                    {% if b.amount %}
+
+                        {% if b.payment_status == 'paid' %}
+
+                            <span class="amount-badge amount-paid">
+                                KES {{ "{:,.0f}".format(b.amount) }}
+                            </span>
+
+                        {% else %}
+
+                            <span class="amount-badge amount-unpaid">
+                                KES {{ "{:,.0f}".format(b.amount) }}
+                            </span>
+
+                        {% endif %}
+
+                    {% else %}
+
+                        <span class="amount-badge amount-na">
+                            N/A
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- BOOKING STATUS -->
+                <td>
+
+                    <span class="status {{ b.status|lower }}">
+
+                        {{ b.status|capitalize }}
+
+                    </span>
+
+                </td>
+
+
+                <!-- CREATED DATE -->
+                <td>
+
+                    {% if b.created_at %}
+
+                        {{ b.created_at.strftime("%d %b %Y") }}
+
+                    {% else %}
+
+                        N/A
+
+                    {% endif %}
+
+                </td>
+
+
+                <!-- PAYMENT STATUS -->
+                <td>
+
+                    {% set payment = b.payment_status|default('Not Paid') %}
+
+                    <span class="payment-status {{ payment|lower|replace(' ', '-') }}">
+
+                        {{ payment|capitalize }}
+
+                    </span>
+
+                </td>
+
+
+                <!-- ACTIONS -->
+                <td class="actions">
+
+                    <div class="action-buttons">
+
+                        <!-- VIEW -->
+                        <a href="{{ url_for('admin.booking_view', booking_id=b.id) }}"
+                           class="action-btn btn-view">
+                            View
+                        </a>
+
+
+                        <!-- PAY -->
+                        <!-- {% if b.payment_status != 'paid' %}
+
+                            <a href="{{ url_for('admin.pay_booking', booking_id=b.id) }}"
+                               class="action-btn btn-pay">
+                                Pay Now
+                            </a>
+
+                        {% endif %} -->
+                        {% if b.payment_status == 'paid' %}
+
+                            <span class="badge bg-success">
+                                Paid
+                            </span>
+
+                        {% else %}
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('admin.pay_booking',
+                                                booking_id=b.id) }}"
+                                onsubmit="return confirm('Mark this booking as paid?');"
+                                style="display: inline;"
+                            >
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Pay
+                                </button>
+                            </form>
+
+                        {% endif %}
+
+                        <!-- APPROVE -->
+                        <a href="{{ url_for('admin.update_booking_status',
+                                           booking_id=b.id,
+                                           status='approved') }}"
+                           class="action-btn btn-approve">
+                            Approve
+                        </a>
+
+
+                        <!-- ACTIVATE -->
+                        <a href="{{ url_for('admin.update_booking_status',
+                                           booking_id=b.id,
+                                           status='active') }}"
+                           class="action-btn btn-activate">
+                            Activate
+                        </a>
+
+
+                        <!-- COMPLETE -->
+                        <a href="{{ url_for('admin.update_booking_status',
+                                           booking_id=b.id,
+                                           status='completed') }}"
+                           class="action-btn btn-complete">
+                            Complete
+                        </a>
+
+
+                        <!-- CANCEL -->
+                        <a href="{{ url_for('admin.update_booking_status',
+                                           booking_id=b.id,
+                                           status='cancelled') }}"
+                           class="action-btn btn-cancel">
+                            Cancel
+                        </a>
+
+
+                        <!-- EDIT -->
+                        <a href="{{ url_for('admin.edit_booking',
+                                           booking_id=b.id) }}"
+                           class="action-btn btn-edit">
+                            Edit
+                        </a>
+
+
+                        <!-- DELETE -->
+                        <a href="{{ url_for('admin.delete_booking',
+                                           booking_id=b.id) }}"
+                           class="action-btn btn-delete"
+                           onclick="return confirm('Delete this booking?');">
+                            Delete
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+
+            {% else %}
+
+            <tr>
+
+                <td colspan="9" class="empty-bookings">
+
+                    <strong>No bookings found</strong>
+
+                    There are currently no customer bookings to display.
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+</div>
+{% endblock %}

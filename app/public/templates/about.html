@@ -1,0 +1,445 @@
+{% extends "base.html" %}
+
+{% block title %}About Us - WheelQ{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet"
+      href="{{ url_for('public.static', filename='css/style.css') }}">
+
+
+<!-- =========================
+     ABOUT HERO
+========================= -->
+
+<section class="about-hero">
+
+    <div class="about-hero-overlay"></div>
+
+    <div class="about-hero-text">
+
+        <span class="about-tag">
+            THIS IS WHEELQ
+        </span>
+
+        <h1>
+            Experience Freedom with
+            <span>WheelQ</span>
+        </h1>
+
+        <p>
+            Where every journey begins with comfort,
+            style, reliability and trust.
+        </p>
+
+        <a href="{{ url_for('public.cars') }}"
+           class="btn hero-btn">
+
+            Explore Our Cars
+
+            <span class="btn-arrow">→</span>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     OUR STORY
+========================= -->
+
+<section class="about-section">
+
+    <div class="section-heading">
+
+        <span class="section-tag">
+            WHO WE ARE
+        </span>
+
+        <h2>
+            Our Story
+        </h2>
+
+        <div class="section-line"></div>
+
+        <p>
+            Founded with a vision to redefine the car hire experience,
+            <strong>WheelQ</strong> brings together reliability,
+            affordability and a luxurious travel experience.
+        </p>
+
+    </div>
+
+
+    <div class="about-cards">
+
+        <!-- Comfort -->
+
+        <div class="about-card">
+
+            <div class="about-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/comfort2.jpg') }}"
+                     alt="Comfort Ride">
+
+                <div class="about-image-overlay"></div>
+
+            </div>
+
+            <div class="about-card-content">
+
+                <span class="card-number">
+                    01
+                </span>
+
+                <h3>
+                    Comfort First
+                </h3>
+
+                <p>
+                    All our vehicles are maintained to high standards
+                    to provide you with a smooth, comfortable and
+                    enjoyable experience.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Safety -->
+
+        <div class="about-card">
+
+            <div class="about-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/trust.jpg') }}"
+                     alt="Trust and Safety">
+
+                <div class="about-image-overlay"></div>
+
+            </div>
+
+            <div class="about-card-content">
+
+                <span class="card-number">
+                    02
+                </span>
+
+                <h3>
+                    Trusted & Safe
+                </h3>
+
+                <p>
+                    With reliable vehicles, trained drivers and
+                    responsive customer support, your safety remains
+                    one of our highest priorities.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Affordable -->
+
+        <div class="about-card">
+
+            <div class="about-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/luxury.jpg') }}"
+                     alt="Affordable Luxury">
+
+                <div class="about-image-overlay"></div>
+
+            </div>
+
+            <div class="about-card-content">
+
+                <span class="card-number">
+                    03
+                </span>
+
+                <h3>
+                    Affordable Luxury
+                </h3>
+
+                <p>
+                    Enjoy premium vehicles and quality service
+                    without unnecessary costs. Great vehicles,
+                    great value and a better experience.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     EXPERIENCE BANNER
+========================= -->
+
+<section class="about-highlight">
+
+    <div class="about-highlight-overlay"></div>
+
+    <div class="about-highlight-content">
+
+        <span class="section-tag">
+            THE WHEELQ EXPERIENCE
+        </span>
+
+        <h2>
+            More Than Just a Car.
+            <span>It's Your Journey.</span>
+        </h2>
+
+        <p>
+            Whether you're travelling for business, heading out
+            for a weekend adventure or simply need a reliable
+            vehicle, WheelQ is here to keep you moving.
+        </p>
+
+        <a href="{{ url_for('public.cars') }}"
+           class="about-highlight-btn">
+
+            Find Your Ride
+
+            <span>→</span>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     CORE VALUES
+========================= -->
+
+<section class="values-section">
+
+    <div class="section-heading">
+
+        <span class="section-tag">
+            WHAT DRIVES US
+        </span>
+
+        <h2>
+            Our Core Values
+        </h2>
+
+        <div class="section-line"></div>
+
+    </div>
+
+
+    <div class="values-grid">
+
+        <div class="value-card">
+
+            <div class="value-icon">
+                01
+            </div>
+
+            <h3>
+                Integrity
+            </h3>
+
+            <p>
+                We believe in transparency, honesty and delivering
+                exactly what we promise to our customers.
+            </p>
+
+        </div>
+
+
+        <div class="value-card">
+
+            <div class="value-icon">
+                02
+            </div>
+
+            <h3>
+                Innovation
+            </h3>
+
+            <p>
+                We continuously improve our services through
+                technology, creativity and customer feedback.
+            </p>
+
+        </div>
+
+
+        <div class="value-card">
+
+            <div class="value-icon">
+                03
+            </div>
+
+            <h3>
+                Customer Focus
+            </h3>
+
+            <p>
+                Your satisfaction drives us. Every decision we make
+                is aimed at creating a better travel experience.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TEAM
+========================= -->
+
+<!-- <section class="team-section">
+
+    <div class="section-heading">
+
+        <span class="section-tag">
+            THE PEOPLE BEHIND WHEELQ
+        </span>
+
+        <h2>
+            Meet the Team
+        </h2>
+
+        <div class="section-line"></div>
+
+        <p>
+            A dedicated team working together to make every
+            WheelQ journey better.
+        </p>
+
+    </div>
+
+
+    <div class="team-grid">
+
+        
+
+        <div class="team-card">
+
+            <div class="team-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/team1.jpg') }}"
+                     alt="Brian Kamau">
+
+            </div>
+
+            <div class="team-info">
+
+                <h3>
+                    Brian Kamau
+                </h3>
+
+                <p>
+                    Founder & CEO
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="team-card">
+
+            <div class="team-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/team2.jpg') }}"
+                     alt="Mary Njeri">
+
+            </div>
+
+            <div class="team-info">
+
+                <h3>
+                    Mary Njeri
+                </h3>
+
+                <p>
+                    Operations Manager
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="team-card">
+
+            <div class="team-image-wrapper">
+
+                <img src="{{ url_for('static', filename='images/team3.jpg') }}"
+                     alt="Kevin Otieno">
+
+            </div>
+
+            <div class="team-info">
+
+                <h3>
+                    Kevin Otieno
+                </h3>
+
+                <p>
+                    Customer Experience Lead
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section> -->
+
+
+<!-- =========================
+     FINAL CTA
+========================= -->
+
+<section class="about-cta">
+
+    <div class="about-cta-content">
+
+        <span class="section-tag">
+            READY TO HIT THE ROAD?
+        </span>
+
+        <h2>
+            Your Next Journey Starts Here.
+        </h2>
+
+        <p>
+            Browse our fleet and find the perfect vehicle
+            for your next adventure.
+        </p>
+
+        <a href="{{ url_for('public.cars') }}"
+           class="about-cta-btn">
+
+            Browse Cars
+
+            <span>→</span>
+
+        </a>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

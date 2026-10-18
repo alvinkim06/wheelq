@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Registration | WheelQ</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('admin.static', filename='css/admin.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.auth-body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 16px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(circle at top right,
+                    rgba(229, 9, 20, 0.12), transparent 35%),
+                linear-gradient(135deg, #080808, #171717);
+            color: #f5f5f5;
+        }
+
+        .registration-card {
+            width: 100%;
+            max-width: 470px;
+            padding: 38px;
+            background: #1b1b1b;
+            border: 1px solid #333;
+            border-top: 4px solid #e50914;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .brand-name {
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #fff;
+        }
+
+        .brand-name span {
+            color: #e50914;
+        }
+
+        .brand-subtitle {
+            margin-top: 7px;
+            color: #f5c518;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .heading {
+            margin-bottom: 25px;
+        }
+
+        .heading h1 {
+            font-size: 25px;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .flash-message {
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            border-radius: 7px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .flash-message.danger,
+        .flash-message.error {
+            background: rgba(229, 9, 20, 0.12);
+            border: 1px solid rgba(229, 9, 20, 0.5);
+            color: #ff8d94;
+        }
+
+        .flash-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+
+        .flash-message.warning {
+            background: rgba(245, 197, 24, 0.1);
+            border: 1px solid rgba(245, 197, 24, 0.4);
+            color: #f5c518;
+        }
+
+        .form-group {
+            margin-bottom: 19px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .form-control {
+            display: block;
+            width: 100%;
+            padding: 13px 14px;
+            background: #111;
+            border: 1px solid #414141;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control::placeholder {
+            color: #777;
+        }
+
+        .form-control:focus {
+            border-color: #e50914;
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        select.form-control option {
+            background: #1b1b1b;
+            color: #fff;
+        }
+
+        .password-hint {
+            display: block;
+            margin-top: 7px;
+            color: #888;
+            font-size: 11px;
+        }
+
+        .register-btn {
+            width: 100%;
+            padding: 14px;
+            margin-top: 5px;
+            border: none;
+            border-radius: 8px;
+            background: #e50914;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .register-btn:hover {
+            background: #c9000b;
+            transform: translateY(-1px);
+        }
+
+        .register-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-link {
+            margin-top: 23px;
+            text-align: center;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .login-link a {
+            color: #f5c518;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .login-link a:hover {
+            color: #ffe16b;
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid #333;
+            text-align: center;
+            color: #777;
+            font-size: 11px;
+        }
+
+        .footer span {
+            color: #f5c518;
+            font-weight: 700;
+        }
+
+        @media (max-width: 480px) {
+            .registration-card {
+                padding: 28px 22px;
+            }
+
+            .brand-name {
+                font-size: 28px;
+            }
+
+            .heading h1 {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-body">
+
+    <main class="registration-card">
+
+        <header class="brand">
+            <div class="brand-name">WHEEL<span>Q</span></div>
+            <p class="brand-subtitle">CAR HIRE MANAGEMENT</p>
+        </header>
+
+        <section class="heading">
+            <h1>Create an Account</h1>
+            <p>Register an account to access the WheelQ management portal.</p>
+        </section>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <form method="POST"
+              action="{{ url_for('admin.register_admin') }}">
+
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    class="form-control"
+                    placeholder="Enter your full name"
+                    autocomplete="name"
+                    required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    required>
+            </div>
+
+          
+<div class="form-group">
+    <label for="role">Account Role</label>
+
+    <select
+        id="role"
+        name="role"
+        class="form-control"
+        required>
+
+        <option value="staff" selected>Staff Member</option>
+        <option value="admin">Administrator</option>
+
+    </select>
+
+    <small class="password-hint">
+        Select the account role assigned to this user.
+    </small>
+</div>
+
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    class="form-control"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    required>
+                <small class="password-hint">
+                    Choose a strong password.
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="confirm_password">Confirm Password</label>
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    class="form-control"
+                    placeholder="Re-enter your password"
+                    autocomplete="new-password"
+                    required>
+            </div>
+
+            <button type="submit" class="register-btn">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="login-link">
+            Already have an account?
+            <a href="{{ url_for('admin.admin_login') }}">Sign in</a>
+        </div>
+
+        <footer class="footer">
+            Powered by <span>WheelQ</span> &bull; Admin Portal
+        </footer>
+
+    </main>
+
+    <script>
+        const registrationForm = document.querySelector("form");
+
+        registrationForm.addEventListener("submit", function (event) {
+            const password = document.getElementById("password").value;
+            const confirmPassword =
+                document.getElementById("confirm_password").value;
+
+            if (password !== confirmPassword) {
+                event.preventDefault();
+                alert("Passwords do not match. Please try again.");
+                document.getElementById("confirm_password").focus();
+            }
+        });
+    </script>
+
+</body>
+</html>

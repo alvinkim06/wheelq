@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>WheelQ | {% block title %}{% endblock %}</title>
+
+    <!-- Shared layout and navigation styles -->
+    <link rel="stylesheet"
+          href="{{ url_for('public.static', filename='css/base.css') }}">
+
+    <!-- Public page styles -->
+    <link rel="stylesheet"
+          href="{{ url_for('public.static', filename='css/style.css') }}">
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="navbar">
+        <div class="logo">
+            <a href="{{ url_for('public.home') }}">
+                <img
+                    src="{{ url_for('static', filename='images/logo1.jpg') }}"
+                    alt="WheelQ Logo"
+                >
+            </a>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('public.home') }}">Home</a></li>
+                <li><a href="{{ url_for('public.cars') }}">Cars</a></li>
+                <li><a href="{{ url_for('public.about') }}">About</a></li>
+                <li><a href="{{ url_for('public.contact') }}">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                        <div class="flash {{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2025 WheelQ Car Hire. All rights reserved.</p>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

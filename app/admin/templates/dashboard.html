@@ -1,0 +1,1056 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+
+<div class="dashboard-page">
+
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+
+        <div>
+            <div class="welcome-label">
+                WHEELQ ADMIN PANEL
+            </div>
+
+            <h1 class="page-title">
+                Dashboard
+            </h1>
+
+            <p class="dashboard-subtitle">
+                Here's what's happening with your WheelQ platform today.
+            </p>
+        </div>
+
+        <div class="dashboard-date">
+            <span class="date-icon">📅</span>
+            <div>
+                <strong id="current-date"></strong>
+                <small id="current-time"></small>
+            </div>
+        </div>
+
+    </div>
+
+
+    <!-- Statistics Cards -->
+    <div class="dashboard-cards">
+
+        <!-- Total Cars -->
+        <div class="dashboard-card card-red">
+
+            <div class="card-icon">
+                🚗
+            </div>
+
+            <div class="card-info">
+                <span class="card-label">
+                    Total Cars
+                </span>
+
+                <strong class="card-number">
+                    {{ cars }}
+                </strong>
+
+                <span class="card-description">
+                    Vehicles in fleet
+                </span>
+            </div>
+
+            <div class="card-decoration">
+                🚗
+            </div>
+
+        </div>
+
+
+        <!-- Pending Bookings -->
+        <div class="dashboard-card card-yellow">
+
+            <div class="card-icon">
+                📅
+            </div>
+
+            <div class="card-info">
+                <span class="card-label">
+                    Pending Bookings
+                </span>
+
+                <strong class="card-number">
+                    {{ pending }}
+                </strong>
+
+                <span class="card-description">
+                    Awaiting approval
+                </span>
+            </div>
+
+            <div class="card-decoration">
+                📅
+            </div>
+
+        </div>
+
+
+        <!-- Active Hires -->
+        <div class="dashboard-card card-dark">
+
+            <div class="card-icon">
+                🛞
+            </div>
+
+            <div class="card-info">
+                <span class="card-label">
+                    Active Hires
+                </span>
+
+                <strong class="card-number">
+                    {{ active }}
+                </strong>
+
+                <span class="card-description">
+                    Cars currently hired
+                </span>
+            </div>
+
+            <div class="card-decoration">
+                🛞
+            </div>
+
+        </div>
+
+
+        <!-- Lease Requests -->
+        <div class="dashboard-card card-red">
+
+            <div class="card-icon">
+                📄
+            </div>
+
+            <div class="card-info">
+                <span class="card-label">
+                    Lease Requests
+                </span>
+
+                <strong class="card-number">
+                    {{ leases_count }}
+                </strong>
+
+                <span class="card-description">
+                    Total lease requests
+                </span>
+            </div>
+
+            <div class="card-decoration">
+                📄
+            </div>
+
+        </div>
+
+
+        <!-- Pending Leases -->
+        <div class="dashboard-card card-yellow">
+
+            <div class="card-icon">
+                ⏱
+            </div>
+
+            <div class="card-info">
+                <span class="card-label">
+                    Pending Lease Requests
+                </span>
+
+                <strong class="card-number">
+                    {{ pending_leases }}
+                </strong>
+
+                <span class="card-description">
+                    Awaiting review
+                </span>
+            </div>
+
+            <div class="card-decoration">
+                ⏱
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Dashboard Lower Section -->
+    <div class="dashboard-grid">
+
+        <!-- Quick Actions -->
+        <div class="dashboard-panel">
+
+            <div class="panel-header">
+                <div>
+                    <h2>Quick Actions</h2>
+                    <p>Frequently used management tools</p>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+
+                <a href="{{ url_for('admin.cars_page') }}"
+                   class="quick-action">
+
+                    <span class="quick-icon red-icon">
+                        🚗
+                    </span>
+
+                    <div>
+                        <strong>View Cars</strong>
+                        <small>Manage fleet vehicles</small>
+                    </div>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('admin.add_car') }}"
+                   class="quick-action">
+
+                    <span class="quick-icon yellow-icon">
+                        ＋
+                    </span>
+
+                    <div>
+                        <strong>Add Car</strong>
+                        <small>Add a vehicle to your fleet</small>
+                    </div>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('admin.bookings_page') }}"
+                   class="quick-action">
+
+                    <span class="quick-icon dark-icon">
+                        📅
+                    </span>
+
+                    <div>
+                        <strong>View Bookings</strong>
+                        <small>Manage customer bookings</small>
+                    </div>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+
+                <a href="{{ url_for('admin.leases_page') }}"
+                   class="quick-action">
+
+                    <span class="quick-icon red-icon">
+                        📄
+                    </span>
+
+                    <div>
+                        <strong>View Leases</strong>
+                        <small>Review investor requests</small>
+                    </div>
+
+                    <span class="action-arrow">
+                        →
+                    </span>
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- System Overview -->
+        <div class="dashboard-panel overview-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <h2>Platform Overview</h2>
+                    <p>Current WheelQ activity</p>
+                </div>
+
+            </div>
+
+            <div class="overview-list">
+
+                <div class="overview-item">
+
+                    <div class="overview-icon red-icon">
+                        🚗
+                    </div>
+
+                    <div class="overview-text">
+                        <strong>Fleet</strong>
+                        <span>Your available vehicles</span>
+                    </div>
+
+                    <strong class="overview-number">
+                        {{ cars }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <div class="overview-icon yellow-icon">
+                        📅
+                    </div>
+
+                    <div class="overview-text">
+                        <strong>Bookings</strong>
+                        <span>Pending customer bookings</span>
+                    </div>
+
+                    <strong class="overview-number">
+                        {{ pending }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <div class="overview-icon dark-icon">
+                        🛞
+                    </div>
+
+                    <div class="overview-text">
+                        <strong>Active Hires</strong>
+                        <span>Vehicles currently on hire</span>
+                    </div>
+
+                    <strong class="overview-number">
+                        {{ active }}
+                    </strong>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <div class="overview-icon red-icon">
+                        📄
+                    </div>
+
+                    <div class="overview-text">
+                        <strong>Leases</strong>
+                        <span>Total investor requests</span>
+                    </div>
+
+                    <strong class="overview-number">
+                        {{ leases_count }}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- Bottom Banner -->
+    <div class="dashboard-banner">
+
+        <div class="banner-content">
+
+            <div class="banner-icon">
+                📊
+            </div>
+
+            <div>
+                <h2>
+                    Keep Your Fleet Moving
+                </h2>
+
+                <p>
+                    Efficient management. Happier clients. Higher revenue.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="banner-brand">
+            <strong>
+                WQ
+            </strong>
+
+            <span>
+                WheelQ
+            </span>
+        </div>
+
+    </div>
+
+</div>
+
+
+<style>
+
+    /* =========================================
+       DASHBOARD PAGE
+    ========================================= */
+
+    .dashboard-page {
+        width: 100%;
+        max-width: 1500px;
+        margin: 0 auto;
+        animation: dashboardFade 0.6s ease;
+    }
+
+
+    @keyframes dashboardFade {
+
+        from {
+            opacity: 0;
+            transform: translateY(15px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+    }
+
+
+    /* =========================================
+       DASHBOARD HEADER
+    ========================================= */
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+        margin-bottom: 30px;
+    }
+
+
+    .welcome-label {
+        color: #b30000;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 2px;
+        margin-bottom: 6px;
+    }
+
+
+    .page-title {
+        margin: 0;
+        color: #171b22;
+        font-size: 34px;
+        font-weight: 700;
+    }
+
+
+    .dashboard-subtitle {
+        margin: 7px 0 0;
+        color: #737984;
+        font-size: 15px;
+    }
+
+
+    .dashboard-date {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 18px;
+        background: #ffffff;
+        border: 1px solid #e7e9ed;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.06);
+    }
+
+
+    .date-icon {
+        font-size: 22px;
+    }
+
+
+    .dashboard-date strong {
+        display: block;
+        color: #20242b;
+        font-size: 13px;
+    }
+
+
+    .dashboard-date small {
+        display: block;
+        margin-top: 3px;
+        color: #858b94;
+        font-size: 11px;
+    }
+
+
+    /* =========================================
+       STATISTICS CARDS
+    ========================================= */
+
+    .dashboard-cards {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(180px, 1fr));
+        gap: 18px;
+        margin-bottom: 24px;
+    }
+
+
+    .dashboard-card {
+        position: relative;
+        overflow: hidden;
+        min-height: 175px;
+        padding: 22px;
+        background: #ffffff;
+        border: 1px solid #e8eaee;
+        border-radius: 16px;
+        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.07);
+        transition:
+            transform 0.3s ease,
+            box-shadow 0.3s ease;
+    }
+
+
+    .dashboard-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+    }
+
+
+    .dashboard-card::after {
+        content: "";
+        position: absolute;
+        width: 130px;
+        height: 130px;
+        right: -50px;
+        bottom: -60px;
+        border-radius: 50%;
+        opacity: 0.08;
+    }
+
+
+    .card-red::after {
+        background: #b30000;
+    }
+
+
+    .card-yellow::after {
+        background: #f4b400;
+    }
+
+
+    .card-dark::after {
+        background: #171b22;
+    }
+
+
+    .card-icon {
+        width: 44px;
+        height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #ffffff;
+        font-size: 20px;
+        margin-bottom: 18px;
+    }
+
+
+    .card-red .card-icon {
+        background: #b30000;
+    }
+
+
+    .card-yellow .card-icon {
+        background: #f4b400;
+    }
+
+
+    .card-dark .card-icon {
+        background: #252b34;
+    }
+
+
+    .card-info {
+        position: relative;
+        z-index: 2;
+    }
+
+
+    .card-label {
+        display: block;
+        color: #3f4650;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+
+    .card-number {
+        display: block;
+        margin-top: 5px;
+        color: #b30000;
+        font-size: 32px;
+        line-height: 1.1;
+    }
+
+
+    .card-yellow .card-number {
+        color: #c28a00;
+    }
+
+
+    .card-dark .card-number {
+        color: #252b34;
+    }
+
+
+    .card-description {
+        display: block;
+        margin-top: 8px;
+        color: #89909a;
+        font-size: 12px;
+    }
+
+
+    .card-decoration {
+        position: absolute;
+        right: 15px;
+        bottom: 8px;
+        font-size: 52px;
+        opacity: 0.07;
+        transform: rotate(-8deg);
+    }
+
+
+    /* =========================================
+       LOWER DASHBOARD GRID
+    ========================================= */
+
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 22px;
+        margin-bottom: 24px;
+    }
+
+
+    .dashboard-panel {
+        background: #ffffff;
+        border: 1px solid #e7e9ed;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 7px 25px rgba(0, 0, 0, 0.06);
+    }
+
+
+    .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+
+
+    .panel-header h2 {
+        margin: 0;
+        color: #1d2229;
+        font-size: 19px;
+    }
+
+
+    .panel-header p {
+        margin: 5px 0 0;
+        color: #858c96;
+        font-size: 12px;
+    }
+
+
+    /* =========================================
+       QUICK ACTIONS
+    ========================================= */
+
+    .quick-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+
+    .quick-action {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 13px 14px;
+        color: inherit;
+        text-decoration: none;
+        border: 1px solid #edf0f3;
+        border-radius: 12px;
+        background: #fafbfc;
+        transition:
+            background 0.25s ease,
+            transform 0.25s ease,
+            border-color 0.25s ease;
+    }
+
+
+    .quick-action:hover {
+        background: #ffffff;
+        border-color: #d9dde3;
+        transform: translateX(5px);
+    }
+
+
+    .quick-icon,
+    .overview-icon {
+        width: 42px;
+        height: 42px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 11px;
+        color: #ffffff;
+        font-size: 18px;
+    }
+
+
+    .red-icon {
+        background: #b30000;
+    }
+
+
+    .yellow-icon {
+        background: #f4b400;
+    }
+
+
+    .dark-icon {
+        background: #252b34;
+    }
+
+
+    .quick-action div {
+        flex: 1;
+        min-width: 0;
+    }
+
+
+    .quick-action strong {
+        display: block;
+        color: #292f37;
+        font-size: 14px;
+    }
+
+
+    .quick-action small {
+        display: block;
+        margin-top: 3px;
+        color: #89909a;
+        font-size: 11px;
+    }
+
+
+    .action-arrow {
+        color: #b30000;
+        font-size: 20px;
+        transition: transform 0.25s ease;
+    }
+
+
+    .quick-action:hover .action-arrow {
+        transform: translateX(4px);
+    }
+
+
+    /* =========================================
+       PLATFORM OVERVIEW
+    ========================================= */
+
+    .overview-list {
+        display: flex;
+        flex-direction: column;
+    }
+
+
+    .overview-item {
+        display: flex;
+        align-items: center;
+        gap: 13px;
+        padding: 15px 0;
+        border-bottom: 1px solid #edf0f3;
+    }
+
+
+    .overview-item:last-child {
+        border-bottom: none;
+    }
+
+
+    .overview-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+        border-radius: 10px;
+    }
+
+
+    .overview-text {
+        flex: 1;
+    }
+
+
+    .overview-text strong {
+        display: block;
+        color: #292f37;
+        font-size: 13px;
+    }
+
+
+    .overview-text span {
+        display: block;
+        margin-top: 3px;
+        color: #8b929b;
+        font-size: 11px;
+    }
+
+
+    .overview-number {
+        color: #b30000;
+        font-size: 19px;
+    }
+
+
+    /* =========================================
+       BOTTOM BANNER
+    ========================================= */
+
+    .dashboard-banner {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: 110px;
+        padding: 20px 30px;
+        border-radius: 16px;
+        background:
+            linear-gradient(
+                105deg,
+                #10151d 0%,
+                #171d27 55%,
+                #252b34 100%
+            );
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    }
+
+
+    .dashboard-banner::after {
+        content: "";
+        position: absolute;
+        width: 250px;
+        height: 250px;
+        right: 130px;
+        top: -180px;
+        border-radius: 50%;
+        background: #b30000;
+        opacity: 0.18;
+    }
+
+
+    .banner-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 18px;
+    }
+
+
+    .banner-icon {
+        font-size: 38px;
+    }
+
+
+    .banner-content h2 {
+        margin: 0;
+        color: #ffffff;
+        font-size: 21px;
+    }
+
+
+    .banner-content p {
+        margin: 6px 0 0;
+        color: #c4c9d0;
+        font-size: 12px;
+    }
+
+
+    .banner-brand {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        color: #ffffff;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+
+    .banner-brand strong {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        background: #b30000;
+        color: #ffffff;
+        font-size: 17px;
+    }
+
+
+    .banner-brand span::after {
+        content: "Q";
+        color: #f4b400;
+    }
+
+
+    .banner-brand span {
+        font-size: 0;
+    }
+
+
+    .banner-brand span::before {
+        content: "Wheel";
+        color: #ffffff;
+        font-size: 22px;
+    }
+
+
+    .banner-brand span::after {
+        font-size: 22px;
+    }
+
+
+    /* =========================================
+       RESPONSIVE DESIGN
+    ========================================= */
+
+    @media (max-width: 1200px) {
+
+        .dashboard-cards {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+    }
+
+
+    @media (max-width: 900px) {
+
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+    }
+
+
+    @media (max-width: 650px) {
+
+        .dashboard-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .dashboard-card {
+            min-height: 150px;
+        }
+
+        .dashboard-date {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .dashboard-panel {
+            padding: 18px;
+        }
+
+        .dashboard-banner {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 20px;
+            padding: 22px;
+        }
+
+        .banner-brand {
+            align-self: flex-end;
+        }
+
+    }
+
+</style>
+
+
+<script>
+
+    function updateDashboardClock() {
+
+        const now = new Date();
+
+        const date = now.toLocaleDateString(
+            "en-KE",
+            {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }
+        );
+
+        const time = now.toLocaleTimeString(
+            "en-KE",
+            {
+                hour: "2-digit",
+                minute: "2-digit"
+            }
+        );
+
+        const dateElement = document.getElementById("current-date");
+        const timeElement = document.getElementById("current-time");
+
+        if (dateElement) {
+            dateElement.textContent = date;
+        }
+
+        if (timeElement) {
+            timeElement.textContent = time;
+        }
+
+    }
+
+
+    updateDashboardClock();
+
+    setInterval(updateDashboardClock, 1000);
+
+</script>
+
+{% endblock %}

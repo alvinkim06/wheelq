@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ car.name }} - WheelQ{% endblock %}
+
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('public.static', filename='css/style.css') }}">
+
+<!-- ============================
+     CAR DETAILS HERO
+============================ -->
+
+
+<!-- ============================
+     CAR DETAILS SECTION
+============================ -->
+<div class="car-details-container" style="max-width: 900px; margin: 40px auto; padding: 20px;">
+    
+    <div class="car-details-grid" style="display: flex; flex-wrap: wrap; gap: 30px;">
+        
+        <!-- CAR IMAGE -->
+        <div class="car-image" style="flex: 1 1 300px; text-align:center;">
+            <img src="{{ url_for('static', filename='uploads/' + car.image) }}" 
+                 alt="{{ car.name }}" 
+                 style="width:100%; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+        </div>
+        
+        <!-- CAR INFO -->
+        <div class="car-info" style="flex: 1 1 300px;">
+            <h2 style="color:#b30000; margin-bottom: 15px;">Car Information</h2>
+
+            <p><strong>Brand:</strong> {{ car.brand }}</p>
+            <p><strong>Type:</strong> {{ car.type }}</p>
+            <p><strong>Price per day:</strong> KES {{ car.price }}</p>
+            <p><strong>Status:</strong> {{ car.status|capitalize }}</p>
+
+            <div style="margin-top: 20px;">
+                <h3 style="margin-bottom:10px;">Details:</h3>
+                <p>{{ car.details or "No additional details available." }}</p>
+            </div>
+
+            <div style="margin-top: 30px;">
+                {% if car.status == "available" %}
+                    <a href="{{ url_for('public.book_car', car_id=car.id) }}"
+                       style="display:inline-block; padding:12px 25px; background:#b30000; color:#fff;
+                              border-radius:10px; font-weight:bold; text-decoration:none; transition:0.3s;">
+                        Book This Car
+                    </a>
+                {% else %}
+                    <span style="display:inline-block; padding:12px 25px; background:#ccc; color:#555;
+                                 border-radius:10px; font-weight:bold;">
+                        Not Available
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+    </div>
+    <div class="gallery-grid">
+
+            {% if car.image_front %}
+            <div class="gallery-item">
+                <h2>Front View</h2>
+                <img src="{{ url_for('static', filename='uploads/' + car.image_front) }}">
+            </div>
+            {% endif %}
+
+            {% if car.image_rear %}
+            <div class="gallery-item">
+                <h2>Rear View</h2>
+                <img src="{{ url_for('static', filename='uploads/' + car.image_rear) }}">
+            </div>
+            {% endif %}
+
+            {% if car.image_left %}
+            <div class="gallery-item">
+                <h2>Left View</h2>
+                <img src="{{ url_for('static', filename='uploads/' + car.image_left) }}">
+            </div>
+            {% endif %}
+
+            {% if car.image_right %}
+            <div class="gallery-item">
+                <h2>Right View</h2>
+                <img src="{{ url_for('static', filename='uploads/' + car.image_right) }}">
+            </div>
+            {% endif %}
+
+        </div>
+
+</div>
+
+{% endblock %}

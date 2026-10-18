@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Login | WheelQ</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('admin.static', filename='css/admin.css') }}">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.auth-body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 16px;
+            font-family: "Segoe UI", Arial, sans-serif;
+            background:
+                radial-gradient(
+                    circle at top right,
+                    rgba(229, 9, 20, 0.12),
+                    transparent 35%
+                ),
+                linear-gradient(135deg, #080808, #171717);
+            color: #f5f5f5;
+        }
+
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            background: #1b1b1b;
+            border: 1px solid #333;
+            border-top: 4px solid #e50914;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        .brand-name {
+            font-size: 34px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #fff;
+        }
+
+        .brand-name span {
+            color: #e50914;
+        }
+
+        .brand-subtitle {
+            margin-top: 7px;
+            color: #f5c518;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .heading {
+            margin-bottom: 28px;
+        }
+
+        .heading h1 {
+            font-size: 27px;
+            margin-bottom: 9px;
+            color: #fff;
+        }
+
+        .heading p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #aaa;
+        }
+
+        .flash-message {
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            border-radius: 7px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .flash-message.danger,
+        .flash-message.error {
+            background: rgba(229, 9, 20, 0.12);
+            border: 1px solid rgba(229, 9, 20, 0.5);
+            color: #ff9298;
+        }
+
+        .flash-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #86efac;
+        }
+
+        .flash-message.warning {
+            background: rgba(245, 197, 24, 0.1);
+            border: 1px solid rgba(245, 197, 24, 0.4);
+            color: #f5c518;
+        }
+
+        .form-group {
+            margin-bottom: 21px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #e8e8e8;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            background: #111;
+            border: 1px solid #414141;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control::placeholder {
+            color: #777;
+        }
+
+        .form-control:focus {
+            border-color: #e50914;
+            box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.15);
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-wrapper .form-control {
+            padding-right: 75px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            top: 50%;
+            right: 13px;
+            transform: translateY(-50%);
+            padding: 5px;
+            border: none;
+            background: transparent;
+            color: #f5c518;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .toggle-password:hover {
+            color: #ffe16b;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 4px 0 25px;
+            font-size: 12px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #aaa;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            accent-color: #e50914;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: #f5c518;
+            text-decoration: none;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: #e50914;
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .login-btn:hover {
+            background: #c9000b;
+            transform: translateY(-1px);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .register-link {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 13px;
+            color: #aaa;
+        }
+
+        .register-link a {
+            color: #f5c518;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            color: #ffe16b;
+            text-decoration: underline;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 19px;
+            border-top: 1px solid #333;
+            text-align: center;
+            color: #777;
+            font-size: 11px;
+        }
+
+        .footer span {
+            color: #f5c518;
+            font-weight: 700;
+        }
+
+        @media (max-width: 480px) {
+            .login-card {
+                padding: 30px 23px;
+            }
+
+            .brand-name {
+                font-size: 29px;
+            }
+
+            .heading h1 {
+                font-size: 24px;
+            }
+
+            .form-options {
+                font-size: 11px;
+            }
+        }
+    </style>
+</head>
+
+<body class="auth-body">
+
+    <main class="login-card">
+
+        <header class="brand">
+            <div class="brand-name">WHEEL<span>Q</span></div>
+            <p class="brand-subtitle">CAR HIRE MANAGEMENT</p>
+        </header>
+
+        <section class="heading">
+            <h1>Welcome Back</h1>
+            <p>Sign in to access your WheelQ management portal.</p>
+        </section>
+
+        <!-- Flash messages from Flask -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <!-- Login form -->
+        <form method="POST"
+              action="{{ url_for('admin.admin_login') }}">
+
+            <div class="form-group">
+                <label for="email">Email Address</label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    class="form-control"
+                    placeholder="Enter your email address"
+                    autocomplete="email"
+                    required>
+            </div>
+             <div class="form-group">
+                <label for="role">Sign in as</label>
+
+                <select
+                    id="role"
+                    name="role"
+                    class="form-control"
+                    required>
+
+                    <option value="admin">Administrator</option>
+                    <option value="staff">Staff Member</option>
+
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-control"
+                        placeholder="Enter your password"
+                        autocomplete="current-password"
+                        required>
+
+                    <button
+                        type="button"
+                        class="toggle-password"
+                        id="togglePassword"
+                        aria-label="Show password"
+                        aria-pressed="false">
+                        Show
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-options">
+                <label class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <span>Remember me</span>
+                </label>
+
+                <!-- Connect this to a reset route if one exists -->
+                <a href="#" class="forgot-password"
+                   onclick="return false;">
+                    Forgot password?
+                </a>
+            </div>
+
+            <button type="submit" class="login-btn">
+                Sign In
+            </button>
+
+        </form>
+
+        <div class="register-link">
+            Don't have an account?
+            <a href="{{ url_for('admin.register_admin') }}">
+                Create account
+            </a>
+        </div>
+
+        <footer class="footer">
+            Powered by <span>WheelQ</span> &bull; Admin Portal
+        </footer>
+
+    </main>
+
+    <script>
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", function () {
+            const isHidden = passwordInput.type === "password";
+
+            passwordInput.type = isHidden ? "text" : "password";
+            togglePassword.textContent = isHidden ? "Hide" : "Show";
+            togglePassword.setAttribute("aria-pressed", String(isHidden));
+            togglePassword.setAttribute(
+                "aria-label",
+                isHidden ? "Hide password" : "Show password"
+            );
+        });
+    </script>
+
+</body>
+</html>

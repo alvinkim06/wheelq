@@ -1,0 +1,88 @@
+{% extends "admin_base.html" %}
+{% block title %}Edit Client - WheelQ{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Edit Client</h1>
+
+<div class="form-container" style="max-width:700px; margin:auto; margin-top:30px;">
+    <form action="{{ url_for('admin.edit_client', client_id=client.id) }}" method="POST" enctype="multipart/form-data" style="display:flex; flex-direction:column; gap:15px;">
+
+        <h3>Personal Details</h3>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" name="name" value="{{ client.name }}" required>
+        </div>
+        <div class="form-group">
+            <label>Phone Number</label>
+            <input type="text" name="phone" value="{{ client.phone }}" required>
+        </div>
+        <div class="form-group">
+            <label>Email Address</label>
+            <input type="email" name="email" value="{{ client.email }}" required>
+        </div>
+        <div class="form-group">
+            <label>ID Number</label>
+            <input type="text" name="id_number" value="{{ client.id_number }}" required>
+        </div>
+        <div class="form-group">
+            <label>Driving License Number</label>
+            <input type="text" name="drivers_license_number" value="{{ client.drivers_license_number }}">
+        </div>
+        <div class="form-group">
+            <label>Area of Residence</label>
+            <input type="text" name="area_of_residence" value="{{ client.area_of_residence }}">
+        </div>
+        <div class="form-group">
+            <label>Area of Usage</label>
+            <input type="text" name="area_of_usage" value="{{ client.area_of_usage }}">
+        </div>
+
+        <h3>Documents</h3>
+        <div class="form-group">
+            <label>ID Front Image</label>
+            <input type="file" name="id_front">
+        </div>
+        <div class="form-group">
+            <label>ID Back Image</label>
+            <input type="file" name="id_back">
+        </div>
+        <div class="form-group">
+            <label>Driver’s License</label>
+            <input type="file" name="drivers_license">
+        </div>
+        <div class="form-group">
+            <label>Passport</label>
+            <input type="file" name="passport">
+        </div>
+
+                <!-- Emergency Contacts -->
+        {% for i in range(1, 4) %}
+        <h3>Emergency Contact {{ i }}</h3>
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="emergency_contact{{ i }}_name"
+                value="{{ client | attr('emergency_contact' ~ i ~ '_name') }}">
+        </div>
+        <div class="form-group">
+            <label>Phone</label>
+            <input type="text" name="emergency_contact{{ i }}_phone"
+                value="{{ client | attr('emergency_contact' ~ i ~ '_phone') }}">
+        </div>
+        <div class="form-group">
+            <label>Relationship</label>
+            <input type="text" name="emergency_contact{{ i }}_relationship"
+                value="{{ client | attr('emergency_contact' ~ i ~ '_relationship') }}">
+        </div>
+        <div class="form-group">
+            <label>Area</label>
+            <input type="text" name="emergency_contact{{ i }}_area"
+                value="{{ client | attr('emergency_contact' ~ i ~ '_area') }}">
+        </div>
+        {% endfor %}
+
+
+
+        <button type="submit" class="btn-primary">Update Client</button>
+    </form>
+</div>
+{% endblock %}

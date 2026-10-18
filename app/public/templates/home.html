@@ -1,0 +1,1708 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - WheelQ Car Hire{% endblock %}
+
+{% block content %}
+
+<!-- ============================
+     HERO / WELCOME BANNER
+============================== -->
+<style>
+/* =========================================
+   WHEELQ HERO BANNER
+   ========================================= */
+
+.hero-banner {
+    position: relative;
+
+    min-height: 80vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 100px 20px;
+
+    overflow: hidden;
+
+    background-image:
+        url("/static/images/welcome.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+}
+
+
+/* =========================================
+   HERO OVERLAY
+   ========================================= */
+
+.hero-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(0, 0, 0, 0.82) 0%,
+            rgba(0, 0, 0, 0.60) 45%,
+            rgba(0, 0, 0, 0.45) 100%
+        );
+
+    z-index: 1;
+}
+
+
+/* Red atmospheric glow */
+
+.hero-banner::before {
+    content: "";
+
+    position: absolute;
+
+    width: 500px;
+    height: 500px;
+
+    top: -250px;
+    right: -150px;
+
+    background: rgba(179, 0, 0, 0.25);
+
+    border-radius: 50%;
+
+    filter: blur(30px);
+
+    z-index: 1;
+
+    pointer-events: none;
+}
+
+
+/* =========================================
+   HERO CONTENT
+   ========================================= */
+
+.hero-content {
+    position: relative;
+
+    z-index: 2;
+
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+
+    animation:
+        heroContentEntrance 1s ease-out;
+}
+
+
+/* =========================================
+   HERO TAG
+   ========================================= */
+
+.hero-tag {
+    display: inline-block;
+
+    margin-bottom: 20px;
+
+    padding: 8px 20px;
+
+    border: 1px solid rgba(255, 255, 255, 0.4);
+
+    border-radius: 30px;
+
+    background: rgba(179, 0, 0, 0.88);
+
+    color: #ffffff;
+
+    font-size: 0.75rem;
+
+    font-weight: 700;
+
+    letter-spacing: 2.5px;
+
+    text-transform: uppercase;
+
+    box-shadow:
+        0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+
+/* =========================================
+   HERO HEADING
+   ========================================= */
+
+.hero-content h1 {
+    margin: 0 0 18px;
+
+    color: #ffffff;
+
+    font-size: 4rem;
+
+    font-weight: 850;
+
+    line-height: 1.1;
+
+    letter-spacing: -1px;
+
+    text-shadow:
+        0 5px 20px rgba(0, 0, 0, 0.65);
+}
+
+
+.hero-content h1 span {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #e00000;
+
+    text-shadow:
+        0 3px 15px rgba(179, 0, 0, 0.45);
+}
+
+
+/* =========================================
+   MOTTO
+   ========================================= */
+
+.hero-content p.hero-motto {
+    margin: 0 0 15px;
+
+    color: #ffffff;
+
+    font-size: 1.5rem;
+
+    font-weight: 600;
+
+    font-style: italic;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================
+   DESCRIPTION
+   ========================================= */
+
+.hero-description {
+    max-width: 680px;
+
+    margin: 0 auto 32px;
+
+    color: rgba(255, 255, 255, 0.88);
+
+    font-size: 1.05rem;
+
+    line-height: 1.8;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+
+/* =========================================
+   HERO BUTTONS
+   ========================================= */
+
+.hero-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+/* Primary button */
+
+.hero-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 12px;
+
+    min-width: 190px;
+
+    padding: 14px 28px;
+
+    background: #b30000;
+
+    color: #ffffff;
+
+    border: 2px solid #b30000;
+
+    border-radius: 8px;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.35);
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.hero-btn:hover {
+    background: #e00000;
+
+    border-color: #e00000;
+
+    color: #ffffff;
+
+    transform: translateY(-4px);
+
+    box-shadow:
+        0 14px 30px rgba(179, 0, 0, 0.45);
+}
+
+
+/* Arrow */
+
+.hero-arrow {
+    font-size: 1.25rem;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.hero-btn:hover .hero-arrow {
+    transform: translateX(6px);
+}
+
+
+/* =========================================
+   SECONDARY BUTTON
+   ========================================= */
+
+.hero-secondary-btn {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-width: 160px;
+
+    padding: 14px 25px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    color: #ffffff;
+
+    border: 2px solid rgba(255, 255, 255, 0.65);
+
+    border-radius: 8px;
+
+    font-size: 1rem;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    backdrop-filter: blur(5px);
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+
+.hero-secondary-btn:hover {
+    background: #ffffff;
+
+    border-color: #ffffff;
+
+    color: #1a1a1a;
+
+    transform: translateY(-4px);
+}
+
+
+/* =========================================
+   SCROLL INDICATOR
+   ========================================= */
+
+.hero-scroll-indicator {
+    position: absolute;
+
+    z-index: 3;
+
+    bottom: 25px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    font-size: 0.72rem;
+
+    letter-spacing: 1.5px;
+
+    text-transform: uppercase;
+}
+
+
+.scroll-line {
+    width: 1px;
+
+    height: 35px;
+
+    background: rgba(255, 255, 255, 0.65);
+
+    animation:
+        scrollPulse 1.8s ease-in-out infinite;
+}
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes heroContentEntrance {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateY(35px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateY(0);
+    }
+
+}
+
+
+@keyframes scrollPulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+
+        transform:
+            scaleY(0.7);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+            scaleY(1);
+    }
+
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .hero-banner {
+        min-height: 75vh;
+
+        padding:
+            80px 20px
+            70px;
+    }
+
+
+    .hero-content h1 {
+        font-size: 2.8rem;
+
+        letter-spacing: -0.5px;
+    }
+
+
+    .hero-content p.hero-motto {
+        font-size: 1.25rem;
+    }
+
+
+    .hero-description {
+        font-size: 1rem;
+
+        line-height: 1.7;
+    }
+
+
+    .hero-scroll-indicator {
+        display: none;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .hero-banner {
+        min-height: 72vh;
+
+        padding:
+            70px 15px;
+    }
+
+
+    .hero-tag {
+        font-size: 0.65rem;
+
+        letter-spacing: 1.5px;
+
+        padding:
+            7px 14px;
+    }
+
+
+    .hero-content h1 {
+        font-size: 2.15rem;
+
+        line-height: 1.15;
+    }
+
+
+    .hero-content p.hero-motto {
+        font-size: 1.1rem;
+    }
+
+
+    .hero-description {
+        font-size: 0.92rem;
+
+        margin-bottom: 25px;
+    }
+
+
+    .hero-actions {
+        flex-direction: column;
+
+        width: 100%;
+    }
+
+
+    .hero-btn,
+    .hero-secondary-btn {
+        width: 100%;
+
+        max-width: 300px;
+    }
+
+}
+
+
+
+
+/* =========================================
+   LEASE YOUR CAR PROMO SECTION
+========================================= */
+
+.lease-promo-section {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 480px;
+    padding: 85px 6%;
+    overflow: hidden;
+
+    /* Background image */
+    background-image:
+        /* linear-gradient(
+            90deg,
+            rgba(158, 213, 19, 0.88) 0%,
+            rgba(184, 230, 18, 0.72) 50%,
+            rgba(235, 243, 7, 0.598) 100%
+        ), */
+        url("/static/images/lease2.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    color: #ffffff;
+}
+
+/* Overlay for readability */
+.lease-promo-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+}
+
+/* Content */
+.lease-promo-content {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 850px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.lease-section-tag {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 9px 17px;
+    border: 1px solid rgba(255, 48, 48, 0.6);
+    border-radius: 30px;
+    background: rgba(255, 48, 48, 0.12);
+    color: #ff4545;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.lease-promo-content h2 {
+    margin: 0 0 22px;
+    color: #ffffff;
+    font-size: clamp(34px, 4.5vw, 55px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -1px;
+}
+
+.lease-promo-content h2 span {
+    display: block;
+    margin-top: 7px;
+    color: #ff3636;
+}
+
+.lease-promo-content p {
+    max-width: 650px;
+    margin: 0 auto 30px;
+    color: #e0e0e0;
+    font-size: 15px;
+    line-height: 1.9;
+}
+
+.lease-promo-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 17px;
+}
+
+.lease-promo-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 15px 28px;
+    border: 1px solid #ff3030;
+    border-radius: 6px;
+    background: #ff3030;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 800;
+    text-decoration: none;
+    box-shadow: 0 8px 25px rgba(255, 48, 48, 0.25);
+    transition:
+        background 0.3s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.lease-promo-btn:hover {
+    transform: translateY(-3px);
+    background: #d82020;
+    box-shadow: 0 12px 30px rgba(255, 48, 48, 0.35);
+}
+
+.lease-btn-icon {
+    font-size: 20px;
+}
+
+.lease-promo-note {
+    color: #cccccc;
+    font-size: 12px;
+    letter-spacing: 1px;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .lease-promo-section {
+        min-height: 440px;
+        padding: 65px 22px;
+        background-position: 60% center;
+    }
+
+    .lease-promo-content h2 {
+        font-size: clamp(30px, 8vw, 38px);
+    }
+
+    .lease-promo-content p {
+        font-size: 14px;
+        line-height: 1.8;
+    }
+
+    .lease-promo-btn {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+
+
+.airport-transfer-section {
+    position: relative;
+    min-height: 430px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 90px 20px;
+
+     background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.62),
+            rgba(0, 0, 0, 0.72)
+        ),
+        url("/static/images/airport_transfer.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    overflow: hidden;
+
+}
+
+
+/* Subtle red glow */
+
+.airport-transfer-section::before {
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+    height: 350px;
+
+    background: rgba(179, 0, 0, 0.25);
+
+    border-radius: 50%;
+
+    top: -180px;
+    left: -120px;
+
+    filter: blur(20px);
+}
+
+
+/* Content container */
+
+.airport-transfer-content {
+    position: relative;
+    z-index: 2;
+
+    width: 100%;
+    max-width: 850px;
+
+    text-align: center;
+
+    color: #ffffff;
+
+    padding: 20px;
+}
+
+
+/* Small section label */
+
+.section-tag {
+    display: inline-block;
+
+    margin-bottom: 18px;
+
+    padding: 7px 18px;
+
+    border: 1px solid rgba(255, 255, 255, 0.5);
+
+    border-radius: 30px;
+
+    background: rgba(179, 0, 0, 0.85);
+
+    color: #ffffff;
+
+    font-size: 0.78rem;
+
+    font-weight: 700;
+
+    letter-spacing: 2px;
+
+    text-transform: uppercase;
+}
+
+
+/* Main heading */
+
+.airport-transfer-content h2 {
+    margin: 0 0 20px;
+
+    color: #ffffff;
+
+    font-size: 3rem;
+
+    font-weight: 800;
+
+    line-height: 1.2;
+
+    text-shadow:
+        0 3px 12px rgba(0, 0, 0, 0.6);
+}
+
+
+/* Description */
+
+.airport-transfer-content p {
+    max-width: 700px;
+
+    margin: 0 auto 32px;
+
+    color: rgba(255, 255, 255, 0.92);
+
+    font-size: 1.1rem;
+
+    line-height: 1.8;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+
+/* Book button */
+
+.airport-transfer-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 12px;
+
+    padding: 14px 28px;
+
+    background: #b30000;
+
+    color: #ffffff;
+
+    border: 2px solid #b30000;
+
+    border-radius: 8px;
+
+    font-size: 1rem;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 8px 25px rgba(0, 0, 0, 0.3);
+
+    transition:
+        background-color 0.3s ease,
+        border-color 0.3s ease,
+        transform 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+
+.airport-transfer-btn:hover {
+    background: #e00000;
+
+    border-color: #e00000;
+
+    color: #ffffff;
+
+    transform: translateY(-3px);
+
+    box-shadow:
+        0 12px 30px rgba(179, 0, 0, 0.45);
+}
+
+
+/* Arrow */
+
+/* .btn-arrow {
+    font-size: 1.3rem;
+
+    line-height: 1;
+
+    transition:
+        transform 0.3s ease;
+}
+
+
+.airport-transfer-btn:hover .btn-arrow {
+    transform: translateX(5px);
+} */
+
+
+/* =========================================
+   WHY CHOOSE WHEELQ
+========================================= */
+
+.why-wheelq-section {
+    position: relative;
+    isolation: isolate;
+    padding: 85px 5%;
+    background: black;
+    color: #fff;
+    overflow: hidden;
+    box-sizing: border-box;
+   
+}
+
+.why-wheelq-section *,
+.why-wheelq-section *::before,
+.why-wheelq-section *::after {
+    box-sizing: border-box;
+}
+
+.why-wheelq-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 75%;
+    height: 1px;
+    transform: translateX(-50%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 35, 35, 0.7),
+        transparent
+    );
+}
+
+/* Heading */
+
+.why-wheelq-header {
+    position: relative;
+    z-index: 1;
+    max-width: 760px;
+    margin: 0 auto 42px;
+    text-align: center;
+}
+
+.why-section-tag {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 8px 15px;
+    border: 1px solid rgba(255, 45, 45, 0.4);
+    border-radius: 30px;
+    background: rgba(255, 35, 35, 0.08);
+    color: #ff3636;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+
+.why-wheelq-header h2 {
+    margin: 0 0 16px;
+    color:f#ff3030;
+    font-size: clamp(30px, 3.5vw, 46px);
+    font-weight: 800;
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+.why-wheelq-header h2 span {
+    display: block;
+    margin-top: 4px;
+    color: #ff3030;
+    
+}
+
+
+.why-wheelq-header p {
+    max-width: 760px;
+    margin: 0 auto;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.8;
+}
+
+
+/* Three evenly sized cards */
+
+.why-wheelq-grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 22px;
+    width: 100%;
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+/* Cards */
+
+.why-card {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #292929;
+    border-radius: 16px;
+    background: #111;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.25);
+    transition:
+        transform 0.3s ease,
+        border-color 0.3s ease,
+        box-shadow 0.3s ease;
+}
+
+.why-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 48, 48, 0.7);
+    box-shadow: 0 18px 38px rgba(255, 30, 30, 0.08);
+}
+
+/* Images */
+
+.why-card-image {
+    position: relative;
+    flex: 0 0 auto;
+    height: clamp(175px, 19vw, 245px);
+    overflow: hidden;
+    background: #1a1a1a;
+}
+
+.why-card-image > img,
+.car-slide img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.why-card:hover .why-card-image > img,
+.why-card:hover .car-slide.active img {
+    transform: scale(1.045);
+}
+
+/* Car image carousel */
+
+.car-showcase-card .why-card-image {
+    position: relative;
+}
+
+.car-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.7s ease, visibility 0.7s ease;
+}
+
+.car-slide.active {
+    z-index: 1;
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Image overlay */
+
+.why-card-overlay {
+    position: absolute;
+    z-index: 2;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.02) 15%,
+        rgba(0, 0, 0, 0.15) 55%,
+        rgba(0, 0, 0, 0.78) 100%
+    );
+}
+
+/* Image badges */
+
+.why-card-badge {
+    position: absolute;
+    z-index: 3;
+    top: 15px;
+    left: 15px;
+    max-width: calc(100% - 30px);
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    background: rgba(10, 10, 10, 0.78);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    overflow-wrap: anywhere;
+    backdrop-filter: blur(8px);
+}
+
+/* Card text */
+
+.why-card-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    flex: 1;
+    padding: 23px 20px 25px;
+}
+
+.why-card-icon {
+    display: flex;
+    flex: 0 0 46px;
+    align-items: center;
+    justify-content: center;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(255, 48, 48, 0.25);
+    border-radius: 12px;
+    background: rgba(255, 48, 48, 0.1);
+    font-size: 22px;
+    transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.why-card:hover .why-card-icon {
+    transform: translateY(-3px);
+    background: rgba(255, 48, 48, 0.18);
+}
+
+.why-card-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.why-card-content h3 {
+    margin: 1px 0 10px;
+    color: #fff;
+    font-size: clamp(16px, 1.35vw, 19px);
+    font-weight: 750;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.why-card-content p {
+    margin: 0;
+    color: #a6a6a6;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+/* =========================================
+   TABLETS
+========================================= */
+
+@media (max-width: 1000px) {
+    .why-wheelq-section {
+        padding: 70px 4%;
+    }
+
+    .why-wheelq-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .why-card-image {
+        height: 220px;
+    }
+
+    .why-card-content h3 {
+        font-size: 18px;
+    }
+}
+
+
+
+
+/* Space between homepage sections */
+.why-wheelq-section,
+.lease-promo-section,
+.airport-transfer-section {
+    margin-bottom: 60px;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 640px) {
+    .why-wheelq-section {
+        padding: 58px 18px;
+    }
+
+    .why-wheelq-header {
+        margin-bottom: 30px;
+    }
+
+    .why-wheelq-header h2 {
+        font-size: clamp(28px, 8vw, 34px);
+        letter-spacing: -0.6px;
+    }
+
+    .why-wheelq-header p {
+        font-size: 13px;
+    }
+
+    .why-wheelq-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+        max-width: 440px;
+    }
+
+    .why-card-image {
+        height: 235px;
+    }
+
+    .why-card-content {
+        gap: 14px;
+        padding: 22px 18px 24px;
+    }
+
+    .why-card-icon {
+        flex-basis: 44px;
+        width: 44px;
+        height: 44px;
+        font-size: 21px;
+    }
+
+    .why-card-content h3 {
+        font-size: 18px;
+    }
+
+    .why-card-content p {
+        font-size: 13px;
+    }
+}
+
+/* Reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+    .why-card,
+    .why-card-image img,
+    .why-card-icon,
+    .car-slide {
+        transition: none;
+    }
+
+    .why-card:hover {
+        transform: none;
+    }
+}
+
+
+/* =========================================
+   RESPONSIVE DESIGN
+   ========================================= */
+
+@media (max-width: 768px) {
+
+    .airport-transfer-section {
+        min-height: 400px;
+
+        padding: 70px 20px;
+    }
+
+
+    .airport-transfer-content h2 {
+        font-size: 2.2rem;
+    }
+
+
+    .airport-transfer-content p {
+        font-size: 1rem;
+
+        line-height: 1.7;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .airport-transfer-section {
+        min-height: 380px;
+
+        padding: 60px 15px;
+    }
+
+
+    .section-tag {
+        font-size: 0.7rem;
+
+        letter-spacing: 1.5px;
+
+        padding: 6px 14px;
+    }
+
+
+    .airport-transfer-content h2 {
+        font-size: 1.8rem;
+    }
+
+
+    .airport-transfer-content p {
+        font-size: 0.95rem;
+
+        margin-bottom: 25px;
+    }
+
+
+    .airport-transfer-btn {
+        width: 100%;
+
+        max-width: 300px;
+
+        padding: 13px 20px;
+    }
+
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .why-cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+}
+</style>
+
+<!-- =========================================
+     WHEELQ HERO SECTION
+     ========================================= -->
+
+<section class="hero-banner">
+
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+
+        <span class="hero-tag">
+            WELCOME TO WHEELQ
+        </span>
+
+        <h1>
+            Your Journey.
+            <span>Our Wheels.</span>
+        </h1>
+
+        <p class="hero-motto">
+            Where Every Wheel is Unique.
+        </p>
+
+        <p class="hero-description">
+            Discover reliable, comfortable and well-maintained cars
+            for every journey. Choose your ride and hit the road
+            with confidence.
+        </p>
+
+        <div class="hero-actions">
+
+            <a
+                href="{{ url_for('public.cars') }}"
+                class="btn hero-btn"
+            >
+                Book a Car Now
+
+                <span class="hero-arrow">
+                    →
+                </span>
+            </a>
+
+            <a
+                href="#why-wheelq"
+                class="hero-secondary-btn"
+            >
+                Explore WheelQ
+            </a>
+
+        </div>
+
+    </div>
+
+
+    <!-- Decorative bottom indicator -->
+
+    <div class="hero-scroll-indicator">
+
+        <span>
+            Scroll to explore
+        </span>
+
+        <div class="scroll-line"></div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     WHY CHOOSE WHEELQ
+     ========================================= -->
+
+<section class="why-wheelq-section">
+
+    <div class="why-wheelq-header">
+        <span class="why-section-tag">WHY CHOOSE WHEELQ</span>
+
+        <h2>
+            Your Journey,
+            <span>Our Commitment</span>
+        </h2>
+
+        <p>
+            We make every journey simple, comfortable and reliable
+            by combining quality vehicles, dependable customer support
+            and transparent pricing.
+        </p>
+    </div>
+
+    <div class="why-wheelq-grid">
+
+        <!-- REASON 1: QUALITY CARS -->
+        <div class="why-card car-showcase-card">
+
+            <div class="why-card-image">
+
+                <div class="car-slide active">
+                    <img
+                        src="{{ url_for('public.static', filename='images/lexuses.jpg') }}"
+                        alt="Quality WheelQ cars"
+                        loading="lazy"
+                    >
+                </div>
+
+                <div class="car-slide">
+                    <img
+                        src="{{ url_for('public.static', filename='images/CX5.jpg') }}"
+                        alt="Mazda CX-5"
+                        loading="lazy"
+                    >
+                </div>
+
+                <div class="car-slide">
+                    <img
+                        src="{{ url_for('public.static', filename='images/civic.jpg') }}"
+                        alt="Honda Civic"
+                        loading="lazy"
+                    >
+                </div>
+
+                <div class="car-slide">
+                    <img
+                        src="{{ url_for('public.static', filename='images/axela.jpg') }}"
+                        alt="Mazda Axela"
+                        loading="lazy"
+                    >
+                </div>
+
+                <div class="why-card-overlay"></div>
+
+                <span class="why-card-badge">PREMIUM FLEET</span>
+            </div>
+
+            <div class="why-card-content">
+                <div class="why-card-icon" aria-hidden="true">🚘</div>
+
+                <div class="why-card-text">
+                    <h3>Quality Cars</h3>
+                    <p>
+                        Choose from a variety of clean, reliable and
+                        well-maintained vehicles, ready for business
+                        trips, holidays and everyday travel.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- REASON 2: CUSTOMER SUPPORT -->
+        <div class="why-card support-card">
+
+            <div class="why-card-image support-image">
+                <img
+                    src="{{ url_for('static', filename='images/save.jpeg') }}"
+                    alt="WheelQ customer support"
+                    loading="lazy"
+                >
+
+                <div class="why-card-overlay"></div>
+
+                <span class="why-card-badge">HERE WHEN YOU NEED US</span>
+            </div>
+
+            <div class="why-card-content">
+                <div class="why-card-icon" aria-hidden="true">☎</div>
+
+                <div class="why-card-text">
+                    <h3>Reliable Customer Support</h3>
+                    <p>
+                        Get assistance before, during and after your
+                        journey. Our team is ready to help with bookings,
+                        questions and travel arrangements.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- REASON 3: AFFORDABLE PRICING -->
+        <div class="why-card pricing-card">
+
+            <div class="why-card-image">
+                <img
+                    src="{{ url_for('static', filename='images/affordable.jpeg') }}"
+                    alt="Affordable car hire with WheelQ"
+                    loading="lazy"
+                >
+
+                <div class="why-card-overlay"></div>
+
+                <span class="why-card-badge">GREAT VALUE</span>
+            </div>
+
+            <div class="why-card-content">
+                <div class="why-card-icon" aria-hidden="true">💰</div>
+
+                <div class="why-card-text">
+                    <h3>Affordable & Transparent Pricing</h3>
+                    <p>
+                        Enjoy competitive car-hire rates with clear
+                        pricing, so you can choose a vehicle that suits
+                        your journey and budget.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="lease-promo-section">
+
+    <div class="lease-promo-overlay"></div>
+
+    <div class="lease-promo-content">
+
+        <span class="lease-section-tag">
+            LEASE YOUR CAR
+        </span>
+
+        <h2>
+            Turn Your Car Into
+            <span>Extra Income</span>
+        </h2>
+
+        <p>
+            Have a vehicle that is sitting idle? Let WheelQ put it
+            to work for you. Partner with us and earn from your car
+            while we take care of the customers and bookings.
+        </p>
+
+        <div class="lease-promo-actions">
+
+            <a
+                href="{{ url_for('public.lease_page') }}"
+                class="lease-promo-btn"
+            >
+                <span class="lease-btn-icon">🚘</span>
+                Lease Your Car
+            </a>
+
+            <span class="lease-promo-note">
+                Simple • Reliable • Professional
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- =========================================
+     AIRPORT TRANSFERS
+     ========================================= -->
+
+<section class="airport-transfer-section">
+    
+  
+
+    <div class="airport-transfer-overlay"></div>
+
+    <div class="airport-transfer-content">
+
+        <span class="section-tag">
+            WHEELQ TRANSPORT SERVICES
+        </span>
+
+        <h2>
+            Airport Transfers Made Easy
+        </h2>
+
+        <p>
+            Book a safe, comfortable and convenient airport transfer
+            with WheelQ. Our professional drivers ensure timely pickup
+            and drop-off, making your journey completely hassle-free.
+        </p>
+
+        <a
+            href="{{ url_for('public.airport_transfer') }}"
+            class="airport-transfer-btn"
+        >
+            Book Airport Transfer
+
+            <span class="btn-arrow">
+                →
+            </span>
+        </a>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     CAR SLIDER JAVASCRIPT
+     ========================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const slides = document.querySelectorAll(".car-slide");
+
+    if (slides.length === 0) {
+        return;
+    }
+
+    let currentSlide = 0;
+
+    function showNextCar() {
+
+        slides[currentSlide].classList.remove("active");
+
+        currentSlide =
+            (currentSlide + 1) % slides.length;
+
+        slides[currentSlide].classList.add("active");
+    }
+
+    setInterval(showNextCar, 4500);
+
+});
+
+
+
+document.querySelectorAll(".car-showcase-card").forEach((card) => {
+    const slides = card.querySelectorAll(".car-slide");
+
+    if (slides.length < 2) return;
+
+    let current = 0;
+
+    setInterval(() => {
+        slides[current].classList.remove("active");
+
+        current = (current + 1) % slides.length;
+
+        slides[current].classList.add("active");
+    }, 3500);
+});
+
+</script>
+
+<!-- <section class="lease-section">
+    <h2>Have a Car? Earn From It!</h2>
+    <p>WheelQ welcomes drivers and car owners to lease their vehicles for hiring and earn consistent weekly or monthly income.</p>
+    <a href="/lease" class="btn lease-btn">Lease Your Car</a>
+</section>
+
+<section class="airport-transfer-section">
+
+    <div class="airport-transfer-overlay"></div>
+
+    <div class="airport-transfer-content">
+
+        <span class="section-tag">
+            WHEELQ TRANSPORT SERVICES
+        </span>
+
+        <h2>
+            Airport Transfers Made Easy
+        </h2>
+
+        <p>
+            Book a safe, comfortable and convenient airport transfer
+            with WheelQ. Our professional drivers ensure timely pickup
+            and drop-off, making your journey completely hassle-free.
+        </p>
+
+        <a href="{{ url_for('public.airport_transfer') }}"
+           class="airport-transfer-btn">
+
+            Book Airport Transfer
+
+            <span class="btn-arrow">→</span>
+
+        </a>
+
+    </div>
+
+</section> -->
+
+{% endblock %}

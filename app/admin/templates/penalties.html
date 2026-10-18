@@ -1,0 +1,114 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<style>
+.penalty-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 2rem;
+}
+
+.penalty-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.penalty-title {
+    font-size: 2rem;
+    color: #b30000;
+}
+
+.penalty-table {
+    margin-top: 1.5rem;
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.penalty-table th {
+    background: #b30000;
+    color: #fff;
+    padding: 14px;
+}
+
+.penalty-table td {
+    padding: 12px;
+}
+
+.penalty-table tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.badge.unpaid {
+    background: #ffcc00;
+}
+
+.badge.paid {
+    background: #28a745;
+    color: white;
+}
+
+.pay-btn {
+    background: #b30000;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    text-decoration: none;
+}
+</style>
+
+<div class="penalty-container">
+
+    <div class="penalty-header">
+        <h1 class="penalty-title">Late Return Penalties</h1>
+    </div>
+
+    <table class="penalty-table">
+        <thead>
+            <tr>
+                <th>Client</th>
+                <th>Car</th>
+                <th>Hours Late</th>
+                <th>Amount (KES)</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in penalties %}
+            <tr>
+                <td>{{ p.client_name }}</td>
+                <td>{{ p.registration_number }}</td>
+                <td>{{ "%.2f"|format(p.hours_late) }}</td>
+                <td>{{ p.penalty_amount }}</td>
+                <td>
+                    <span class="badge {{ p.status }}">
+                        {{ p.status }}
+                    </span>
+                </td>
+                <td>
+                    {% if p.status == "unpaid" %}
+                        <a href="{{ url_for('admin.pay_penalty', penalty_id=p.id) }}" class="pay-btn">
+                            Mark Paid
+                        </a>
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+</div>
+
+{% endblock %}

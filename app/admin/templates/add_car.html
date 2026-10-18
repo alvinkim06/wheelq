@@ -1,0 +1,358 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+
+<div class="admin-form-container">
+
+    <h2>Add New Car</h2>
+
+    <form
+        action="{{ url_for('admin.add_car') }}"
+        method="POST"
+        enctype="multipart/form-data"
+    >
+
+        <!-- Car Information -->
+        <div class="form-section">
+
+            <h3>Car Information</h3>
+
+            
+            <!-- APPROVED INVESTORS -->
+            <label for="lease_id">
+                Investor / Vehicle Owner
+            </label>
+
+            <select
+                name="lease_id"
+                id="lease_id"
+                class="form-select"
+                required
+            >
+
+                <option value="">
+                    -- Select Approved Investor --
+                </option>
+
+                {% for lease in leases %}
+
+                    <option value="{{ lease.id }}">
+                        {{ lease.owner_name }}
+                        -
+                        {{ lease.car_model }}
+                        ({{ lease.car_plate }})
+                    </option>
+
+                {% else %}
+
+                    <option value="" disabled>
+                        No approved investors available
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+            <label for="name">Car Name</label>
+            <input
+                type="text"
+                id="name"
+                name="name"
+                required
+            >
+
+
+            <label for="brand">Brand</label>
+            <input
+                type="text"
+                id="brand"
+                name="brand"
+                required
+            >
+
+
+            <label for="price">Price Per Day</label>
+            <input
+                type="number"
+                id="price"
+                name="price"
+                min="0"
+                required
+            >
+
+
+            <label for="registration_number">
+                Registration Number
+            </label>
+
+            <input
+                type="text"
+                id="registration_number"
+                name="registration_number"
+                placeholder="e.g. KDA 123A"
+                required
+
+            >
+
+
+
+
+            <label for="type">
+                Car Type
+            </label>
+
+            <select
+                name="type"
+                id="type"
+                required
+            >
+
+                <option value="">
+                    -- Select Car Type --
+                </option>
+
+                <option value="Saloon Car">
+                    Saloon Car
+                </option>
+
+                <option value="SUV">
+                    SUV
+                </option>
+
+                <option value="Classic Saloon">
+                    Classic Saloon
+                </option>
+
+                <option value="Truck">
+                    Truck
+                </option>
+
+                <option value="7 Seater">
+                    7 Seater
+                </option>
+
+                <option value="14 Seater">
+                    14 Seater
+                </option>
+
+            </select>
+            <div class="form-group">
+                <label for="year">Vehicle Year</label>
+                <input
+                    type="number"
+                    id="year"
+                    name="year"
+                    min="1900"
+                    max="2100"
+                    value="{{ car.year if car else '' }}"
+                >
+            </div>
+
+            <label for="details">
+                Details
+            </label>
+
+            <textarea
+                name="details"
+                id="details"
+                rows="4"
+                placeholder="Enter additional vehicle details..."
+            ></textarea>
+
+        </div>
+
+
+        <!-- INSURANCE -->
+        <div class="form-section">
+
+            <h3>Insurance Details</h3>
+
+            <label for="insurance_provider">
+                Insurance Provider
+            </label>
+
+            <input
+                type="text"
+                id="insurance_provider"
+                name="insurance_provider"
+                placeholder="e.g. ABC Insurance"
+            >
+
+
+            <label for="insurance_expiry">
+                Insurance Expiry Date
+            </label>
+
+            <input
+                type="date"
+                id="insurance_expiry"
+                name="insurance_expiry"
+            >
+
+        </div>
+
+
+        <!-- IMAGES -->
+        <div class="form-section">
+
+            <h3>Vehicle Images</h3>
+
+            <label for="image">
+                Car Profile Image
+            </label>
+
+            <input
+                type="file"
+                id="image"
+                name="image"
+                accept="image/*"
+                required
+            >
+
+
+            <label for="image_front">
+                Front View Image
+            </label>
+
+            <input
+                type="file"
+                id="image_front"
+                name="image_front"
+                accept="image/*"
+            >
+
+
+            <label for="image_rear">
+                Rear View Image
+            </label>
+
+            <input
+                type="file"
+                id="image_rear"
+                name="image_rear"
+                accept="image/*"
+            >
+
+
+            <label for="image_left">
+                Left Side Image
+            </label>
+
+            <input
+                type="file"
+                id="image_left"
+                name="image_left"
+                accept="image/*"
+            >
+
+
+            <label for="image_right">
+                Right Side Image
+            </label>
+
+            <input
+                type="file"
+                id="image_right"
+                name="image_right"
+                accept="image/*"
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="btn-primary"
+        >
+            Add Car
+        </button>
+
+    </form>
+
+</div>
+
+
+<style>
+
+.admin-form-container {
+    max-width: 850px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.admin-form-container h2 {
+    text-align: center;
+    color: #b30000;
+    margin-bottom: 30px;
+}
+
+.form-section {
+    margin-bottom: 30px;
+    padding: 25px;
+    background: #fff6f6;
+    border-radius: 12px;
+    border: 1px solid #eee;
+}
+
+.form-section h3 {
+    color: #b30000;
+    margin-bottom: 20px;
+}
+
+.form-section label {
+    display: block;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 7px;
+    color: #333;
+}
+
+.form-section input,
+.form-section select,
+.form-section textarea {
+    width: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    background: white;
+}
+
+.form-section input:focus,
+.form-section select:focus,
+.form-section textarea:focus {
+    outline: none;
+    border-color: #b30000;
+    box-shadow: 0 0 5px rgba(179,0,0,0.2);
+}
+
+.form-section input[type="file"] {
+    padding: 9px;
+}
+
+.btn-primary {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    background: #b30000;
+    color: white;
+    border: none;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary:hover {
+    background: #ffcc00;
+    color: #222;
+}
+
+</style>
+
+{% endblock %}

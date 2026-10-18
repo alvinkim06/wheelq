@@ -1,0 +1,1362 @@
+{% extends "base.html" %}
+
+{% block title %}Lease Your Car - WheelQ{% endblock %}
+
+{% block content %}
+
+<div class="lease-page">
+
+    <!-- FLASH MESSAGES -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            <div class="flash-container">
+
+                {% for category, message in messages %}
+
+                    <div class="flash-message {{ category }}">
+
+                        <span class="flash-icon">
+                            {% if category == "success" %}
+                                ✓
+                            {% elif category == "danger" %}
+                                !
+                            {% else %}
+                                i
+                            {% endif %}
+                        </span>
+
+                        <span>
+                            {{ message }}
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    {% endwith %}
+
+    <!-- ==============================
+         HERO SECTION
+    =============================== -->
+    <section class="lease-hero">
+
+        <div class="lease-hero-content">
+
+            <span class="lease-badge">
+                PARTNER WITH WHEELQ
+            </span>
+
+            <h1>
+                Lease Your Car
+                <span>With WheelQ</span>
+            </h1>
+
+            <p>
+                Turn your vehicle into an income-generating asset.
+                Submit your car details and our team will review your
+                lease request and get back to you.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==============================
+         MAIN CONTENT
+    =============================== -->
+    <div class="lease-container">
+
+        <!-- INTRODUCTION -->
+        <div class="lease-intro">
+
+            <h2>
+                Submit Your Vehicle
+            </h2>
+
+            <p>
+                Fill in the details below and provide clear images of
+                your vehicle. Our team will review your application
+                before approving the vehicle for our fleet.
+            </p>
+
+        </div>
+
+
+     
+
+
+        <!-- ==============================
+             LEASE FORM
+        =============================== -->
+        <form
+            action="{{ url_for('public.submit_lease') }}"
+            method="POST"
+            enctype="multipart/form-data"
+            class="lease-form"
+        >
+
+            <!-- ==============================
+                 OWNER INFORMATION
+            =============================== -->
+            <div class="form-section">
+
+                <div class="section-heading">
+
+                    <div class="section-number">
+                        01
+                    </div>
+
+                    <div>
+                        <h3>
+                            Owner Information
+                        </h3>
+
+                        <p>
+                            Tell us how we can reach you.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="owner_name">
+                            Full Name
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="owner_name"
+                            name="owner_name"
+                            required
+                            placeholder="Your Full Name"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            Email Address
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            required
+                            placeholder="you@example.com"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="phone">
+                            Phone Number
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="phone"
+                            name="phone"
+                            required
+                            placeholder="0722 123 456"
+                        >
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 VEHICLE INFORMATION
+            =============================== -->
+            <div class="form-section">
+
+                <div class="section-heading">
+
+                    <div class="section-number">
+                        02
+                    </div>
+
+                    <div>
+                        <h3>
+                            Vehicle Information
+                        </h3>
+
+                        <p>
+                            Provide the details of the vehicle you want
+                            to lease to WheelQ.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="form-grid">
+
+                    <div class="form-group">
+
+                        <label for="car_model">
+                            Car Model
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="car_model"
+                            name="car_model"
+                            required
+                            placeholder="Toyota Corolla"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="car_year">
+                            Car Year
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="number"
+                            id="car_year"
+                            name="car_year"
+                            required
+                            min="1900"
+                            max="2099"
+                            placeholder="2020"
+                        >
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="car_plate">
+                            Registration Number
+                            <span>*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            id="car_plate"
+                            name="car_plate"
+                            required
+                            placeholder="KAA 123A"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group full-width">
+
+                    <label for="notes">
+                        Additional Information
+                    </label>
+
+                    <textarea
+                        id="notes"
+                        name="notes"
+                        rows="5"
+                        placeholder="Tell us anything else we should know about the vehicle..."
+                    ></textarea>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 VEHICLE IMAGES
+            =============================== -->
+            <div class="form-section">
+
+                <div class="section-heading">
+
+                    <div class="section-number">
+                        03
+                    </div>
+
+                    <div>
+                        <h3>
+                            Vehicle Images
+                        </h3>
+
+                        <p>
+                            Upload clear images of all four sides of
+                            your vehicle.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="image-upload-grid">
+
+                    <!-- FRONT -->
+                    <div class="upload-box">
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+                        <h4>
+                            Front View
+                        </h4>
+
+                        <p>
+                            Front of the vehicle
+                        </p>
+
+                        <label
+                            for="image_front"
+                            class="upload-button"
+                        >
+                            Choose Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image_front"
+                            name="image_front"
+                            accept="image/*"
+                            required
+                        >
+
+                        <span
+                            class="file-name"
+                            id="front-file-name"
+                        >
+                            No file selected
+                        </span>
+
+                    </div>
+
+
+                    <!-- REAR -->
+                    <div class="upload-box">
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+                        <h4>
+                            Rear View
+                        </h4>
+
+                        <p>
+                            Rear of the vehicle
+                        </p>
+
+                        <label
+                            for="image_rear"
+                            class="upload-button"
+                        >
+                            Choose Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image_rear"
+                            name="image_rear"
+                            accept="image/*"
+                            required
+                        >
+
+                        <span
+                            class="file-name"
+                            id="rear-file-name"
+                        >
+                            No file selected
+                        </span>
+
+                    </div>
+
+
+                    <!-- LEFT -->
+                    <div class="upload-box">
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+                        <h4>
+                            Left Side
+                        </h4>
+
+                        <p>
+                            Left side of the vehicle
+                        </p>
+
+                        <label
+                            for="image_left"
+                            class="upload-button"
+                        >
+                            Choose Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image_left"
+                            name="image_left"
+                            accept="image/*"
+                            required
+                        >
+
+                        <span
+                            class="file-name"
+                            id="left-file-name"
+                        >
+                            No file selected
+                        </span>
+
+                    </div>
+
+
+                    <!-- RIGHT -->
+                    <div class="upload-box">
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+                        <h4>
+                            Right Side
+                        </h4>
+
+                        <p>
+                            Right side of the vehicle
+                        </p>
+
+                        <label
+                            for="image_right"
+                            class="upload-button"
+                        >
+                            Choose Image
+                        </label>
+
+                        <input
+                            type="file"
+                            id="image_right"
+                            name="image_right"
+                            accept="image/*"
+                            required
+                        >
+
+                        <span
+                            class="file-name"
+                            id="right-file-name"
+                        >
+                            No file selected
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ==============================
+                 SUBMISSION
+            =============================== -->
+            <div class="lease-submit-section">
+
+                <div class="submit-info">
+
+                    <strong>
+                        Ready to submit?
+                    </strong>
+
+                    <p>
+                        By submitting this form, you are requesting
+                        WheelQ to review your vehicle for leasing.
+                    </p>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="lease-submit-btn"
+                >
+                    Submit Lease Request
+                    <span>→</span>
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- ==============================
+     STYLING
+================================ -->
+<style>
+
+    /* =================================
+       GENERAL PAGE
+    ================================= */
+
+    .lease-page {
+        width: 100%;
+        background: #fff6f6;
+        color: #222;
+        padding-bottom: 60px;
+    }
+
+
+    /* =================================
+       HERO SECTION
+    ================================= */
+
+    .lease-hero {
+        max-width: 1200px;
+        margin: 20px auto 40px;
+
+        min-height: 360px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        padding: 60px 30px;
+
+        box-sizing: border-box;
+
+        border-radius: 20px;
+
+        background:
+            linear-gradient(
+                rgba(150, 0, 0, 0.78),
+                rgba(179, 0, 0, 0.65)
+            ),
+            url('/static/images/hero-car.jpg')
+            center / cover no-repeat;
+
+        color: #ffffff;
+
+        text-align: center;
+    }
+
+
+    .lease-hero-content {
+        max-width: 800px;
+    }
+
+
+    .lease-badge {
+        display: inline-block;
+
+        padding: 8px 18px;
+
+        margin-bottom: 15px;
+
+        background: #ffcc00;
+
+        color: #800000;
+
+        border-radius: 30px;
+
+        font-size: 12px;
+
+        font-weight: 800;
+
+        letter-spacing: 1.5px;
+    }
+
+
+    .lease-hero h1 {
+        margin: 0;
+
+        font-size: 3rem;
+
+        font-weight: 800;
+
+        line-height: 1.2;
+    }
+
+
+    .lease-hero h1 span {
+        color: #ffcc00;
+    }
+
+
+    .lease-hero p {
+        max-width: 700px;
+
+        margin: 20px auto 0;
+
+        font-size: 1.1rem;
+
+        line-height: 1.7;
+
+        color: #ffffff;
+
+        opacity: 0.95;
+    }
+
+
+    /* =================================
+       MAIN CONTAINER
+    ================================= */
+
+    .lease-container {
+        max-width: 1100px;
+
+        margin: 0 auto;
+
+        padding: 0 20px;
+    }
+
+
+    /* =================================
+       INTRODUCTION
+    ================================= */
+
+    .lease-intro {
+        text-align: center;
+
+        max-width: 750px;
+
+        margin: 0 auto 35px;
+    }
+
+
+    .lease-intro h2 {
+        margin: 0 0 10px;
+
+        color: #900;
+
+        font-size: 2rem;
+    }
+
+
+    .lease-intro p {
+        margin: 0;
+
+        color: #666;
+
+        line-height: 1.7;
+
+        font-size: 1rem;
+    }
+
+
+    /* =================================
+       FLASH MESSAGES
+    ================================= */
+
+    .flash-container {
+        margin-bottom: 25px;
+    }
+
+
+    .flash-message {
+        display: flex;
+
+        align-items: center;
+
+        gap: 12px;
+
+        padding: 14px 18px;
+
+        margin-bottom: 10px;
+
+        border-radius: 10px;
+
+        font-size: 14px;
+
+        font-weight: 500;
+    }
+
+
+    .flash-icon {
+        width: 26px;
+        height: 26px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        border-radius: 50%;
+
+        font-weight: 700;
+    }
+
+
+    .flash-message.success {
+        background: #e9f8ee;
+
+        color: #176b35;
+
+        border: 1px solid #b8e5c6;
+    }
+
+
+    .flash-message.success .flash-icon {
+        background: #1f9d4c;
+
+        color: #ffffff;
+    }
+
+
+    .flash-message.danger,
+    .flash-message.error {
+        background: #fff0f0;
+
+        color: #a00000;
+
+        border: 1px solid #f1baba;
+    }
+
+
+    .flash-message.danger .flash-icon,
+    .flash-message.error .flash-icon {
+        background: #b30000;
+
+        color: #ffffff;
+    }
+
+
+    /* =================================
+       FORM
+    ================================= */
+
+    .lease-form {
+        background: #ffffff;
+
+        border-radius: 18px;
+
+        padding: 35px;
+
+        box-shadow:
+            0 8px 30px rgba(0, 0, 0, 0.08);
+
+        border: 1px solid #eeeeee;
+    }
+
+
+    /* =================================
+       FORM SECTIONS
+    ================================= */
+
+    .form-section {
+        padding-bottom: 35px;
+
+        margin-bottom: 35px;
+
+        border-bottom: 1px solid #eeeeee;
+    }
+
+
+    .section-heading {
+        display: flex;
+
+        align-items: center;
+
+        gap: 15px;
+
+        margin-bottom: 25px;
+    }
+
+
+    .section-number {
+        width: 45px;
+        height: 45px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        flex-shrink: 0;
+
+        background: #b30000;
+
+        color: #ffffff;
+
+        border-radius: 50%;
+
+        font-size: 13px;
+
+        font-weight: 800;
+    }
+
+
+    .section-heading h3 {
+        margin: 0 0 4px;
+
+        color: #8f0000;
+
+        font-size: 1.3rem;
+    }
+
+
+    .section-heading p {
+        margin: 0;
+
+        color: #777;
+
+        font-size: 13px;
+    }
+
+
+    /* =================================
+       FORM GRID
+    ================================= */
+
+    .form-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(3, 1fr);
+
+        gap: 20px;
+    }
+
+
+    .form-group {
+        display: flex;
+
+        flex-direction: column;
+    }
+
+
+    .form-group.full-width {
+        margin-top: 20px;
+    }
+
+
+    .form-group label {
+        margin-bottom: 8px;
+
+        color: #333;
+
+        font-size: 14px;
+
+        font-weight: 700;
+    }
+
+
+    .form-group label span {
+        color: #b30000;
+    }
+
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+
+        padding: 13px 14px;
+
+        box-sizing: border-box;
+
+        border: 1px solid #d8d8d8;
+
+        border-radius: 9px;
+
+        background: #ffffff;
+
+        color: #222;
+
+        font-family: inherit;
+
+        font-size: 14px;
+
+        outline: none;
+
+        transition:
+            border-color 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+
+    .form-group textarea {
+        resize: vertical;
+
+        min-height: 120px;
+    }
+
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        border-color: #b30000;
+
+        box-shadow:
+            0 0 0 3px rgba(179, 0, 0, 0.10);
+    }
+
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+        color: #aaa;
+    }
+
+
+    /* =================================
+       IMAGE UPLOAD SECTION
+    ================================= */
+
+    .image-upload-grid {
+        display: grid;
+
+        grid-template-columns:
+            repeat(4, 1fr);
+
+        gap: 18px;
+    }
+
+
+    .upload-box {
+        position: relative;
+
+        display: flex;
+
+        flex-direction: column;
+
+        align-items: center;
+
+        justify-content: center;
+
+        min-height: 210px;
+
+        padding: 20px;
+
+        box-sizing: border-box;
+
+        background: #fffafa;
+
+        border: 2px dashed #e1b5b5;
+
+        border-radius: 14px;
+
+        text-align: center;
+
+        transition:
+            border-color 0.25s ease,
+            background-color 0.25s ease,
+            transform 0.25s ease;
+    }
+
+
+    .upload-box:hover {
+        border-color: #b30000;
+
+        background: #fff5f5;
+
+        transform: translateY(-3px);
+    }
+
+
+    .upload-icon {
+        width: 50px;
+        height: 50px;
+
+        display: flex;
+
+        align-items: center;
+        justify-content: center;
+
+        margin-bottom: 12px;
+
+        background: #ffe7e7;
+
+        color: #b30000;
+
+        border-radius: 50%;
+
+        font-size: 22px;
+
+        font-weight: 700;
+    }
+
+
+    .upload-box h4 {
+        margin: 0 0 5px;
+
+        color: #333;
+
+        font-size: 15px;
+    }
+
+
+    .upload-box p {
+        margin: 0 0 14px;
+
+        color: #888;
+
+        font-size: 12px;
+    }
+
+
+    .upload-box input[type="file"] {
+        position: absolute;
+
+        width: 1px;
+        height: 1px;
+
+        opacity: 0;
+
+        overflow: hidden;
+    }
+
+
+    .upload-button {
+        display: inline-block;
+
+        padding: 8px 15px;
+
+        background: #b30000;
+
+        color: #ffffff;
+
+        border-radius: 7px;
+
+        cursor: pointer;
+
+        font-size: 12px;
+
+        font-weight: 700;
+
+        transition:
+            background-color 0.25s ease;
+    }
+
+
+    .upload-button:hover {
+        background: #ffcc00;
+
+        color: #800000;
+    }
+
+
+    .file-name {
+        display: block;
+
+        max-width: 100%;
+
+        margin-top: 10px;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+
+        white-space: nowrap;
+
+        color: #888;
+
+        font-size: 11px;
+    }
+
+
+    /* =================================
+       SUBMIT SECTION
+    ================================= */
+
+    .lease-submit-section {
+        display: flex;
+
+        align-items: center;
+
+        justify-content: space-between;
+
+        gap: 25px;
+
+        padding-top: 5px;
+    }
+
+
+    .submit-info {
+        flex: 1;
+    }
+
+
+    .submit-info strong {
+        display: block;
+
+        margin-bottom: 5px;
+
+        color: #333;
+
+        font-size: 15px;
+    }
+
+
+    .submit-info p {
+        margin: 0;
+
+        color: #777;
+
+        font-size: 13px;
+
+        line-height: 1.5;
+    }
+
+
+    .lease-submit-btn {
+        display: inline-flex;
+
+        align-items: center;
+
+        justify-content: center;
+
+        gap: 12px;
+
+        padding: 14px 25px;
+
+        background: #b30000;
+
+        color: #ffffff;
+
+        border: none;
+
+        border-radius: 9px;
+
+        cursor: pointer;
+
+        font-family: inherit;
+
+        font-size: 14px;
+
+        font-weight: 700;
+
+        white-space: nowrap;
+
+        transition:
+            background-color 0.25s ease,
+            transform 0.25s ease,
+            box-shadow 0.25s ease;
+    }
+
+
+    .lease-submit-btn span {
+        font-size: 20px;
+
+        line-height: 1;
+    }
+
+
+    .lease-submit-btn:hover {
+        background: #ffcc00;
+
+        color: #800000;
+
+        transform: translateY(-2px);
+
+        box-shadow:
+            0 6px 15px rgba(179, 0, 0, 0.20);
+    }
+
+
+    /* =================================
+       TABLET
+    ================================= */
+
+    @media (max-width: 900px) {
+
+        .form-grid {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+
+        .image-upload-grid {
+            grid-template-columns:
+                repeat(2, 1fr);
+        }
+
+
+        .lease-hero {
+            margin-left: 15px;
+
+            margin-right: 15px;
+        }
+
+
+        .lease-hero h1 {
+            font-size: 2.5rem;
+        }
+
+    }
+
+
+    /* =================================
+       MOBILE
+    ================================= */
+
+    @media (max-width: 600px) {
+
+        .lease-page {
+            padding-bottom: 35px;
+        }
+
+
+        .lease-hero {
+            min-height: 300px;
+
+            margin: 10px;
+
+            padding: 50px 20px;
+
+            border-radius: 15px;
+        }
+
+
+        .lease-hero h1 {
+            font-size: 2rem;
+        }
+
+
+        .lease-hero p {
+            font-size: 0.95rem;
+        }
+
+
+        .lease-container {
+            padding: 0 12px;
+        }
+
+
+        .lease-intro h2 {
+            font-size: 1.6rem;
+        }
+
+
+        .lease-form {
+            padding: 20px 16px;
+
+            border-radius: 14px;
+        }
+
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .image-upload-grid {
+            grid-template-columns: 1fr;
+        }
+
+
+        .section-heading {
+            align-items: flex-start;
+        }
+
+
+        .section-number {
+            width: 38px;
+            height: 38px;
+
+            font-size: 11px;
+        }
+
+
+        .section-heading h3 {
+            font-size: 1.1rem;
+        }
+
+
+        .lease-submit-section {
+            flex-direction: column;
+
+            align-items: stretch;
+
+            text-align: center;
+        }
+
+
+        .lease-submit-btn {
+            width: 100%;
+        }
+
+    }
+
+</style>
+
+
+<!-- ==============================
+     FILE NAME SCRIPT
+================================ -->
+<script>
+
+    function showFileName(inputId, outputId) {
+
+        const input = document.getElementById(inputId);
+
+        const output = document.getElementById(outputId);
+
+        input.addEventListener("change", function () {
+
+            if (this.files && this.files.length > 0) {
+
+                output.textContent = this.files[0].name;
+
+            } else {
+
+                output.textContent = "No file selected";
+
+            }
+
+        });
+
+    }
+
+
+    showFileName(
+        "image_front",
+        "front-file-name"
+    );
+
+
+    showFileName(
+        "image_rear",
+        "rear-file-name"
+    );
+
+
+    showFileName(
+        "image_left",
+        "left-file-name"
+    );
+
+
+    showFileName(
+        "image_right",
+        "right-file-name"
+    );
+
+</script>
+
+{% endblock %}

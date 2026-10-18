@@ -1,0 +1,725 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+
+<div class="clients-page">
+
+<!-- Page Header -->
+<div class="clients-header">
+    <div class="clients-heading">
+        <span class="clients-eyebrow">WHEELQ ADMINISTRATION</span>
+        <h1>Client Management</h1>
+        <p>Manage registered customers, view booking activity, and update client records.</p>
+    </div>
+
+    <a href="{{ url_for('admin.register_client') }}" class="btn-register">
+        <span class="btn-plus">+</span>
+        Register Client
+    </a>
+</div>
+
+<!-- Search and Filters -->
+<div class="clients-filter-card">
+    <form method="get" action="{{ url_for('admin.clients_page') }}" class="clients-filter-form">
+
+        <div class="filter-search">
+            <label for="clientSearch">Search clients</label>
+            <div class="search-input-wrap">
+                <span class="search-icon">⌕</span>
+                <input
+                    type="text"
+                    id="clientSearch"
+                    name="search"
+                    value="{{ search or '' }}"
+                    placeholder="Name, email, phone or ID number..."
+                >
+            </div>
+        </div>
+
+        <div class="filter-status">
+            <label for="clientStatus">Client status</label>
+            <select id="clientStatus" name="status">
+                <option value="" {% if not status %}selected{% endif %}>All Clients</option>
+                <option value="active" {% if status == "active" %}selected{% endif %}>Active</option>
+                <option value="inactive" {% if status == "inactive" %}selected{% endif %}>Inactive</option>
+            </select>
+        </div>
+
+        <div class="filter-actions">
+            <button type="submit" class="btn-filter">Apply Filters</button>
+
+            {% if search or status %}
+                <a href="{{ url_for('admin.clients_page') }}" class="btn-clear">Clear</a>
+            {% endif %}
+        </div>
+
+    </form>
+</div>
+
+<!-- Clients Table -->
+<div class="clients-table-card">
+
+    <div class="table-card-header">
+        <div>
+            <h2>Registered Clients</h2>
+            <p>Customer records and booking activity</p>
+        </div>
+
+        <span class="table-label">CLIENT DIRECTORY</span>
+    </div>
+
+    <div class="clients-table-wrap">
+        <table class="clients-table">
+            <thead>
+                <tr>
+                    <th>CLIENT</th>
+                    <th>EMAIL ADDRESS</th>
+                    <th>PHONE NUMBER</th>
+                    <th>TOTAL BOOKINGS</th>
+                    <th class="actions-heading">ACTIONS</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for c in clients %}
+                <tr>
+                    <td>
+                        <div class="client-identity">
+                            <div class="client-avatar">
+                                {{ (c.name or 'C')[:1]|upper }}
+                            </div>
+                            <div class="client-name">
+                                <strong>{{ c.name or 'Unnamed Client' }}</strong>
+                                <span>Client ID: {{ c.id }}</span>
+                            </div>
+                        </div>
+                    </td>
+
+                    <td>
+                        <span class="client-contact">{{ c.email or '—' }}</span>
+                    </td>
+
+                    <td>
+                        <span class="client-contact">{{ c.phone or '—' }}</span>
+                    </td>
+
+                    <td>
+                        <span class="booking-count">{{ c.total or 0 }}</span>
+                    </td>
+
+                    <td>
+                        <div class="client-actions">
+
+                            {% if c.total == 0 or c.has_incomplete_booking %}
+                                <a href="{{ url_for('admin.create_booking', client_id=c.id) }}"
+                                class="btn-create-booking">
+                                    + Create Booking
+                                </a>
+                            {% endif %}
+                            <a href="{{ url_for('admin.client_details', client_id=c.id) }}"
+                               class="btn-client-details">
+                                Details
+                            </a>
+
+                            <a href="{{ url_for('admin.edit_client', client_id=c.id) }}"
+                               class="btn-client-edit">
+                                Edit
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">
+                        <div class="clients-empty">
+                            <div class="empty-icon">⌕</div>
+                            <h3>No clients found</h3>
+                            <p>
+                                {% if search or status %}
+                                    Try changing your search or filters.
+                                {% else %}
+                                    Registered clients will appear here.
+                                {% endif %}
+                            </p>
+
+                            {% if search or status %}
+                                <a href="{{ url_for('admin.clients_page') }}">Clear filters</a>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="clients-table-footer">
+        <span>WheelQ Client Directory</span>
+        <span>Customer Management</span>
+    </div>
+
+</div>
+
+</div>
+
+<style>
+/* ===============================
+   WHEELQ CLIENT MANAGEMENT
+   =============================== */
+
+.clients-page {
+    --wheelq-red: #b30000;
+    --wheelq-red-dark: #850000;
+    --wheelq-yellow: #ffcc00;
+    --wheelq-text: #252936;
+    --wheelq-muted: #737b8c;
+    --wheelq-border: #e8eaf0;
+
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 28px;
+    box-sizing: border-box;
+    color: var(--wheelq-text);
+    font-family: inherit;
+}
+
+.clients-page * {
+    box-sizing: border-box;
+}
+
+.clients-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    margin-bottom: 26px;
+}
+
+.clients-eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    color: var(--wheelq-red);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1.8px;
+}
+
+.clients-heading h1 {
+    margin: 0 0 8px;
+    color: var(--wheelq-text);
+    font-size: clamp(25px, 3vw, 32px);
+    font-weight: 800;
+    letter-spacing: -0.8px;
+}
+
+.clients-heading p {
+    margin: 0;
+    color: var(--wheelq-muted);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.btn-register {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-shrink: 0;
+    min-height: 46px;
+    padding: 0 19px;
+    border: 1px solid var(--wheelq-red);
+    border-radius: 9px;
+    background: var(--wheelq-red);
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 13px;
+    font-weight: 750;
+    box-shadow: 0 5px 12px rgba(179, 0, 0, 0.13);
+    transition: background .2s, transform .2s;
+}
+
+.btn-register:hover {
+    background: var(--wheelq-red-dark);
+    transform: translateY(-1px);
+}
+
+.btn-plus {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 23px;
+    height: 23px;
+    border-radius: 6px;
+    background: var(--wheelq-yellow);
+    color: #292929;
+    font-size: 20px;
+    line-height: 1;
+}
+
+/* Search and filters */
+
+.clients-filter-card {
+    margin-bottom: 25px;
+    padding: 22px;
+    border: 1px solid var(--wheelq-border);
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(20, 27, 45, .035);
+}
+
+.clients-filter-form {
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+}
+
+.filter-search {
+    flex: 1;
+    min-width: 220px;
+}
+
+.filter-status {
+    width: 190px;
+    flex-shrink: 0;
+}
+
+.clients-filter-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #454b59;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.search-input-wrap {
+    position: relative;
+}
+
+.search-icon {
+    position: absolute;
+    top: 50%;
+    left: 13px;
+    color: #8991a0;
+    font-size: 23px;
+    transform: translateY(-54%);
+    pointer-events: none;
+}
+
+.search-input-wrap input,
+.filter-status select {
+    display: block;
+    width: 100%;
+    height: 45px;
+    padding: 0 13px;
+    border: 1px solid #dfe3eb;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--wheelq-text);
+    font: inherit;
+    font-size: 13px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.search-input-wrap input {
+    padding-left: 42px;
+}
+
+.search-input-wrap input:focus,
+.filter-status select:focus {
+    border-color: var(--wheelq-red);
+    box-shadow: 0 0 0 3px rgba(179, 0, 0, .08);
+}
+
+.search-input-wrap input::placeholder {
+    color: #a0a6b2;
+}
+
+.filter-actions {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+}
+
+.btn-filter,
+.btn-clear {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 45px;
+    padding: 0 17px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: .2s;
+}
+
+.btn-filter {
+    border: 1px solid var(--wheelq-red);
+    background: var(--wheelq-red);
+    color: #fff;
+}
+
+.btn-filter:hover {
+    background: var(--wheelq-red-dark);
+}
+
+.btn-clear {
+    border: 1px solid #dfe3eb;
+    background: #fff;
+    color: #515969;
+}
+
+.btn-clear:hover {
+    border-color: #b9bec8;
+    background: #f7f8fa;
+}
+
+/* Table card */
+
+.clients-table-card {
+    overflow: hidden;
+    border: 1px solid var(--wheelq-border);
+    border-radius: 13px;
+    background: #fff;
+    box-shadow: 0 4px 18px rgba(20, 27, 45, .04);
+}
+
+.table-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 23px 25px;
+    border-bottom: 1px solid var(--wheelq-border);
+}
+
+.table-card-header h2 {
+    margin: 0 0 6px;
+    color: var(--wheelq-text);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.table-card-header p {
+    margin: 0;
+    color: var(--wheelq-muted);
+    font-size: 12px;
+}
+
+.table-label {
+    padding: 8px 11px;
+    border: 1px solid #f0df9a;
+    border-radius: 6px;
+    background: #fff9df;
+    color: #725800;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .8px;
+    white-space: nowrap;
+}
+
+.clients-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.clients-table {
+    width: 100%;
+    min-width: 760px;
+    margin: 0;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.clients-table thead th {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--wheelq-border);
+    background: #f8f9fb;
+    color: #737b8c;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .7px;
+    white-space: nowrap;
+}
+
+.clients-table tbody td {
+    padding: 17px 20px;
+    border-bottom: 1px solid #eef0f4;
+    color: #454b59;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.clients-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.clients-table tbody tr {
+    transition: background .15s;
+}
+
+.clients-table tbody tr:hover {
+    background: #fffdf8;
+}
+
+.client-identity {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 175px;
+}
+
+.client-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 39px;
+    flex-shrink: 0;
+    border: 1px solid #f1dada;
+    border-radius: 10px;
+    background: #fff0f0;
+    color: var(--wheelq-red);
+    font-size: 15px;
+    font-weight: 850;
+}
+
+.client-name {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.client-name strong {
+    color: #292e3a;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.client-name span {
+    color: #9198a6;
+    font-size: 11px;
+}
+
+.client-contact {
+    overflow-wrap: anywhere;
+    color: #555d6d;
+}
+
+.booking-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 33px;
+    height: 29px;
+    padding: 0 9px;
+    border: 1px solid #f0df9a;
+    border-radius: 7px;
+    background: #fff9df;
+    color: #725800;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.actions-heading {
+    text-align: center;
+}
+
+.client-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-client-details,
+.btn-client-edit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 66px;
+    min-height: 33px;
+    padding: 0 11px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none !important;
+    transition: .2s;
+}
+
+.btn-client-details {
+    border: 1px solid #e2e5eb;
+    background: #fff;
+    color: #454b59 !important;
+}
+
+.btn-client-details:hover {
+    border-color: #c7ccd5;
+    background: #f5f6f8;
+}
+
+.btn-client-edit {
+    border: 1px solid #f0df9a;
+    background: #fff9df;
+    color: #705600 !important;
+}
+
+.btn-client-edit:hover {
+    border-color: var(--wheelq-yellow);
+    background: var(--wheelq-yellow);
+    color: #272727 !important;
+}
+
+/* Empty state and footer */
+
+.clients-empty {
+    padding: 55px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 14px;
+    border-radius: 13px;
+    background: #fff0f0;
+    color: var(--wheelq-red);
+    font-size: 30px;
+}
+
+.clients-empty h3 {
+    margin: 0 0 8px;
+    color: var(--wheelq-text);
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.clients-empty p {
+    margin: 0 0 13px;
+    color: var(--wheelq-muted);
+    font-size: 13px;
+}
+
+.clients-empty a {
+    color: var(--wheelq-red);
+    font-size: 12px;
+    font-weight: 750;
+    text-decoration: none;
+}
+
+.clients-empty a:hover {
+    text-decoration: underline;
+}
+
+.clients-table-footer {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 23px;
+    border-top: 1px solid var(--wheelq-border);
+    background: #fcfcfd;
+    color: #8a91a0;
+    font-size: 11px;
+}
+
+
+.btn-create-booking {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 11px;
+    border-radius: 7px;
+    background: #b30000;
+    border: 1px solid #b30000;
+    color: #fff !important;
+    font-size: 11px;
+    font-weight: 750;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: background .2s, transform .2s;
+}
+
+.btn-create-booking:hover {
+    background: #850000;
+    transform: translateY(-1px);
+}
+
+
+/* Responsive layout */
+
+@media (max-width: 900px) {
+    .clients-page {
+        padding: 20px;
+    }
+
+    .clients-filter-form {
+        flex-wrap: wrap;
+    }
+
+    .filter-search {
+        flex-basis: 100%;
+    }
+
+    .filter-status {
+        flex: 1;
+        width: auto;
+    }
+}
+
+@media (max-width: 600px) {
+    .clients-page {
+        padding: 14px;
+    }
+
+    .clients-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .btn-register {
+        align-self: flex-start;
+    }
+
+    .clients-filter-card {
+        padding: 15px;
+    }
+
+    .filter-search,
+    .filter-status {
+        flex-basis: 100%;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .filter-actions {
+        width: 100%;
+    }
+
+    .btn-filter {
+        flex: 1;
+    }
+
+    .table-card-header {
+        padding: 18px;
+    }
+
+    .table-label {
+        display: none;
+    }
+
+    .clients-table-footer {
+        padding: 13px 15px;
+        font-size: 10px;
+    }
+}
+</style>
+
+{% endblock %}

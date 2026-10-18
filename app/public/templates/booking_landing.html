@@ -1,0 +1,139 @@
+<!-- booking_landing.html -->
+{% extends "base.html" %}
+{% block title %}Book a Car - WheelQ{% endblock %}
+{% block content %}
+
+<link rel="stylesheet" href="{{ url_for('public.static', filename='css/style.css') }}">
+
+<!-- ============================
+     BOOKING HERO BANNER
+============================ -->
+<div class="hero-banner" style="
+    background: linear-gradient(rgba(255, 0, 0, 0.6), rgba(255, 204, 0, 0.5)),
+    url('/static/images/book-hero.jpg') center/cover no-repeat;">
+    <div class="hero-content">
+        <h1>Book Your <span>Perfect Ride</span></h1>
+        <p class="motto">Fast • Reliable • Secure Car Hire</p>
+    </div>
+</div>
+
+
+<!-- ============================
+     BOOKING FORM SECTION
+============================ -->
+<div class="contact-container" style="margin-top: 30px;">
+    <h2 style="color:#b30000; font-size:2rem; margin-bottom:10px;">Booking Details</h2>
+    <p style="max-width:700px; margin: auto; color:#444;">
+        Fill in your details below to complete your booking request. A representative 
+        from WheelQ will contact you shortly to finalize your reservation.
+    </p>
+
+    <div class="contact-grid" style="margin-top: 40px;">
+
+        <!-- ======================
+             BOOKING FORM
+        ======================= -->
+        <div class="contact-form">
+            <h2>Enter Your Details</h2>
+
+            <form method="POST" action="{{ url_for('public.book_car', car_id=car.id) }}">
+                <!-- <div class="form-group">
+                    <label>Official ID</label>
+                    <input type="text" name="official_id" placeholder="National ID or Passport" required>
+                </div> -->
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="full_name" placeholder="Your full name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" placeholder="07XX XXX XXX" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="your@gmail.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Pickup Date</label>
+                    <input type="date" name="pickup_date" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Drop-off Date</label>
+                    <input type="date" name="dropoff_date" required>
+                </div>
+                <div class="form-group">
+                    <label>Total Amount (KES)</label>
+                    <input type="text" id="total_amount" name="amount" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes (optional)</label>
+                    <textarea name="notes" rows="4" placeholder="Any special instructions?"></textarea>
+                </div>
+               
+                    <button type="submit"
+                            style="padding:12px 25px; background:#b30000; color:#fff;
+                                border:none; border-radius:10px; font-size:1rem;
+                                font-weight:bold; cursor:pointer;">
+                        Confirm Booking
+                    </button>
+            
+
+            </form>
+        </div>
+
+
+        <!-- ======================
+             CAR SUMMARY CARD
+        ======================= -->
+        <div class="contact-info">
+            <h2>Car Summary</h2>
+
+            <div style="text-align:center;">
+                <img src="{{ url_for('static', filename='images/' ~ car.image) }}" 
+                     alt="{{ car.name }}" 
+                     style="width:100%; border-radius:12px;">
+            </div>
+
+            <h3 style="margin-top:15px; color:#b30000;">{{ car.name }}</h3>
+            <p><strong>Brand:</strong> {{ car.brand }}</p>
+            <p><strong>Price per day:</strong> KES {{ car.price }}</p>
+            <p><strong>Details:</strong> {{ car.details }}</p>
+
+            <a href="{{ url_for('public.car_details', car_id=car.id) }}"
+               style="display:inline-block; margin-top:20px;
+                      padding:10px 20px; background:#ffcc00; color:#900;
+                      border-radius:10px; text-decoration:none; font-weight:bold;">
+                View Full Details
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- ====== Calculate Total Amount Script ====== -->
+<script>
+    const pricePerDay = { car:price | safe }; // Pass from backend
+    const pickupInput = document.getElementById("pickup_date");
+    const dropoffInput = document.getElementById("dropoff_date");
+    const amountInput = document.getElementById("total_amount");
+
+    function calculateAmount() {
+        const pickupDate = new Date(pickupInput.value);
+        const dropoffDate = new Date(dropoffInput.value);
+
+        if (pickupDate && dropoffDate && dropoffDate >= pickupDate) {
+            let days = Math.ceil((dropoffDate - pickupDate) / (1000 * 60 * 60 * 24)) || 1;
+            amountInput.value = days * pricePerDay;
+        } else {
+            amountInput.value = 0;
+        }
+    }
+
+    pickupInput.addEventListener("change", calculateAmount);
+    dropoffInput.addEventListener("change", calculateAmount);
+    </script>
+{% endblock %}

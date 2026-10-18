@@ -1,0 +1,147 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<h3 class="mb-3">💰 Earnings & Expenses ({{ period|capitalize }})</h3>
+
+<div class="btn-group mb-3">
+    <a class="btn btn-outline-primary" href="?period=daily">Daily</a>
+    <a class="btn btn-outline-primary" href="?period=weekly">Weekly</a>
+    <a class="btn btn-outline-primary" href="?period=monthly">Monthly</a>
+    <a class="btn btn-outline-primary" href="?period=annual">Annual</a>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5 class="text-center">📊 Earnings vs Expenses</h5>
+            <canvas id="barChart"></canvas>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5 class="text-center">📈 Financial Trend</h5>
+            <canvas id="lineChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>Total Earnings</h5>
+            <h3 class="text-success">KES {{ total_earnings }}</h3>
+
+
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow p-3">
+            <h5>Total Expenses</h5>
+            <h3 class="text-danger">KES {{ total_expenses }}</h3>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<h5>Individual Records</h5>
+
+<table class="table table-striped table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Date</th>
+            <th>Booking</th>
+            <th>Amount</th>
+            <th>Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in records %}
+        <tr>
+            <td>{{ r.created_at.strftime("%d %b %Y") }}</td>
+            <td>#{{ r.booking_id }}</td>
+            <td>KES {{ r.amount }}</td>
+            <td>
+                {% if r.payment_method %}
+                    Hire Fee
+                {% else %}
+                    Damage Fee
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<button onclick="window.print()" class="btn btn-success mt-3">
+    🖨️ Print Report
+</button>
+
+
+
+<script>
+    const labels = {{ labels | tojson | safe }};
+    const earningsData = {{ earnings_series | tojson | safe }};
+    const expensesData = {{ expenses_series | tojson | safe }};
+
+    // 📊 Bar Chart
+    new Chart(document.getElementById("barChart"), {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Earnings (KES)",
+                    data: earningsData,
+                    backgroundColor: "rgba(40, 167, 69, 0.7)"
+                },
+                {
+                    label: "Expenses (KES)",
+                    data: expensesData,
+                    backgroundColor: "rgba(220, 53, 69, 0.7)"
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "top" }
+            }
+        }
+    });
+
+    // 📈 Line Chart
+    new Chart(document.getElementById("lineChart"), {
+        type: "line",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Earnings",
+                    data: earningsData,
+                    borderColor: "green",
+                    tension: 0.4,
+                    fill: false
+                },
+                {
+                    label: "Expenses",
+                    data: expensesData,
+                    borderColor: "red",
+                    tension: 0.4,
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: "top" }
+            }
+        }
+    });
+</script>
+{% endblock %}

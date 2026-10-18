@@ -1,0 +1,127 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<style>
+.booking-form-container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.booking-form-container h2 {
+    margin-bottom: 25px;
+    color: #b30000;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 0.95rem;
+}
+
+.form-group input:disabled {
+    background: #f3f3f3;
+    color: #666;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: #b30000;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #8f0000;
+}
+</style>
+
+<div class="booking-form-container">
+
+    <h2>Create Booking</h2>
+
+    <form method="POST">
+
+        <div class="form-group">
+            <label>Client</label>
+            <input type="text" value="{{ client.name }} ({{ client.email }})" disabled>
+        </div>
+
+        <div class="form-group">
+            <label>Select Car</label>
+            <select name="car_id" required>
+                <option value="">-- Select Available Car --</option>
+                {% for car in cars %}
+                <option value="{{ car.id }}">
+                    {{ car.name }} - {{ car.brand }} | Ksh {{ car.price }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Pickup Date</label>
+                <input type="date" name="pickup_date" required min="{{ today }}">
+
+            </div>
+
+            <div class="form-group">
+                <label>Dropoff Date</label>
+                <input type="date" name="dropoff_date" required>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Notes (Optional)</label>
+            <textarea name="notes" placeholder="Any special instructions or comments..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-btn">
+            Create Booking
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

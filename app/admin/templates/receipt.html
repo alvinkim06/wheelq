@@ -1,0 +1,70 @@
+{% extends "admin_base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <div class="text-center mb-3">
+            <img src="{{ url_for('static', filename='images/wheelq-logo.png') }}"
+                alt="WheelQ Logo"
+                style="max-height: 80px;">
+        </div>
+
+
+        <h3 class="text-center mb-1">WheelQ Car Rentals</h3>
+        <p class="text-center text-muted mb-3">
+            Official Payment Receipt
+        </p>
+      
+
+        <hr>
+
+        <h5>Client Details</h5>
+        <p>
+            <strong>Name:</strong> {{ client.name }}<br>
+            <strong>Phone:</strong> {{ client.phone }}<br>
+            <strong>ID Number:</strong> {{ client.id_number }}
+        </p>
+
+        <h5>Car Details</h5>
+        <p>
+            <strong>Car:</strong> {{ car.brand }} {{ car.model }}<br>
+            <strong>Registration Number:</strong> {{ car.plate_number }}
+        </p>
+
+        <h5>Booking Details</h5>
+        <p>
+            <strong>Pickup Date:</strong> {{ booking.pickup_date }}<br>
+            <strong>Drop-off Date:</strong> {{ booking.dropoff_date }}
+        </p>
+
+        <h5>Payment Summary</h5>
+        <p>
+            <strong>Amount Paid:</strong> KES {{ transaction.amount }}<br>
+            <strong>Payment Date:</strong> {{ transaction.created_at.strftime("%d %b %Y") }}
+        </p>
+
+        <hr>
+
+        <div class="text-center">
+            <button onclick="window.print()" class="btn btn-success">
+                Print / Download Receipt
+            </button>
+
+            <a href="{{ url_for('admin.financials') }}"
+               class="btn btn-secondary ms-2">
+                Back to Financials
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn, nav, footer {
+        display: none;
+    }
+}
+</style>
+
+{% endblock %}

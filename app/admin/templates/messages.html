@@ -1,0 +1,449 @@
+{% extends "admin_base.html" %}
+
+{% block title %}
+    Inbox
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* =========================================
+       MESSAGES / INBOX PAGE
+    ========================================= */
+
+    .messages-page {
+        width: 100%;
+        padding: 25px;
+        box-sizing: border-box;
+    }
+
+    /* =========================================
+       PAGE HEADER
+    ========================================= */
+
+    .messages-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .messages-header h1 {
+        margin: 0;
+        color: #b30000;
+        font-size: 28px;
+        font-weight: 700;
+    }
+
+    .messages-header p {
+        margin: 5px 0 0;
+        color: #777;
+        font-size: 14px;
+    }
+
+    /* =========================================
+       MESSAGE COUNT
+    ========================================= */
+
+    .message-count {
+        background: #b30000;
+        color: #ffffff;
+        padding: 9px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    /* =========================================
+       TABLE CONTAINER
+    ========================================= */
+
+    .messages-table-container {
+        width: 100%;
+        overflow-x: auto;
+        background: #ffffff;
+        border-radius: 14px;
+        border: 1px solid #eeeeee;
+        box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    /* =========================================
+       TABLE
+    ========================================= */
+
+    .messages-table {
+        width: 100%;
+        min-width: 750px;
+        border-collapse: collapse;
+        table-layout: auto;
+    }
+
+    .messages-table thead {
+        background: #b30000;
+        color: #ffffff;
+    }
+
+    .messages-table th {
+        padding: 15px 18px;
+        text-align: left;
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        white-space: nowrap;
+    }
+
+    .messages-table td {
+        padding: 15px 18px;
+        border-bottom: 1px solid #eeeeee;
+        color: #333333;
+        font-size: 14px;
+        vertical-align: middle;
+    }
+
+    .messages-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .messages-table tbody tr:hover {
+        background-color: #fffbea;
+    }
+
+    .messages-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* =========================================
+       UNREAD MESSAGE
+    ========================================= */
+
+    .messages-table tbody tr.unread {
+        background-color: #fff5f5;
+        font-weight: 600;
+    }
+
+    .messages-table tbody tr.unread:hover {
+        background-color: #fff0f0;
+    }
+
+    /* =========================================
+       STATUS BADGES
+    ========================================= */
+
+    .message-status {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 65px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .status-unread {
+        background-color: #ffe0e0;
+        color: #b30000;
+    }
+
+    .status-read {
+        background-color: #e8f5e9;
+        color: #198754;
+    }
+
+    /* =========================================
+       NAME
+    ========================================= */
+
+    .message-name {
+        font-weight: 600;
+        color: #222222;
+    }
+
+    /* =========================================
+       EMAIL
+    ========================================= */
+
+    .message-email {
+        color: #555555;
+        word-break: break-word;
+    }
+
+    /* =========================================
+       DATE
+    ========================================= */
+
+    .message-date {
+        color: #777777;
+        white-space: nowrap;
+    }
+
+    /* =========================================
+       VIEW BUTTON
+    ========================================= */
+
+    .message-view-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        background-color: #b30000;
+        color: #ffffff;
+
+        padding: 8px 18px;
+
+        border-radius: 7px;
+
+        text-decoration: none;
+
+        font-size: 13px;
+        font-weight: 600;
+
+        white-space: nowrap;
+
+        transition: all 0.25s ease;
+    }
+
+    .message-view-btn:hover {
+        background-color: #ffcc00;
+        color: #222222;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+    }
+
+    /* =========================================
+       EMPTY STATE
+    ========================================= */
+
+    .empty-messages {
+        text-align: center;
+        padding: 60px 20px !important;
+        color: #777777;
+    }
+
+    .empty-messages-icon {
+        font-size: 40px;
+        margin-bottom: 10px;
+        color: #b30000;
+    }
+
+    .empty-messages h3 {
+        margin: 5px 0 8px;
+        color: #333333;
+        font-size: 18px;
+    }
+
+    .empty-messages p {
+        margin: 0;
+        color: #888888;
+        font-size: 14px;
+    }
+
+    /* =========================================
+       RESPONSIVE DESIGN
+    ========================================= */
+
+    @media (max-width: 768px) {
+
+        .messages-page {
+            padding: 15px;
+        }
+
+        .messages-header {
+            align-items: flex-start;
+            flex-direction: column;
+        }
+
+        .messages-header h1 {
+            font-size: 24px;
+        }
+
+        .message-count {
+            align-self: flex-start;
+        }
+
+        .messages-table th,
+        .messages-table td {
+            padding: 12px 14px;
+        }
+    }
+
+    @media (max-width: 480px) {
+
+        .messages-page {
+            padding: 10px;
+        }
+
+        .messages-header h1 {
+            font-size: 21px;
+        }
+
+        .messages-header p {
+            font-size: 13px;
+        }
+    }
+</style>
+
+
+<div class="messages-page">
+
+    <!-- =====================================
+         PAGE HEADER
+    ====================================== -->
+
+    <div class="messages-header">
+
+        <div>
+            <h1>Inbox</h1>
+
+            <p>
+                Manage messages and enquiries received from website visitors.
+            </p>
+        </div>
+
+        <div class="message-count">
+            {{ messages|length }}
+            Message{{ '' if messages|length == 1 else 's' }}
+        </div>
+
+    </div>
+
+
+    <!-- =====================================
+         MESSAGES TABLE
+    ====================================== -->
+
+    <div class="messages-table-container">
+
+        <table class="messages-table">
+
+            <thead>
+
+                <tr>
+                    <th>Status</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for msg in messages %}
+
+                <tr class="{{ 'unread' if not msg.is_read }}">
+
+                    <!-- Status -->
+
+                    <td>
+
+                        {% if not msg.is_read %}
+
+                        <span class="message-status status-unread">
+                            Unread
+                        </span>
+
+                        {% else %}
+
+                        <span class="message-status status-read">
+                            Read
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <!-- Name -->
+
+                    <td>
+
+                        <span class="message-name">
+                            {{ msg.name }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- Email -->
+
+                    <td>
+
+                        <span class="message-email">
+                            {{ msg.email }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- Date -->
+
+                    <td>
+
+                        <span class="message-date">
+                            {{ msg.created_at.strftime('%d %b %Y, %H:%M') }}
+                        </span>
+
+                    </td>
+
+
+                    <!-- Action -->
+
+                    <td>
+
+                        <a
+                            href="{{ url_for('admin.admin_message_detail', message_id=msg.id) }}"
+                            class="message-view-btn"
+                        >
+                            View Message
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% else %}
+
+                <!-- Empty State -->
+
+                <tr>
+
+                    <td
+                        colspan="5"
+                        class="empty-messages"
+                    >
+
+                        <div class="empty-messages-icon">
+                            ✉
+                        </div>
+
+                        <h3>
+                            No Messages
+                        </h3>
+
+                        <p>
+                            Your inbox is currently empty.
+                        </p>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+{% endblock %}

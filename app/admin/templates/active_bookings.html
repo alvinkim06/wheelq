@@ -1,0 +1,23 @@
+{% extends "admin_base.html" %}
+{% block content %}
+<h3>Active Bookings</h3>
+
+<table class="table">
+{% for b in bookings %}
+<tr>
+    <td>{{ b.client_name }}</td>
+    <td>{{ b.car.name if b.car }}</td>
+    <td>KES {{ b.amount }}</td>
+
+    <td>
+        <a href="{{ url_for('admin.deactivate_booking', booking_id=b.id) }}"
+           class="btn btn-warning btn-sm">Deactivate</a>
+
+        <a href="{{ url_for('admin.return_vehicle', booking_id=b.id) }}"
+           class="btn btn-danger btn-sm">Vehicle Returned</a>
+    </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+
