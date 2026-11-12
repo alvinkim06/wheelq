@@ -98,19 +98,59 @@
             </select>
         </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label>Pickup Date</label>
-                <input type="date" name="pickup_date" required min="{{ today }}">
+<div class="form-row">
+    <div class="form-group">
+        <label>Area of Usage *</label>
+        <input type="text"
+               name="area_of_usage"
+               placeholder="e.g. Nairobi, Naivasha, Mombasa"
+               required>
+    </div>
+</div>
 
-            </div>
+<div class="form-row">
+    <div class="form-group">
+        <label>Pickup Date</label>
+        <input type="date"
+               name="pickup_date"
+               required
+               min="{{ today }}">
+    </div>
 
-            <div class="form-group">
-                <label>Dropoff Date</label>
-                <input type="date" name="dropoff_date" required>
-            </div>
-        </div>
+    <div class="form-group">
+        <label>Pickup Time</label>
+        <input type="time"
+               name="pickup_time"
+               required>
+    </div>
+</div>        
 
+<div class="form-row">
+    <div class="form-group">
+        <label>Drop-off Date</label>
+        <input type="date"
+               name="dropoff_date"
+               required
+               min="{{ today }}">
+    </div>
+
+    <div class="form-group">
+        <label>Drop-off Time</label>
+        <input type="time"
+               name="dropoff_time"
+               required>
+    </div>
+
+    <label for="dropoff_time">Scheduled Drop-off Time</label>
+    <input
+        type="time"
+        id="dropoff_time"
+        name="dropoff_time"
+        class="form-control"
+        required
+    >
+</div>    
+		
         <div class="form-group">
             <label>Notes (Optional)</label>
             <textarea name="notes" placeholder="Any special instructions or comments..."></textarea>

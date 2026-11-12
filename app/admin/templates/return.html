@@ -1,95 +1,460 @@
-{% extends 'admin_base.html' %}
+
+{% extends "admin_base.html" %}
+
 {% block content %}
+<div class="wheelq-workflow">
+    <div class="workflow-header">
+        <div>
+            <span class="eyebrow">BOOKING MANAGEMENT</span>
+            <h2>Vehicle return inspection</h2>
+            <p>Inspect the vehicle, record damages and review any late-return penalty.</p>
+        </div>
+        <a href="{{ url_for('admin.bookings_page') }}" class="back-link">
+            ← Back to bookings
+        </a>
+    </div>
 
-<div class="return-card">
-    <h3 class="return-title">🔁 Vehicle Return</h3>
-
-    <p class="return-note">
-        Record vehicle condition and any additional charges before completing
-        the return process.
-    </p>
-
-    <form method="post" class="return-form">
-        <div class="form-group">
-            <label>Damage Notes</label>
-            <textarea name="damage_notes"
-                      placeholder="Describe any visible damages or issues..."></textarea>
+    <div class="workflow-card">
+        <div class="vehicle-heading">
+            <div class="vehicle-icon">🔁</div>
+            <div>
+                <h3>{{ booking.car.registration_number if booking.car else 'Vehicle' }}</h3>
+                <span>Booking #{{ booking.id }} · {{ booking.client_name }}</span>
+            </div>
+            <span class="status-pill">Return pending</span>
         </div>
 
-        <div class="form-group">
-            <label>Extra Charges (optional)</label>
-            <input type="number"
-                   name="extra_charges"
-                   min="0"
-                   step="0.01"
-                   placeholder="e.g. 2500">
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span>Client phone</span>
+                <strong>{{ booking.client_phone }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Scheduled return</span>
+                <strong>
+                    {{ booking.dropoff_date }}
+                    {% if booking.dropoff_time %} · {{ booking.dropoff_time }}{% endif %}
+                </strong>
+            </div>
+            <div class="detail-item">
+                <span>Booking amount</span>
+                <strong>KSh {{ "{:,.2f}".format(booking.amount) }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Payment status</span>
+                <strong>{{ booking.payment_status|replace('_', ' ')|title }}</strong>
+            </div>
         </div>
 
-        <button type="submit"
-                class="btn btn-success"
-                onclick="return confirm('Confirm vehicle return and close booking?');">
-            ✅ Confirm Return
-        </button>
-    </form>
+        <section class="workflow-section">
+            <div class="section-heading">
+                <div>
+                    <h3>Vehicle damage inspection</h3>
+                    <p>Record each damage item found during the inspection.</p>
+                </div>
+                <span class="section-icon">🛠️</span>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('admin.add_damage_charge', booking_id=booking.id) }}"
+                  class="damage-form">
+                {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% endif %}
+
+                <div class="form-field">
+                    <label>Damage description</label>
+                    <input type="text"
+                           name="description"
+                           placeholder="e.g. Scratched rear bumper"
+                           required>
+                </div>
+
+                <div class="form-field">
+                    <label>Damage charge (KSh)</label>
+                    <input type="number"
+                           name="amount"
+                           min="0.01"
+                           step="0.01"
+                           placeholder="0.00"
+                           required>
+                </div>
+
+                <div class="form-field full-width">
+                    <label>Inspection notes</label>
+                    <textarea name="notes"
+                              rows="3"
+                              placeholder="Describe the damage and any relevant details..."></textarea>
+                </div>
+
+                <button type="submit" class="workflow-btn btn-outline">
+                    + Record damage charge
+                </button>
+            </form>
+
+            <div class="damage-list">
+                <h4>Recorded damage charges</h4>
+
+                {% if damage_charges %}
+                    {% for damage in damage_charges %}
+                        <div class="damage-row">
+                            <div>
+                                <strong>{{ damage.description or 'Vehicle damage' }}</strong>
+                                <small>{{ damage.notes or 'No additional notes' }}</small>
+                                <small>Status: {{ damage.status|title }}</small>
+                            </div>
+                            <strong>KSh {{ "{:,.2f}".format(damage.amount) }}</strong>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="empty-state">
+                        No damage charges have been recorded for this booking.
+                    </div>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="workflow-section">
+            <div class="section-heading">
+                <div>
+                    <h3>Late-return penalty</h3>
+                    <p>The penalty will be calculated when you confirm the return.</p>
+                </div>
+                <span class="section-icon">⏱️</span>
+            </div>
+
+            <div class="penalty-grid">
+                <div>
+                    <span>Penalty rate</span>
+                    <strong>KSh {{ "{:,.2f}".format(setting.rate) }}</strong>
+                </div>
+                <div>
+                    <span>Charging interval</span>
+                    <strong>{{ setting.interval_minutes }} minutes</strong>
+                </div>
+                <div>
+                    <span>Grace period</span>
+                    <strong>{{ setting.grace_period_minutes }} minutes</strong>
+                </div>
+            </div>
+
+            <p class="helper-note">
+                The configured rate is charged for each applicable interval
+                after the grace period. No late penalty is charged if the
+                vehicle is returned on time.
+                <a href="{{ url_for('admin.penalty_settings') }}">Manage penalty settings</a>
+            </p>
+        </section>
+
+        <section class="workflow-section">
+            <div class="section-heading">
+                <div>
+                    <h3>Confirm vehicle return</h3>
+                    <p>Review the actual return time before completing this booking.</p>
+                </div>
+                <span class="section-icon">✓</span>
+            </div>
+
+            <form method="POST"
+                  action="{{ url_for('admin.return_vehicle', booking_id=booking.id) }}"
+                  id="returnConfirmForm">
+                {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% endif %}
+
+                <div class="form-field">
+                    <label for="actual_return_at">Actual return date and time</label>
+                    <input type="datetime-local"
+                           id="actual_return_at"
+                           name="actual_return_at"
+                           required>
+                </div>
+
+                <label class="confirmation-label">
+                    <input type="checkbox" id="returnConfirmed" required>
+                    <span>
+                        I have inspected the vehicle, recorded all applicable
+                        damages, and confirmed the actual return time.
+                    </span>
+                </label>
+
+                <button type="submit" class="workflow-btn btn-primary">
+                    Confirm return & complete booking
+                </button>
+            </form>
+        </section>
+    </div>
 </div>
+
+<script>
+(function () {
+    const input = document.getElementById("actual_return_at");
+
+    if (input && !input.value) {
+        const now = new Date();
+        const local = new Date(
+            now.getTime() - now.getTimezoneOffset() * 60000
+        );
+        input.value = local.toISOString().slice(0, 16);
+    }
+
+    const form = document.getElementById("returnConfirmForm");
+
+    if (form) {
+        form.addEventListener("submit", function (event) {
+            if (!document.getElementById("returnConfirmed").checked) {
+                event.preventDefault();
+                alert("Please confirm the vehicle inspection before completing the return.");
+                return;
+            }
+
+            if (!confirm(
+                "Confirm this vehicle return? The booking will be marked completed and any applicable late penalty will be added to Financial Management."
+            )) {
+                event.preventDefault();
+            }
+        });
+    }
+})();
+</script>
+
 <style>
-    .return-card {
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 25px;
-    max-width: 600px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-left: 5px solid #007bff;
+.wheelq-workflow {
+    max-width: 1050px;
+    margin: 25px auto;
+    color: #f5f5f5;
 }
-
-.return-title {
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #333;
+.workflow-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
 }
-
-.return-note {
+.eyebrow {
+    color: #f5c400;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+.workflow-header h2 {
+    font-weight: 800;
+    margin: 7px 0;
+}
+.workflow-header p,
+.section-heading p {
+    color: #aaa;
+    margin: 0;
+}
+.back-link {
+    color: #f5c400;
+    text-decoration: none;
+    font-weight: 700;
+}
+.workflow-card {
+    background: #171717;
+    border: 1px solid #303030;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.2);
+}
+.vehicle-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #333;
+}
+.vehicle-icon {
+    width: 55px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    background: #292400;
+    border-radius: 14px;
+    font-size: 25px;
+}
+.vehicle-heading h3 {
+    margin: 0 0 5px;
+    font-weight: 800;
+}
+.vehicle-heading span {
+    color: #aaa;
+}
+.status-pill {
+    margin-left: auto;
+    padding: 7px 13px;
+    background: #302800;
+    color: #f5c400 !important;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.detail-grid,
+.penalty-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 24px 0;
+}
+.detail-item span,
+.penalty-grid span {
+    display: block;
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+.detail-item strong,
+.penalty-grid strong {
+    color: #fff;
     font-size: 14px;
-    color: #666;
+}
+.workflow-section {
+    border-top: 1px solid #333;
+    padding: 25px 0;
+}
+.section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 20px;
 }
-
-.return-form .form-group {
-    margin-bottom: 15px;
+.section-heading h3 {
+    margin: 0 0 7px;
+    font-size: 18px;
+    font-weight: 800;
 }
-
-.return-form label {
+.section-icon {
+    font-size: 25px;
+}
+.damage-form {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 16px;
+    align-items: end;
+}
+.form-field label {
     display: block;
-    font-weight: 500;
-    margin-bottom: 5px;
+    color: #ccc;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 8px;
 }
-
-.return-form textarea,
-.return-form input {
+.form-field input,
+.form-field textarea {
     width: 100%;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-}
-
-.return-form textarea {
-    min-height: 100px;
-    resize: vertical;
-}
-
-.return-form input:focus,
-.return-form textarea:focus {
+    background: #222;
+    color: #fff;
+    border: 1px solid #414141;
+    border-radius: 9px;
+    padding: 12px;
     outline: none;
-    border-color: #007bff;
 }
-
-.return-form button {
-    margin-top: 10px;
-    padding: 10px 18px;
+.form-field input:focus,
+.form-field textarea:focus {
+    border-color: #f5c400;
+}
+.full-width {
+    grid-column: 1 / -1;
+}
+.workflow-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 18px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-outline {
+    color: #f5c400;
+    border: 1px solid #f5c400;
+    background: transparent;
+}
+.btn-primary {
+    width: 100%;
+    color: #111;
+    background: #f5c400;
+}
+.btn-primary:hover {
+    background: #ffda35;
+}
+.damage-list {
+    margin-top: 28px;
+}
+.damage-list h4 {
     font-size: 14px;
-    border-radius: 5px;
+    margin-bottom: 12px;
 }
-
+.damage-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 15px;
+    margin-bottom: 9px;
+    background: #222;
+    border: 1px solid #383838;
+    border-radius: 10px;
+}
+.damage-row small {
+    display: block;
+    color: #999;
+    margin-top: 5px;
+}
+.damage-row > strong {
+    white-space: nowrap;
+    color: #f5c400;
+}
+.empty-state {
+    padding: 18px;
+    background: #222;
+    color: #999;
+    border-radius: 10px;
+}
+.penalty-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    background: #222;
+    border-radius: 12px;
+    padding: 18px;
+}
+.helper-note {
+    color: #999;
+    font-size: 13px;
+    line-height: 1.7;
+}
+.helper-note a {
+    color: #f5c400;
+}
+.confirmation-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #ddd;
+    line-height: 1.6;
+    margin: 20px 0;
+}
+.confirmation-label input {
+    margin-top: 5px;
+    accent-color: #f5c400;
+}
+@media(max-width: 650px) {
+    .workflow-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .workflow-card {
+        padding: 18px;
+    }
+    .detail-grid,
+    .damage-form,
+    .penalty-grid {
+        grid-template-columns: 1fr;
+    }
+    .full-width {
+        grid-column: auto;
+    }
+}
 </style>
 {% endblock %}

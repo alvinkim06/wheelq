@@ -53,3 +53,24 @@ build/
 # =========================
 Thumbs.db
 Desktop.ini
+
+# Additional local environments
+.venv-1/
+
+# Local email test output
+wheelq_test_invoice.pdf
+
+
+# Local backups and editor copies
+*.backup
+*.save
+*.save.*
+*.before_details_cache
+
+# User-uploaded files and customer documents
+app/static/uploads/
+
+# Local email testing
+test_email_delivery.py
+test_email_templates.py
+wheelq_test_invoice.pdf

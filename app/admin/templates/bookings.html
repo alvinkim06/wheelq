@@ -218,10 +218,14 @@
         color: #187a36;
     }
 
-    .payment-status.unpaid,
-    .payment-status.not-paid {
+    .payment-status.pending {
         background: #fff1cc;
         color: #856404;
+    }
+
+    .payment-status.partial {
+        background: #51aad0;
+        color: #ceee19;
     }
 
     /* ================================
@@ -525,101 +529,79 @@
 
                 <!-- ACTIONS -->
                 <td class="actions">
-
                     <div class="action-buttons">
 
                         <!-- VIEW -->
                         <a href="{{ url_for('admin.booking_view', booking_id=b.id) }}"
-                           class="action-btn btn-view">
+                        class="action-btn btn-view">
                             View
                         </a>
 
-
                         <!-- PAY -->
-                        <!-- {% if b.payment_status != 'paid' %}
-
-                            <a href="{{ url_for('admin.pay_booking', booking_id=b.id) }}"
-                               class="action-btn btn-pay">
-                                Pay Now
-                            </a>
-
-                        {% endif %} -->
                         {% if b.payment_status == 'paid' %}
-
-                            <span class="badge bg-success">
-                                Paid
-                            </span>
-
+                            <span class="badge bg-success">Paid</span>
                         {% else %}
+                            <form method="POST"
+                                action="{{ url_for('admin.pay_booking', booking_id=b.id) }}"
+                                style="display: inline; margin: 0;">
 
-                            <form
-                                method="POST"
-                                action="{{ url_for('admin.pay_booking',
-                                                booking_id=b.id) }}"
-                                onsubmit="return confirm('Mark this booking as paid?');"
-                                style="display: inline;"
-                            >
-                                <button type="submit" class="btn btn-success btn-sm">
+                                {% if csrf_token is defined %}
+                                    <input type="hidden" name="csrf_token"
+                                        value="{{ csrf_token() }}">
+                                {% endif %}
+
+                                <button type="submit" class="action-btn btn-pay">
                                     Pay
                                 </button>
                             </form>
-
                         {% endif %}
 
                         <!-- APPROVE -->
                         <a href="{{ url_for('admin.update_booking_status',
-                                           booking_id=b.id,
-                                           status='approved') }}"
-                           class="action-btn btn-approve">
+                                            booking_id=b.id,
+                                            status='approved') }}"
+                        class="action-btn btn-approve">
                             Approve
                         </a>
 
-
-                        <!-- ACTIVATE -->
-                        <a href="{{ url_for('admin.update_booking_status',
-                                           booking_id=b.id,
-                                           status='active') }}"
-                           class="action-btn btn-activate">
+                        <!-- ACTIVATE / RELEASE -->
+                        <a href="{{ url_for('admin.release_car',
+                                            booking_id=b.id) }}"
+                        class="action-btn btn-activate">
                             Activate
                         </a>
 
-
-                        <!-- COMPLETE -->
-                        <a href="{{ url_for('admin.update_booking_status',
-                                           booking_id=b.id,
-                                           status='completed') }}"
-                           class="action-btn btn-complete">
+                        <!-- COMPLETE / RETURN -->
+                        <a href="{{ url_for('admin.return_vehicle',
+                                            booking_id=b.id) }}"
+                        class="action-btn btn-complete">
                             Complete
                         </a>
 
-
                         <!-- CANCEL -->
                         <a href="{{ url_for('admin.update_booking_status',
-                                           booking_id=b.id,
-                                           status='cancelled') }}"
-                           class="action-btn btn-cancel">
+                                            booking_id=b.id,
+                                            status='cancelled') }}"
+                        class="action-btn btn-cancel">
                             Cancel
                         </a>
 
-
                         <!-- EDIT -->
                         <a href="{{ url_for('admin.edit_booking',
-                                           booking_id=b.id) }}"
-                           class="action-btn btn-edit">
+                                            booking_id=b.id) }}"
+                        class="action-btn btn-edit">
                             Edit
                         </a>
 
-
                         <!-- DELETE -->
                         <a href="{{ url_for('admin.delete_booking',
-                                           booking_id=b.id) }}"
-                           class="action-btn btn-delete"
-                           onclick="return confirm('Delete this booking?');">
+                                            booking_id=b.id) }}"
+                        class="action-btn btn-delete"
+                        onclick="return confirm('Delete this booking?');">
                             Delete
                         </a>
 
                     </div>
-
                 </td>
 
             </tr>

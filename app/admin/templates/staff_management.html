@@ -1,0 +1,416 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Staff Management | WheelQ{% endblock %}
+
+{% block content %}
+<style>
+.staff-page {
+    max-width: 1250px;
+    margin: auto;
+    color: #f5f5f5;
+}
+
+.staff-header {
+    margin-bottom: 25px;
+}
+
+.staff-header h1 {
+    color: #ffcc00;
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.staff-header p {
+    color: #aaa;
+}
+
+.staff-panel {
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 23px;
+    margin-bottom: 25px;
+}
+
+.staff-panel h2 {
+    color: #ffcc00;
+    font-size: 19px;
+    margin: 0 0 20px;
+}
+
+.staff-form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 15px;
+}
+
+.staff-panel label {
+    display: block;
+    color: #ddd;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.staff-panel input,
+.staff-panel select {
+    width: 100%;
+    padding: 11px;
+    background: #252525;
+    border: 1px solid #444;
+    border-radius: 7px;
+    color: white;
+    box-sizing: border-box;
+}
+
+.staff-panel input:focus,
+.staff-panel select:focus {
+    outline: none;
+    border-color: #ffcc00;
+}
+
+.staff-btn {
+    padding: 11px 17px;
+    border: none;
+    border-radius: 7px;
+    background: #b30000;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.staff-btn:hover {
+    background: #e00000;
+}
+
+.staff-btn.yellow {
+    background: #ffcc00;
+    color: #111;
+}
+
+.staff-btn.yellow:hover {
+    background: #e6b800;
+}
+
+.staff-btn.grey {
+    background: #444;
+}
+
+.staff-btn.danger {
+    background: #7d0000;
+}
+
+.staff-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.staff-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 750px;
+}
+
+.staff-table th {
+    text-align: left;
+    padding: 14px 12px;
+    background: #252525;
+    color: #ffcc00;
+    font-size: 13px;
+}
+
+.staff-table td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #333;
+    color: #ddd;
+    font-size: 13px;
+    vertical-align: top;
+}
+
+.staff-table tr:hover td {
+    background: #202020;
+}
+
+.status {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.status.active {
+    color: #6ee7a0;
+    background: #123d27;
+}
+
+.status.inactive {
+    color: #ff9999;
+    background: #451b1b;
+}
+
+.role {
+    color: #ffcc00;
+    text-transform: uppercase;
+    font-size: 11px;
+}
+
+.staff-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 210px;
+}
+
+.staff-actions details {
+    border: 1px solid #444;
+    border-radius: 7px;
+    padding: 9px;
+    background: #202020;
+}
+
+.staff-actions summary {
+    color: #ffcc00;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+.staff-actions form {
+    margin-top: 12px;
+}
+
+.staff-actions input,
+.staff-actions select {
+    margin-bottom: 9px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px;
+    background: #151515;
+    color: white;
+    border: 1px solid #444;
+    border-radius: 6px;
+}
+
+.staff-actions button {
+    margin: 3px 0;
+}
+
+@media(max-width:600px) {
+    .staff-panel {
+        padding: 16px;
+    }
+
+    .staff-header h1 {
+        font-size: 23px;
+    }
+}
+</style>
+
+<div class="staff-page">
+
+    <div class="staff-header">
+        <h1>Staff Management</h1>
+        <p>Create and manage WheelQ administrators and staff accounts.</p>
+    </div>
+
+    <!-- Create account -->
+    <section class="staff-panel">
+        <h2>Create New Account</h2>
+
+        <form method="POST"
+              action="{{ url_for('admin.staff_management') }}">
+
+            <div class="staff-form-grid">
+
+                <div>
+                    <label>Full Name</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <div>
+                    <label>Email Address</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div>
+                    <label>Temporary Password</label>
+                    <input type="password"
+                           name="password"
+                           minlength="8"
+                           required>
+                </div>
+
+                <div>
+                    <label>Account Role</label>
+                    <select name="role" required>
+                        <option value="staff">Staff</option>
+                        <option value="admin">Administrator</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button type="submit" class="staff-btn" style="margin-top:18px">
+                + Create Account
+            </button>
+        </form>
+    </section>
+
+    <!-- Account directory -->
+    <section class="staff-panel">
+
+        <h2>Accounts Directory ({{ users|length }})</h2>
+
+        <div class="staff-table-wrap">
+
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Date Created</th>
+                        <th>Management Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for member in users %}
+                    <tr>
+
+                        <td><strong>{{ member.name }}</strong></td>
+
+                        <td>{{ member.email }}</td>
+
+                        <td>
+                            <span class="role">{{ member.role }}</span>
+                        </td>
+
+                        <td>
+                            {% if member.is_active %}
+                                <span class="status active">Active</span>
+                            {% else %}
+                                <span class="status inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ member.created_at.strftime('%d %b %Y') if member.created_at else 'N/A' }}
+                        </td>
+
+                        <td>
+                            <div class="staff-actions">
+
+                                <!-- Edit account -->
+                                <details>
+                                    <summary>Edit Account</summary>
+
+                                    <form method="POST"
+                                          action="{{ url_for('admin.edit_staff', user_id=member.id) }}">
+
+                                        <label>Name</label>
+                                        <input type="text"
+                                               name="name"
+                                               value="{{ member.name }}"
+                                               required>
+
+                                        <label>Email</label>
+                                        <input type="email"
+                                               name="email"
+                                               value="{{ member.email }}"
+                                               required>
+
+                                        <label>Role</label>
+                                        <select name="role">
+                                            <option value="staff"
+                                                {% if member.role == 'staff' %}selected{% endif %}>
+                                                Staff
+                                            </option>
+
+                                            <option value="admin"
+                                                {% if member.role in ['admin', 'super_admin'] %}selected{% endif %}>
+                                                Administrator
+                                            </option>
+                                        </select>
+
+                                        <button class="staff-btn yellow" type="submit">
+                                            Save Account
+                                        </button>
+                                    </form>
+                                </details>
+
+                                <!-- Reset password -->
+                                <details>
+                                    <summary>Reset Password</summary>
+
+                                    <form method="POST"
+                                          action="{{ url_for('admin.reset_staff_password', user_id=member.id) }}">
+
+                                        <label>New Password</label>
+                                        <input type="password"
+                                               name="password"
+                                               minlength="8"
+                                               required>
+
+                                        <label>Confirm Password</label>
+                                        <input type="password"
+                                               name="confirm_password"
+                                               minlength="8"
+                                               required>
+
+                                        <button class="staff-btn yellow" type="submit">
+                                            Reset Password
+                                        </button>
+                                    </form>
+                                </details>
+
+                                <!-- Activate / deactivate -->
+                                <form method="POST"
+                                      action="{{ url_for('admin.toggle_staff_status', user_id=member.id) }}">
+
+                                    <button type="submit"
+                                            class="staff-btn grey"
+                                            {% if member.id == current_admin_id %}disabled{% endif %}>
+                                        {% if member.is_active %}
+                                            Deactivate Account
+                                        {% else %}
+                                            Activate Account
+                                        {% endif %}
+                                    </button>
+                                </form>
+
+                                <!-- Delete -->
+                                <form method="POST"
+                                      action="{{ url_for('admin.delete_staff', user_id=member.id) }}"
+                                      onsubmit="return confirm('Permanently delete this account? This cannot be undone.');">
+
+                                    <button type="submit"
+                                            class="staff-btn danger"
+                                            {% if member.id == current_admin_id %}disabled{% endif %}>
+                                        Delete Account
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align:center;padding:30px;color:#aaa">
+                            No accounts have been created yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+            </table>
+
+        </div>
+    </section>
+
+</div>
+{% endblock %}

@@ -57,6 +57,68 @@
             <input type="file" name="passport">
         </div>
 
+                <!-- CLIENT FINANCIAL AND SOCIAL DOCUMENTS -->
+        <h3>Additional Client Records</h3>
+
+        <div class="form-group">
+            <label>M-Pesa Statement (Optional PDF)</label>
+            <input
+                type="file"
+                name="mpesa_statement"
+                accept=".pdf,application/pdf"
+                onchange="toggleMpesaPassword(this)"
+            >
+            <small>Upload the client's original password-protected M-Pesa PDF.</small>
+        </div>
+
+        <div class="form-group" id="mpesa-password-group" style="display:none;">
+            <label>Existing M-Pesa PDF Password</label>
+            <input
+                type="password"
+                name="mpesa_password"
+                autocomplete="new-password"
+                placeholder="Enter the PDF's existing password"
+            >
+            <small>This password is verified but is never stored by WheelQ.</small>
+        </div>
+
+        <hr>
+
+        <h3>Social Media Records (Optional)</h3>
+
+        <div class="form-group">
+            <label>Social Media Platform</label>
+            <select name="social_media_platform">
+                <option value="">Select platform</option>
+                <option value="Facebook">Facebook</option>
+                <option value="Instagram">Instagram</option>
+                <option value="TikTok">TikTok</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="X">X</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Social Media Screenshots</label>
+            <input
+                type="file"
+                name="social_media_screenshots"
+                accept=".jpg,.jpeg,.png,.webp"
+                multiple
+            >
+            <small>You can select multiple screenshots.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Description (Optional)</label>
+            <textarea
+                name="social_media_description"
+                rows="3"
+                placeholder="Add details about these screenshots..."
+            ></textarea>
+        </div>
+
         <!-- Emergency Contacts -->
         <h3>Emergency Contact 1</h3>
         <div class="form-group">
@@ -115,4 +177,15 @@
         <button type="submit" class="btn-primary">Register Client</button>
     </form>
 </div>
+
+<script>
+function toggleMpesaPassword(input) {
+    const passwordGroup = document.getElementById(
+        "mpesa-password-group"
+    );
+
+    passwordGroup.style.display =
+        input.files.length > 0 ? "block" : "none";
+}
+</script>
 {% endblock %}

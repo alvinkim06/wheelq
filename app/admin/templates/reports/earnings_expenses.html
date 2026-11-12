@@ -1,147 +1,683 @@
+
 {% extends "admin_base.html" %}
+
+{% block title %}Earnings & Expenses | WheelQ Admin{% endblock %}
+
 {% block content %}
+<style>
+    :root {
+        --wq-yellow: #f5c518;
+        --wq-black: #171717;
+        --wq-red: #b30000;
+        --wq-green: #16834a;
+        --wq-bg: #f4f5f7;
+        --wq-muted: #777;
+    }
+
+    .finance-page {
+        padding: 24px;
+        background: var(--wq-bg);
+        min-height: 100vh;
+    }
+
+    .finance-header {
+        background: var(--wq-black);
+        color: white;
+        border-radius: 15px;
+        padding: 26px 30px;
+        border-bottom: 5px solid var(--wq-yellow);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin-bottom: 25px;
+    }
+
+    .finance-header h2 {
+        font-weight: 850;
+        margin: 0;
+    }
+
+    .finance-header p {
+        color: #c5c5c5;
+        margin: 7px 0 0;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .btn-yellow {
+        background: var(--wq-yellow);
+        color: var(--wq-black);
+        border: 0;
+        border-radius: 9px;
+        padding: 11px 17px;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .btn-yellow:hover {
+        background: #dfb000;
+        color: var(--wq-black);
+    }
+
+    .btn-light-custom {
+        background: white;
+        color: var(--wq-black);
+        border-radius: 9px;
+        padding: 11px 17px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    .section-label {
+        color: #777;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 1px;
+        margin: 25px 0 13px;
+    }
+
+    .metric-card {
+        height: 100%;
+        padding: 21px;
+        border-radius: 13px;
+        background: white;
+        border: 1px solid #ececec;
+        box-shadow: 0 4px 16px rgba(0,0,0,.035);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card:after {
+        content: "";
+        position: absolute;
+        height: 4px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: var(--wq-yellow);
+    }
+
+    .metric-card.expense:after { background: var(--wq-red); }
+    .metric-card.profit:after { background: var(--wq-green); }
+
+    .metric-label {
+        color: var(--wq-muted);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .metric-value {
+        font-size: clamp(21px, 2.4vw, 29px);
+        font-weight: 850;
+        color: var(--wq-black);
+        margin-top: 10px;
+        overflow-wrap: anywhere;
+    }
+
+    .metric-note {
+        font-size: 12px;
+        color: #999;
+        margin-top: 7px;
+    }
+
+    .metric-icon {
+        float: right;
+        width: 39px;
+        height: 39px;
+        display: grid;
+        place-items: center;
+        border-radius: 10px;
+        background: #fff6cf;
+        color: #7a6000;
+        font-size: 19px;
+    }
+
+    .expense .metric-icon {
+        background: #fff0f0;
+        color: var(--wq-red);
+    }
+
+    .profit .metric-icon {
+        background: #e9f7ef;
+        color: var(--wq-green);
+    }
+
+    .panel {
+        background: white;
+        border-radius: 13px;
+        padding: 22px;
+        border: 1px solid #ececec;
+        box-shadow: 0 4px 16px rgba(0,0,0,.035);
+        height: 100%;
+    }
+
+    .panel-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+    }
+
+    .panel-heading h5 {
+        font-weight: 800;
+        margin: 0;
+        color: var(--wq-black);
+    }
+
+    .filter-panel {
+        background: white;
+        padding: 20px;
+        border-radius: 13px;
+        border: 1px solid #ececec;
+        margin-bottom: 20px;
+    }
+
+    .filter-panel label {
+        display: block;
+        font-size: 12px;
+        font-weight: 800;
+        margin-bottom: 7px;
+        color: #555;
+    }
+
+    .filter-panel .form-control,
+    .filter-panel .form-select {
+        min-height: 42px;
+        border-radius: 8px;
+    }
+
+    .table-panel {
+        background: white;
+        border-radius: 13px;
+        border: 1px solid #ececec;
+        overflow: hidden;
+        box-shadow: 0 4px 16px rgba(0,0,0,.035);
+    }
+
+    .table-panel-header {
+        padding: 20px 22px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+        border-bottom: 1px solid #eee;
+    }
+
+    .table-panel-header h5 {
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .table-responsive { padding: 0 12px 12px; }
+
+    .finance-table {
+        min-width: 850px;
+        margin: 0;
+    }
+
+    .finance-table thead th {
+        background: #f8f8f8;
+        color: #777;
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: .5px;
+        padding: 15px 12px;
+        border-bottom: 1px solid #eee;
+        white-space: nowrap;
+    }
+
+    .finance-table tbody td {
+        padding: 15px 12px;
+        vertical-align: middle;
+        border-color: #f0f0f0;
+        font-size: 13px;
+    }
+
+    .type-pill {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .type-earning {
+        color: #08743c;
+        background: #e6f6ed;
+    }
+
+    .type-expense {
+        color: #b30000;
+        background: #fff0f0;
+    }
+
+    .source-label {
+        color: #777;
+        font-size: 11px;
+        display: block;
+        margin-top: 4px;
+    }
+
+    .amount-earning {
+        color: var(--wq-green);
+        font-weight: 800;
+    }
+
+    .amount-expense {
+        color: var(--wq-red);
+        font-weight: 800;
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #ddd;
+        border-radius: 7px;
+        width: 34px;
+        height: 32px;
+        background: white;
+        color: #333;
+        text-decoration: none;
+    }
+
+    .action-btn:hover { background: #f5f5f5; }
+
+    .action-delete {
+        color: var(--wq-red);
+        border-color: #f0d0d0;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 55px 20px;
+        color: #888;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+    }
+
+    @media(max-width: 768px) {
+        .finance-page { padding: 13px; }
+        .finance-header { padding: 22px 18px; }
+        .header-actions { width: 100%; }
+        .header-actions a { flex: 1; text-align: center; }
+        .panel { padding: 16px; }
+    }
+</style>
+
+<div class="finance-page">
+
+    <div class="finance-header">
+        <div>
+            <h2>Financial Overview</h2>
+            <p>WheelQ Tours & Car Hire · Earnings, expenses and business performance</p>
+        </div>
+
+        <div class="header-actions">
+            <a href="{{ url_for('admin.financials') }}" class="btn-light-custom">
+                ← Financial Charges
+            </a>
+            <a href="{{ url_for('admin.add_manual_financial_entry') }}" class="btn-yellow">
+                + Add Transaction
+            </a>
+        </div>
+    </div>
+
+    <div class="filter-panel">
+        <form method="GET" action="{{ url_for('admin.earnings_expenses') }}">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label>Reporting period</label>
+                    <select name="period" id="period" class="form-select">
+                        <option value="daily" {% if period == 'daily' %}selected{% endif %}>Today</option>
+                        <option value="weekly" {% if period == 'weekly' %}selected{% endif %}>Last 7 days</option>
+                        <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>This month</option>
+                        <option value="annual" {% if period == 'annual' %}selected{% endif %}>This year</option>
+                        <option value="custom" {% if period == 'custom' %}selected{% endif %}>Custom dates</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 custom-date">
+                    <label>Start date</label>
+                    <input type="date" name="start_date" class="form-control"
+                           value="{{ start_date }}">
+                </div>
+
+                <div class="col-md-3 custom-date">
+                    <label>End date</label>
+                    <input type="date" name="end_date" class="form-control"
+                           value="{{ end_date }}">
+                </div>
+
+                <div class="col-md-3">
+                    <button class="btn-yellow w-100" type="submit">
+                        Apply Filters
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <div class="section-label">Financial performance</div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="metric-card">
+                <div class="metric-icon">↗</div>
+                <div class="metric-label">Total Earnings</div>
+                <div class="metric-value">
+                    KSh {{ "{:,.2f}".format(total_earnings|float) }}
+                </div>
+                <div class="metric-note">Successful customer payments and manual income</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="metric-card expense">
+                <div class="metric-icon">↘</div>
+                <div class="metric-label">Total Expenses</div>
+                <div class="metric-value">
+                    KSh {{ "{:,.2f}".format(total_expenses|float) }}
+                </div>
+                <div class="metric-note">Actual investor payouts and manual expenses</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="metric-card profit">
+                <div class="metric-icon">◆</div>
+                <div class="metric-label">Net Profit / Loss</div>
+                <div class="metric-value">
+                    KSh {{ "{:,.2f}".format(net_profit|float) }}
+                </div>
+                <div class="metric-note">
+                    {{ "Profit" if net_profit >= 0 else "Loss" }} for the selected period
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="section-label">Financial analytics</div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h5>Earnings vs Expenses</h5>
+                    <span class="text-muted small">KSh</span>
+                </div>
+                <div style="height:300px">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="panel">
+                <div class="panel-heading">
+                    <h5>Financial Trend</h5>
+                    <span class="text-muted small">KSh</span>
+                </div>
+                <div style="height:300px">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-label">Transaction records</div>
+
+    <div class="table-panel">
+        <div class="table-panel-header">
+            <div>
+                <h5>Transaction History</h5>
+                <small class="text-muted">
+                    {{ records|length }} transactions in the selected period
+                </small>
+            </div>
+
+            <input type="search"
+                   id="transactionSearch"
+                   class="form-control"
+                   style="max-width:260px"
+                   placeholder="Search transactions...">
+        </div>
+
+        <div class="table-responsive">
+            <table class="table finance-table" id="transactionTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Transaction</th>
+                        <th>Category</th>
+                        <th>Description</th>
+                        <th>Method</th>
+                        <th>Amount</th>
+                        <th>Source</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td class="text-nowrap">
+                            {{ record.date.strftime('%d %b %Y') }}
+                        </td>
+
+                        <td>
+                            <span class="type-pill {{ 'type-earning' if record.type == 'earning' else 'type-expense' }}">
+                                {{ record.type|upper }}
+                            </span>
+                        </td>
+
+                        <td>{{ record.category }}</td>
+
+                        <td>
+                            <strong>{{ record.description }}</strong>
+                            {% if record.reference %}
+                                <span class="source-label">Ref: {{ record.reference }}</span>
+                            {% endif %}
+                        </td>
+
+                        <td>{{ record.payment_method or '—' }}</td>
+
+                        <td class="{{ 'amount-earning' if record.type == 'earning' else 'amount-expense' }} text-nowrap">
+                            {{ '+' if record.type == 'earning' else '−' }}
+                            KSh {{ "{:,.2f}".format(record.amount|float) }}
+                        </td>
+
+                        <td>
+                            <span class="source-label">{{ record.source }}</span>
+                        </td>
+
+                        <td class="text-nowrap">
+                            {% if record.editable %}
+                                <a href="{{ url_for('admin.edit_manual_financial_entry', entry_id=record.id) }}"
+                                   class="action-btn"
+                                   title="Edit transaction">
+                                    ✎
+                                </a>
+
+                                <form method="POST"
+                                      action="{{ url_for('admin.delete_manual_financial_entry', entry_id=record.id) }}"
+                                      style="display:inline"
+                                      onsubmit="return confirm('Delete this transaction? This action cannot be undone.');">
+
+                                    {# If Flask-WTF CSRF is enabled, include your CSRF token here. #}
+
+                                    <button type="submit"
+                                            class="action-btn action-delete"
+                                            title="Delete transaction">
+                                        ×
+                                    </button>
+                                </form>
+                            {% else %}
+                                <span class="text-muted small">Imported</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-icon">📊</div>
+                                <h5>No transactions found</h5>
+                                <p>There are no financial records for this reporting period.</p>
+                                <a href="{{ url_for('admin.add_manual_financial_entry') }}"
+                                   class="btn-yellow">
+                                    + Add Transaction
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<div id="earnings-chart-data"
+     data-labels='{{ labels|tojson|forceescape }}'
+     data-earnings='{{ earnings_series|tojson|forceescape }}'
+     data-expenses='{{ expenses_series|tojson|forceescape }}'>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<h3 class="mb-3">💰 Earnings & Expenses ({{ period|capitalize }})</h3>
-
-<div class="btn-group mb-3">
-    <a class="btn btn-outline-primary" href="?period=daily">Daily</a>
-    <a class="btn btn-outline-primary" href="?period=weekly">Weekly</a>
-    <a class="btn btn-outline-primary" href="?period=monthly">Monthly</a>
-    <a class="btn btn-outline-primary" href="?period=annual">Annual</a>
-</div>
-
-<div class="row mb-5">
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5 class="text-center">📊 Earnings vs Expenses</h5>
-            <canvas id="barChart"></canvas>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5 class="text-center">📈 Financial Trend</h5>
-            <canvas id="lineChart"></canvas>
-        </div>
-    </div>
-</div>
-
-
-<div class="row mb-4">
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>Total Earnings</h5>
-            <h3 class="text-success">KES {{ total_earnings }}</h3>
-
-
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card shadow p-3">
-            <h5>Total Expenses</h5>
-            <h3 class="text-danger">KES {{ total_expenses }}</h3>
-        </div>
-    </div>
-</div>
-
-<hr>
-
-<h5>Individual Records</h5>
-
-<table class="table table-striped table-hover">
-    <thead class="table-dark">
-        <tr>
-            <th>Date</th>
-            <th>Booking</th>
-            <th>Amount</th>
-            <th>Type</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for r in records %}
-        <tr>
-            <td>{{ r.created_at.strftime("%d %b %Y") }}</td>
-            <td>#{{ r.booking_id }}</td>
-            <td>KES {{ r.amount }}</td>
-            <td>
-                {% if r.payment_method %}
-                    Hire Fee
-                {% else %}
-                    Damage Fee
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-<button onclick="window.print()" class="btn btn-success mt-3">
-    🖨️ Print Report
-</button>
-
-
-
 <script>
-    const labels = {{ labels | tojson | safe }};
-    const earningsData = {{ earnings_series | tojson | safe }};
-    const expensesData = {{ expenses_series | tojson | safe }};
+document.addEventListener("DOMContentLoaded", function () {
 
-    // 📊 Bar Chart
-    new Chart(document.getElementById("barChart"), {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: "Earnings (KES)",
-                    data: earningsData,
-                    backgroundColor: "rgba(40, 167, 69, 0.7)"
-                },
-                {
-                    label: "Expenses (KES)",
-                    data: expensesData,
-                    backgroundColor: "rgba(220, 53, 69, 0.7)"
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
-            }
-        }
+    // Show custom date inputs only when custom reporting is selected.
+    const period = document.getElementById("period");
+    const customDateFields = document.querySelectorAll(".custom-date");
+
+    function toggleCustomDates() {
+        const show = period.value === "custom";
+        customDateFields.forEach(field => {
+            field.style.display = show ? "block" : "none";
+        });
+    }
+
+    period.addEventListener("change", toggleCustomDates);
+    toggleCustomDates();
+
+    // Transaction search.
+    const search = document.getElementById("transactionSearch");
+
+    search.addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+
+        document.querySelectorAll("#transactionTable tbody tr").forEach(row => {
+            row.style.display = row.innerText.toLowerCase().includes(query)
+                ? ""
+                : "none";
+        });
     });
 
-    // 📈 Line Chart
-    new Chart(document.getElementById("lineChart"), {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: "Earnings",
-                    data: earningsData,
-                    borderColor: "green",
-                    tension: 0.4,
-                    fill: false
+    // Charts.
+    const chartData = document.getElementById('earnings-chart-data');
+
+    const labels = JSON.parse(chartData.dataset.labels);
+    const earnings = JSON.parse(chartData.dataset.earnings);
+    const expenses = JSON.parse(chartData.dataset.expenses);
+
+    if (typeof Chart !== "undefined") {
+        new Chart(document.getElementById("comparisonChart"), {
+            type: "bar",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Earnings",
+                        data: earnings,
+                        backgroundColor: "#f5c518",
+                        borderRadius: 6
+                    },
+                    {
+                        label: "Expenses",
+                        data: expenses,
+                        backgroundColor: "#b30000",
+                        borderRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" }
                 },
-                {
-                    label: "Expenses",
-                    data: expensesData,
-                    borderColor: "red",
-                    tension: 0.4,
-                    fill: false
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => "KSh " + Number(value).toLocaleString()
+                        }
+                    }
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
             }
-        }
-    });
+        });
+
+        new Chart(document.getElementById("trendChart"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Earnings",
+                        data: earnings,
+                        borderColor: "#d6a900",
+                        backgroundColor: "rgba(245,197,24,.12)",
+                        fill: true,
+                        tension: .35
+                    },
+                    {
+                        label: "Expenses",
+                        data: expenses,
+                        borderColor: "#b30000",
+                        backgroundColor: "rgba(179,0,0,.08)",
+                        fill: true,
+                        tension: .35
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: "bottom" }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: value => "KSh " + Number(value).toLocaleString()
+                        }
+                    }
+                }
+            }
+        });
+    }
+});
 </script>
 {% endblock %}

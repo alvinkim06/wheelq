@@ -1,13 +1,1089 @@
+
 {% extends "admin_base.html" %}
+
+{% block title %}Reports & Analytics | WheelQ Admin{% endblock %}
+
 {% block content %}
+<style>
+:root {
+    --wq-yellow: #f5c518;
+    --wq-black: #171717;
+    --wq-red: #b30000;
+    --wq-green: #16834a;
+    --wq-bg: #f4f5f7;
+    --wq-muted: #777;
+}
 
-<h2 class="mb-4">📊 Reports & Analytics</h2>
+.reports-page {
+    padding: 24px;
+    background: var(--wq-bg);
+    min-height: 100vh;
+}
 
-<div class="list-group">
-    <a href="{{ url_for('admin.earnings_expenses', period='daily') }}"
-       class="list-group-item list-group-item-action">
-        💰 Earnings & Expenses
-    </a>
+.report-header {
+    background: var(--wq-black);
+    color: white;
+    border-bottom: 5px solid var(--wq-yellow);
+    border-radius: 15px;
+    padding: 27px;
+    margin-bottom: 23px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.report-header h2 {
+    font-weight: 850;
+    margin: 0;
+}
+
+.report-header p {
+    color: #ccc;
+    margin: 7px 0 0;
+}
+
+.report-header .period-label {
+    background: rgba(245,197,24,.15);
+    border: 1px solid rgba(245,197,24,.4);
+    color: var(--wq-yellow);
+    border-radius: 8px;
+    padding: 9px 13px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.report-filter {
+    background: white;
+    border: 1px solid #e9e9e9;
+    border-radius: 13px;
+    padding: 20px;
+    margin-bottom: 23px;
+    box-shadow: 0 3px 15px rgba(0,0,0,.03);
+}
+
+.report-filter label {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: #555;
+    margin-bottom: 7px;
+}
+
+.report-filter .form-control,
+.report-filter .form-select {
+    min-height: 43px;
+    border-radius: 8px;
+}
+
+.btn-wheelq {
+    background: var(--wq-yellow);
+    color: var(--wq-black);
+    border: 0;
+    border-radius: 8px;
+    padding: 11px 18px;
+    font-weight: 800;
+}
+
+.btn-wheelq:hover {
+    background: #dfb000;
+    color: var(--wq-black);
+}
+
+.section-title {
+    margin: 28px 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.section-title h5 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 850;
+    color: var(--wq-black);
+}
+
+.section-title span {
+    color: #888;
+    font-size: 11px;
+}
+
+.stat-card {
+    background: white;
+    border: 1px solid #ededed;
+    border-radius: 13px;
+    padding: 19px;
+    height: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,.035);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::after {
+    content: "";
+    height: 4px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--wq-yellow);
+}
+
+.stat-card.red::after { background: var(--wq-red); }
+.stat-card.green::after { background: var(--wq-green); }
+.stat-card.black::after { background: var(--wq-black); }
+
+.stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.stat-name {
+    color: #777;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.stat-icon {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    background: #fff6d2;
+    color: #806600;
+    border-radius: 9px;
+    font-size: 17px;
+}
+
+.red .stat-icon {
+    background: #fff0f0;
+    color: var(--wq-red);
+}
+
+.green .stat-icon {
+    background: #e8f7ee;
+    color: var(--wq-green);
+}
+
+.stat-number {
+    margin-top: 13px;
+    font-size: clamp(22px, 2vw, 29px);
+    font-weight: 850;
+    color: var(--wq-black);
+    overflow-wrap: anywhere;
+}
+
+.stat-caption {
+    color: #999;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.report-panel {
+    background: white;
+    border: 1px solid #ececec;
+    border-radius: 13px;
+    padding: 21px;
+    height: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,.035);
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.panel-heading h6 {
+    font-weight: 850;
+    font-size: 14px;
+    margin: 0;
+}
+
+.chart-container {
+    position: relative;
+    height: 290px;
+}
+
+.breakdown-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+
+.breakdown-row:last-child {
+    border-bottom: 0;
+}
+
+.breakdown-row span:first-child {
+    color: #666;
+}
+
+.breakdown-row strong {
+    color: var(--wq-black);
+}
+
+.report-table-panel {
+    background: white;
+    border: 1px solid #ececec;
+    border-radius: 13px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,.035);
+}
+
+.report-table-heading {
+    padding: 19px 21px;
+    border-bottom: 1px solid #eee;
+}
+
+.report-table-heading h6 {
+    margin: 0;
+    font-weight: 850;
+}
+
+.report-table-heading small {
+    color: #999;
+}
+
+.report-table {
+    min-width: 650px;
+    margin: 0;
+}
+
+.report-table thead th {
+    padding: 14px;
+    background: #f8f8f8;
+    color: #777;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    white-space: nowrap;
+}
+
+.report-table tbody td {
+    padding: 13px 14px;
+    font-size: 12px;
+    vertical-align: middle;
+    border-color: #f0f0f0;
+}
+
+.status-pill {
+    padding: 5px 9px;
+    border-radius: 30px;
+    font-size: 10px;
+    font-weight: 800;
+    background: #eee;
+    color: #555;
+    display: inline-block;
+}
+
+.status-pill.success {
+    background: #e7f6ed;
+    color: #08743c;
+}
+
+.status-pill.warning {
+    background: #fff6dc;
+    color: #806000;
+}
+
+.status-pill.danger {
+    background: #fff0f0;
+    color: #b30000;
+}
+
+.money-positive {
+    color: var(--wq-green);
+    font-weight: 800;
+}
+
+.money-negative {
+    color: var(--wq-red);
+    font-weight: 800;
+}
+
+.empty-note {
+    color: #999;
+    font-size: 12px;
+    text-align: center;
+    padding: 22px;
+}
+
+@media(max-width: 768px) {
+    .reports-page { padding: 12px; }
+    .report-header { padding: 21px 17px; }
+    .report-panel { padding: 16px; }
+    .chart-container { height: 250px; }
+}
+</style>
+
+<div class="reports-page">
+
+    <div class="report-header">
+        <div>
+            <h2>Reports & Analytics</h2>
+            <p>WheelQ Tours & Car Hire · Business intelligence dashboard</p>
+        </div>
+
+        <div class="period-label">
+            {{ start_date }} — {{ end_date }}
+        </div>
+    </div>
+
+    <!-- DATE FILTERS -->
+    <div class="report-filter">
+        <form method="GET" action="{{ url_for('admin.reports_dashboard') }}">
+            <div class="row g-3 align-items-end">
+
+                <div class="col-md-3">
+                    <label>Reporting period</label>
+                    <select name="period" id="reportPeriod" class="form-select">
+                        <option value="daily" {% if period == 'daily' %}selected{% endif %}>Daily · Today</option>
+                        <option value="weekly" {% if period == 'weekly' %}selected{% endif %}>Weekly · Last 7 days</option>
+                        <option value="monthly" {% if period == 'monthly' %}selected{% endif %}>Monthly · This month</option>
+                        <option value="annual" {% if period == 'annual' %}selected{% endif %}>Annual · This year</option>
+                        <option value="custom" {% if period == 'custom' %}selected{% endif %}>Custom date range</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 custom-date">
+                    <label>Start date</label>
+                    <input type="date"
+                           name="start_date"
+                           class="form-control"
+                           value="{{ start_date }}">
+                </div>
+
+                <div class="col-md-3 custom-date">
+                    <label>End date</label>
+                    <input type="date"
+                           name="end_date"
+                           class="form-control"
+                           value="{{ end_date }}">
+                </div>
+
+                <div class="col-md-3">
+                    <button type="submit" class="btn-wheelq w-100">
+                        Apply Report Filters →
+                    </button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+    <!-- FINANCIAL OVERVIEW -->
+    <div class="section-title">
+        <h5>01 · Financial Performance</h5>
+        <span>Actual cash movements</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-top">
+                    <span class="stat-name">TOTAL EARNINGS</span>
+                    <span class="stat-icon">↗</span>
+                </div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(total_earnings|float) }}
+                </div>
+                <div class="stat-caption">Successful collections + manual income</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card red">
+                <div class="stat-top">
+                    <span class="stat-name">TOTAL EXPENSES</span>
+                    <span class="stat-icon">↘</span>
+                </div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(total_expenses|float) }}
+                </div>
+                <div class="stat-caption">Investor payouts + manual expenses</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card green">
+                <div class="stat-top">
+                    <span class="stat-name">NET PROFIT / LOSS</span>
+                    <span class="stat-icon">◆</span>
+                </div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(net_profit|float) }}
+                </div>
+                <div class="stat-caption">
+                    {{ "Profit" if net_profit >= 0 else "Loss" }} in selected period
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Customer Collections</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(customer_payment_total|float) }}
+                </div>
+                <div class="stat-caption">Successful financial payments</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Other Earnings</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(manual_earning_total|float) }}
+                </div>
+                <div class="stat-caption">Manually recorded income</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card red">
+                <div class="stat-name">Investor Payouts</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(investor_payout_total|float) }}
+                </div>
+                <div class="stat-caption">Actual lease-linked payouts</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card red">
+                <div class="stat-name">Other Expenses</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(manual_expense_total|float) }}
+                </div>
+                <div class="stat-caption">Manually recorded expenses</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINANCIAL CHARTS -->
+    <div class="section-title">
+        <h5>02 · Financial Trends</h5>
+        <span>Selected reporting period</span>
+    </div>
+
+    <div class="row g-3">
+        <div class="col-lg-7">
+            <div class="report-panel">
+                <div class="panel-heading">
+                    <h6>Earnings vs Expenses</h6>
+                    <small class="text-muted">KSh</small>
+                </div>
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <div class="report-panel">
+                <div class="panel-heading">
+                    <h6>Payment Methods</h6>
+                    <small class="text-muted">Collections</small>
+                </div>
+                <div class="chart-container">
+                    <canvas id="paymentChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- BOOKING ANALYTICS -->
+    <div class="section-title">
+        <h5>03 · Booking Analytics</h5>
+        <span>Bookings created during selected period</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Total Bookings</div>
+                <div class="stat-number">{{ total_bookings }}</div>
+                <div class="stat-caption">New booking records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card green">
+                <div class="stat-name">Completed</div>
+                <div class="stat-number">{{ completed_bookings }}</div>
+                <div class="stat-caption">Completed booking records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card red">
+                <div class="stat-name">Cancelled</div>
+                <div class="stat-number">{{ cancelled_bookings }}</div>
+                <div class="stat-caption">Cancelled booking records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Pending</div>
+                <div class="stat-number">{{ pending_bookings }}</div>
+                <div class="stat-caption">Awaiting action</div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="report-panel">
+                <div class="panel-heading">
+                    <h6>Booking Status Breakdown</h6>
+                </div>
+
+                {% for status, count in booking_statuses.items() %}
+                    <div class="breakdown-row">
+                        <span>{{ status }}</span>
+                        <strong>{{ count }}</strong>
+                    </div>
+                {% else %}
+                    <div class="empty-note">No booking records in this period.</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="report-panel">
+                <div class="panel-heading">
+                    <h6>Booking Value</h6>
+                </div>
+
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(booking_value|float) }}
+                </div>
+                <div class="stat-caption">
+                    Total stated booking value created during this period.
+                    This is not counted as collected revenue.
+                </div>
+
+                <hr>
+
+                <div class="breakdown-row">
+                    <span>Booked vehicle-days overlapping period</span>
+                    <strong>{{ booking_days }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FLEET ANALYTICS -->
+    <div class="section-title">
+        <h5>04 · Fleet Performance</h5>
+        <span>Current fleet snapshot</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Total Vehicles</div>
+                <div class="stat-number">{{ total_vehicles }}</div>
+                <div class="stat-caption">Registered fleet</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card green">
+                <div class="stat-name">Available</div>
+                <div class="stat-number">{{ available_vehicles }}</div>
+                <div class="stat-caption">Currently marked available</div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="report-panel">
+                <div class="panel-heading">
+                    <h6>Vehicle Status Breakdown</h6>
+                </div>
+
+                {% for status, count in fleet_statuses.items() %}
+                    <div class="breakdown-row">
+                        <span>{{ status }}</span>
+                        <strong>{{ count }}</strong>
+                    </div>
+                {% else %}
+                    <div class="empty-note">No vehicles registered.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- CUSTOMER ANALYTICS -->
+    <div class="section-title">
+        <h5>05 · Customer Analytics</h5>
+        <span>Customer registrations and activity</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">New Customers</div>
+                <div class="stat-number">{{ total_new_customers }}</div>
+                <div class="stat-caption">Registered during period</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card green">
+                <div class="stat-name">Returning Customers</div>
+                <div class="stat-number">{{ returning_customers }}</div>
+                <div class="stat-caption">Customers with bookings in period</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card red">
+                <div class="stat-name">Active Blacklist</div>
+                <div class="stat-number">{{ active_blacklist }}</div>
+                <div class="stat-caption">Current active blacklist records</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">New Blacklist Records</div>
+                <div class="stat-number">{{ new_blacklist_records }}</div>
+                <div class="stat-caption">Added during selected period</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHARGES AND PENALTIES -->
+    <div class="section-title">
+        <h5>06 · Charges, Penalties & Damages</h5>
+        <span>Amounts raised and collection indicators</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-name">Financial Charges Raised</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(charges_raised|float) }}
+                </div>
+                <div class="stat-caption">Charges created in this period</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card red">
+                <div class="stat-name">Outstanding Charges</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(outstanding_charges|float) }}
+                </div>
+                <div class="stat-caption">Remaining on charges created in this period</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-name">Approved Adjustments</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(total_adjustments|float) }}
+                </div>
+                <div class="stat-caption">Approved adjustments in period</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="report-panel">
+                <div class="panel-heading"><h6>Late Penalties</h6></div>
+                <div class="breakdown-row">
+                    <span>Penalty charges</span>
+                    <strong>KSh {{ "{:,.2f}".format(penalty_total|float) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Marked paid</span>
+                    <strong class="money-positive">KSh {{ "{:,.2f}".format(penalty_collected|float) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Not marked paid</span>
+                    <strong class="money-negative">KSh {{ "{:,.2f}".format(penalty_outstanding|float) }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="report-panel">
+                <div class="panel-heading"><h6>Damage Charges</h6></div>
+                <div class="breakdown-row">
+                    <span>Damage records</span>
+                    <strong>{{ damage_total and "Recorded" or "None" }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Damage amount</span>
+                    <strong>KSh {{ "{:,.2f}".format(damage_total|float) }}</strong>
+                </div>
+                <div class="breakdown-row">
+                    <span>Collected through linked payments</span>
+                    <strong class="money-positive">KSh {{ "{:,.2f}".format(damage_collected|float) }}</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="report-panel">
+                <div class="panel-heading"><h6>Airport Transfers</h6></div>
+                <div class="stat-number">{{ airport_transfer_count }}</div>
+                <div class="stat-caption">Transfer requests created during period</div>
+                {% for status, count in transfer_statuses.items() %}
+                    <div class="breakdown-row">
+                        <span>{{ status }}</span>
+                        <strong>{{ count }}</strong>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- INVESTOR ANALYTICS -->
+    <div class="section-title">
+        <h5>07 · Investor & Lease Analytics</h5>
+        <span>Lease activity and actual payout liabilities</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Lease Applications</div>
+                <div class="stat-number">{{ lease_count }}</div>
+                <div class="stat-caption">Created during period</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card">
+                <div class="stat-name">Approved Lease Value</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(lease_agreed_total|float) }}
+                </div>
+                <div class="stat-caption">Agreed amount for approved leases</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card red">
+                <div class="stat-name">Outstanding Lease Liability</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(lease_outstanding_total|float) }}
+                </div>
+                <div class="stat-caption">Not yet paid; excluded from cash expenses</div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="stat-card green">
+                <div class="stat-name">Actual Payouts</div>
+                <div class="stat-number">
+                    KSh {{ "{:,.2f}".format(investor_payout_total|float) }}
+                </div>
+                <div class="stat-caption">Included in cash expenses</div>
+            </div>
+        </div>
+
+        <div class="col-12">
+            <div class="report-panel">
+                <div class="panel-heading"><h6>Lease Status Breakdown</h6></div>
+                {% for status, count in lease_statuses.items() %}
+                    <div class="breakdown-row">
+                        <span>{{ status }}</span>
+                        <strong>{{ count }}</strong>
+                    </div>
+                {% else %}
+                    <div class="empty-note">No lease applications in this period.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ENQUIRIES -->
+    <div class="section-title">
+        <h5>08 · Customer Enquiries</h5>
+        <span>Contact messages received during period</span>
+    </div>
+
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <div class="stat-card">
+                <div class="stat-name">Total Enquiries</div>
+                <div class="stat-number">{{ enquiry_count }}</div>
+                <div class="stat-caption">Contact messages received</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card red">
+                <div class="stat-name">Unread Enquiries</div>
+                <div class="stat-number">{{ unread_enquiries }}</div>
+                <div class="stat-caption">Awaiting review</div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="stat-card green">
+                <div class="stat-name">Replied Enquiries</div>
+                <div class="stat-number">{{ replied_enquiries }}</div>
+                <div class="stat-caption">Messages with an admin reply</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT BOOKINGS -->
+    <div class="section-title">
+        <h5>09 · Recent Bookings</h5>
+        <span>Latest 10 bookings in selected period</span>
+    </div>
+
+    <div class="report-table-panel">
+        <div class="table-responsive">
+            <table class="table report-table">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Customer</th>
+                        <th>Vehicle</th>
+                        <th>Pickup</th>
+                        <th>Return</th>
+                        <th>Status</th>
+                        <th>Booking Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in recent_bookings %}
+                    <tr>
+                        <td>#{{ booking.id }}</td>
+                        <td>{{ booking.client_name }}</td>
+                        <td>{{ booking.car.name if booking.car else "Unavailable" }}</td>
+                        <td>{{ booking.pickup_date.strftime('%d %b %Y') }}</td>
+                        <td>{{ booking.dropoff_date.strftime('%d %b %Y') }}</td>
+                        <td>
+                            <span class="status-pill
+                                {% if booking.status == 'completed' %}success
+                                {% elif booking.status == 'cancelled' %}danger
+                                {% else %}warning{% endif %}">
+                                {{ booking.status|title }}
+                            </span>
+                        </td>
+                        <td>KSh {{ "{:,.2f}".format(booking.amount|float) }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="empty-note">No bookings found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- RECENT PAYMENTS -->
+    <div class="section-title">
+        <h5>10 · Recent Customer Payments</h5>
+        <span>Successful collections only</span>
+    </div>
+
+    <div class="report-table-panel">
+        <div class="table-responsive">
+            <table class="table report-table">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Customer</th>
+                        <th>Category</th>
+                        <th>Payment Date</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in recent_payments %}
+                    <tr>
+                        <td>#{{ payment.id }}</td>
+                        <td>
+                            {{ payment.charge.client.name if payment.charge and payment.charge.client else "Customer" }}
+                        </td>
+                        <td>{{ payment.charge.category if payment.charge else "—" }}</td>
+                        <td>{{ payment.received_at.strftime('%d %b %Y') if payment.received_at else "—" }}</td>
+                        <td>{{ payment.payment_method }}</td>
+                        <td>{{ payment.reference or "—" }}</td>
+                        <td class="money-positive">
+                            KSh {{ "{:,.2f}".format(payment.amount|float) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="empty-note">No successful payments found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- RECENT INVESTOR PAYOUTS -->
+    <div class="section-title">
+        <h5>11 · Recent Investor Payouts</h5>
+        <span>Actual lease-linked payments</span>
+    </div>
+
+    <div class="report-table-panel">
+        <div class="table-responsive">
+            <table class="table report-table">
+                <thead>
+                    <tr>
+                        <th>Payment ID</th>
+                        <th>Investor</th>
+                        <th>Vehicle</th>
+                        <th>Date</th>
+                        <th>Method</th>
+                        <th>Reference</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in recent_expenses %}
+                    <tr>
+                        <td>#{{ payment.id }}</td>
+                        <td>{{ payment.investor_name or (payment.lease.owner_name if payment.lease else "Investor") }}</td>
+                        <td>{{ payment.car.registration_number if payment.car else "—" }}</td>
+                        <td>{{ payment.created_at.strftime('%d %b %Y') if payment.created_at else "—" }}</td>
+                        <td>{{ payment.payment_method or "—" }}</td>
+                        <td>{{ payment.reference or "—" }}</td>
+                        <td class="money-negative">
+                            KSh {{ "{:,.2f}".format(payment.amount|float) }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="7" class="empty-note">No investor payouts found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="text-center text-muted small mt-4 mb-3">
+        WheelQ Tours & Car Hire · Internal Management Report
+    </div>
+
+</div>
+<div id="payment-chart-data"
+     data-labels='{{ labels|tojson|forceescape }}'
+     data-earnings='{{ earnings_series|tojson|forceescape }}'
+     data-expenses='{{ expenses_series|tojson|forceescape }}'
+     data-labels='{{ payment_methods.keys()|list|tojson|forceescape }}'
+     data-values='{{ payment_methods.values()|list|map("float")|list|tojson|forceescape }}'>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const period = document.getElementById("reportPeriod");
+    const customFields = document.querySelectorAll(".custom-date");
+
+    function updateDateFields() {
+        customFields.forEach(field => {
+            field.style.display = period.value === "custom" ? "block" : "none";
+        });
+    }
+
+    period.addEventListener("change", updateDateFields);
+    updateDateFields();
+
+
+    const paymentData = document.getElementById("payment-chart-data");
+    const labels = JSON.parse(paymentData.dataset.labels);
+    const earnings = JSON.parse(paymentData.dataset.earnings);
+    const expenses = JSON.parse(paymentData.dataset.expenses);
+    
+
+    const paymentLabels = JSON.parse(paymentData.dataset.labels);
+    const paymentValues = JSON.parse(paymentData.dataset.values);
+
+    if (typeof Chart === "undefined") return;
+
+    new Chart(document.getElementById("financialChart"), {
+        type: "bar",
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: "Earnings",
+                    data: earnings,
+                    backgroundColor: "#f5c518",
+                    borderRadius: 5
+                },
+                {
+                    label: "Expenses",
+                    data: expenses,
+                    backgroundColor: "#b30000",
+                    borderRadius: 5
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: "bottom" }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: value => "KSh " + Number(value).toLocaleString()
+                    }
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById("paymentChart"), {
+        type: "doughnut",
+        data: {
+            labels: paymentLabels,
+            datasets: [{
+                data: paymentValues,
+                backgroundColor: [
+                    "#f5c518", "#171717", "#b30000",
+                    "#16834a", "#777777", "#e39b24"
+                ],
+                borderWidth: 2,
+                borderColor: "#fff"
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: "bottom" }
+            }
+        }
+    });
+
+});
+</script>
 {% endblock %}

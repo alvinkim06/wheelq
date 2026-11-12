@@ -1,0 +1,26 @@
+
+{% extends "emails/base.html" %}
+{% block title %}Airport Transfer Confirmation - WheelQ{% endblock %}
+
+{% block content %}
+<h2>Hello {{ customer_name }},</h2>
+
+<p>Your airport transfer request has been successfully received. Thank you for choosing WheelQ!</p>
+
+<div class="details">
+    <h3>Transfer Details</h3>
+    <p><strong>Transfer Reference:</strong> {{ transfer_reference }}</p>
+    <p><strong>Airport:</strong> {{ airport }}</p>
+    <p><strong>Pickup Location:</strong> {{ pickup_location }}</p>
+    <p><strong>Drop-off Location:</strong> {{ dropoff_location }}</p>
+    <p><strong>Pickup Date & Time:</strong> {{ pickup_datetime }}</p>
+    <p><strong>Passengers:</strong> {{ passengers }}</p>
+    <p><strong>Vehicle:</strong> {{ car_name|default('To be confirmed') }}</p>
+    <p><strong>Status:</strong> {{ transfer_status|default('Pending confirmation') }}</p>
+</div>
+
+<p>Our team will contact you to confirm the transfer arrangements.</p>
+
+<p>We look forward to making your journey comfortable.</p>
+<p><strong>WheelQ Tours & Car Hire Team</strong></p>
+{% endblock %}

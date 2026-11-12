@@ -1,0 +1,193 @@
+{% extends "admin_base.html" %}
+
+{% block title %}My Account | WheelQ{% endblock %}
+
+{% block content %}
+<style>
+.account-page {
+    max-width: 1050px;
+    margin: 0 auto;
+    color: #f5f5f5;
+}
+
+.account-header {
+    margin-bottom: 25px;
+}
+
+.account-header h1 {
+    color: #ffcc00;
+    font-size: 27px;
+    margin-bottom: 8px;
+}
+
+.account-header p {
+    color: #aaa;
+}
+
+.account-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
+}
+
+.account-card {
+    background: #171717;
+    border: 1px solid #333;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.account-card h2 {
+    color: #ffcc00;
+    font-size: 19px;
+    margin: 0 0 20px;
+}
+
+.account-card label {
+    display: block;
+    color: #ddd;
+    margin: 15px 0 7px;
+    font-size: 14px;
+}
+
+.account-card input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 7px;
+    border: 1px solid #444;
+    background: #252525;
+    color: white;
+    box-sizing: border-box;
+}
+
+.account-card input:focus {
+    outline: none;
+    border-color: #ffcc00;
+}
+
+.account-btn {
+    margin-top: 20px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 7px;
+    background: #b30000;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.account-btn:hover {
+    background: #e00000;
+}
+
+.account-meta {
+    color: #aaa;
+    font-size: 13px;
+    margin-top: 20px;
+}
+
+.account-role {
+    display: inline-block;
+    background: #332b00;
+    color: #ffcc00;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+</style>
+
+<div class="account-page">
+
+    <div class="account-header">
+        <h1>My Account</h1>
+        <p>Manage your personal information and account security.</p>
+    </div>
+
+    <div class="account-grid">
+
+        <!-- Profile information -->
+        <section class="account-card">
+            <h2>Profile Information</h2>
+
+            <form method="POST"
+                  action="{{ url_for('admin.my_account') }}">
+
+                <label>Full Name</label>
+                <input
+                    type="text"
+                    name="name"
+                    value="{{ user.name }}"
+                    required
+                >
+
+                <label>Email Address</label>
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ user.email }}"
+                    required
+                >
+
+                <label>Account Role</label>
+                <div style="margin-top:8px">
+                    <span class="account-role">{{ user.role }}</span>
+                </div>
+
+                <button type="submit" class="account-btn">
+                    Save Changes
+                </button>
+            </form>
+
+            <div class="account-meta">
+                Account created:
+                {{ user.created_at.strftime('%d %B %Y') if user.created_at else 'Not available' }}
+            </div>
+        </section>
+
+        <!-- Password -->
+        <section class="account-card">
+            <h2>Change Password</h2>
+
+            <form method="POST"
+                  action="{{ url_for('admin.change_my_password') }}">
+
+                <label>Current Password</label>
+                <input
+                    type="password"
+                    name="current_password"
+                    autocomplete="current-password"
+                    required
+                >
+
+                <label>New Password</label>
+                <input
+                    type="password"
+                    name="new_password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <label>Confirm New Password</label>
+                <input
+                    type="password"
+                    name="confirm_password"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button type="submit" class="account-btn">
+                    Update Password
+                </button>
+            </form>
+
+            <div class="account-meta">
+                Use at least 8 characters for your new password.
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

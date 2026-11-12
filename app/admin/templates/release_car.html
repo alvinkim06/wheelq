@@ -1,59 +1,249 @@
+
 {% extends "admin_base.html" %}
+
 {% block content %}
-
-<div class="release-card">
-    <h3 class="release-title">🚗 Release Vehicle</h3>
-
-    <p class="release-note">
-        Before releasing the vehicle, ensure the hire agreement is downloaded
-        and signed by the client.
-    </p>
-
-    <div class="release-actions">
-        <a href="{{ url_for('admin.download_agreement', booking_id=booking.id) }}"
-           class="btn btn-outline-primary">
-            📄 Download Hire Agreement
-        </a>
-
-        <a href="{{ url_for('admin.activate_booking', booking_id=booking.id) }}"
-           class="btn btn-success"
-           onclick="return confirm('Are you sure you want to release this vehicle to the client?');">
-            ✅ Release Vehicle
+<div class="wheelq-workflow">
+    <div class="workflow-header">
+        <div>
+            <span class="eyebrow">BOOKING MANAGEMENT</span>
+            <h2>Release vehicle</h2>
+            <p>Review the hire details and confirm the vehicle handover.</p>
+        </div>
+        <a href="{{ url_for('admin.bookings_page') }}" class="back-link">
+            ← Back to bookings
         </a>
     </div>
+
+    <div class="workflow-card">
+        <div class="vehicle-heading">
+            <div class="vehicle-icon">🚗</div>
+            <div>
+                <h3>{{ booking.car.registration_number if booking.car else 'Vehicle' }}</h3>
+                <span>Booking #{{ booking.id }}</span>
+            </div>
+            <span class="status-pill">{{ booking.status|replace('_', ' ')|title }}</span>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span>Client</span>
+                <strong>{{ booking.client_name }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Phone</span>
+                <strong>{{ booking.client_phone }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Pickup date</span>
+                <strong>{{ booking.pickup_date }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Expected return</span>
+                <strong>
+                    {{ booking.dropoff_date }}
+                    {% if booking.dropoff_time %} · {{ booking.dropoff_time }}{% endif %}
+                </strong>
+            </div>
+            <div class="detail-item">
+                <span>Booking amount</span>
+                <strong>KSh {{ "{:,.2f}".format(booking.amount) }}</strong>
+            </div>
+            <div class="detail-item">
+                <span>Payment status</span>
+                <strong>{{ booking.payment_status|replace('_', ' ')|title }}</strong>
+            </div>
+        </div>
+
+        <div class="agreement-panel">
+            <div class="agreement-icon">📄</div>
+            <div class="agreement-copy">
+                <h4>Hire agreement</h4>
+                <p>Download the agreement, review it with the client, and ensure it is signed before handing over the vehicle.</p>
+                <a href="{{ url_for('admin.download_agreement', booking_id=booking.id) }}"
+                   class="workflow-btn btn-outline">
+                    Download agreement
+                </a>
+            </div>
+        </div>
+
+        <form method="POST"
+              action="{{ url_for('admin.activate_booking', booking_id=booking.id) }}"
+              class="release-confirm-form">
+            {% if csrf_token is defined %}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            {% endif %}
+
+            <label class="confirmation-label">
+                <input type="checkbox"
+                       name="agreement_confirmed"
+                       value="yes"
+                       required>
+                <span>
+                    I confirm that the hire agreement has been reviewed and signed,
+                    and the vehicle is ready for handover.
+                </span>
+            </label>
+
+            <button type="submit" class="workflow-btn btn-primary">
+                Confirm handover & release vehicle
+            </button>
+        </form>
+    </div>
 </div>
+
 <style>
-    .release-card {
-    background: #ffffff;
-    border-radius: 8px;
-    padding: 25px;
-    max-width: 600px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    border-left: 5px solid #28a745;
+.wheelq-workflow {
+    max-width: 1050px;
+    margin: 25px auto;
+    color: #f5f5f5;
 }
-
-.release-title {
-    margin-bottom: 10px;
-    font-weight: 600;
-    color: #333;
-}
-
-.release-note {
-    font-size: 14px;
-    color: #666;
-    margin-bottom: 20px;
-}
-
-.release-actions {
+.workflow-header {
     display: flex;
+    justify-content: space-between;
+    align-items: center;
     gap: 15px;
-    flex-wrap: wrap;
+    margin-bottom: 25px;
 }
-
-.release-actions .btn {
-    padding: 10px 18px;
+.eyebrow {
+    color: #f5c400;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 2px;
+}
+.workflow-header h2 {
+    font-weight: 800;
+    margin: 7px 0;
+}
+.workflow-header p {
+    color: #a9a9a9;
+    margin: 0;
+}
+.back-link {
+    color: #f5c400;
+    text-decoration: none;
+    font-weight: 700;
+}
+.workflow-card {
+    background: #171717;
+    border: 1px solid #303030;
+    border-radius: 18px;
+    padding: 28px;
+    box-shadow: 0 12px 35px rgba(0,0,0,.2);
+}
+.vehicle-heading {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #333;
+}
+.vehicle-icon {
+    width: 55px;
+    height: 55px;
+    display: grid;
+    place-items: center;
+    background: #292400;
+    border-radius: 14px;
+    font-size: 25px;
+}
+.vehicle-heading h3 {
+    margin: 0 0 5px;
+    font-weight: 800;
+}
+.vehicle-heading span {
+    color: #aaa;
+}
+.status-pill {
+    margin-left: auto;
+    padding: 7px 13px;
+    background: #302800;
+    color: #f5c400 !important;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: 700;
+}
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    padding: 25px 0;
+}
+.detail-item span {
+    display: block;
+    color: #999;
+    font-size: 12px;
+    margin-bottom: 6px;
+}
+.detail-item strong {
+    color: #fff;
     font-size: 14px;
-    border-radius: 5px;
+}
+.agreement-panel {
+    display: flex;
+    gap: 18px;
+    background: #222;
+    border: 1px solid #3a3a3a;
+    border-radius: 14px;
+    padding: 22px;
+    margin-bottom: 25px;
+}
+.agreement-icon {
+    font-size: 30px;
+}
+.agreement-copy h4 {
+    margin: 0 0 8px;
+}
+.agreement-copy p {
+    color: #aaa;
+    line-height: 1.6;
+}
+.workflow-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 9px;
+    padding: 12px 18px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-outline {
+    color: #f5c400;
+    border: 1px solid #f5c400;
+    background: transparent;
+}
+.btn-primary {
+    width: 100%;
+    color: #111;
+    background: #f5c400;
+}
+.btn-primary:hover {
+    background: #ffda35;
+}
+.confirmation-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: #ddd;
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
+.confirmation-label input {
+    margin-top: 5px;
+    accent-color: #f5c400;
+}
+@media(max-width: 650px) {
+    .workflow-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .workflow-card {
+        padding: 18px;
+    }
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
 {% endblock %}

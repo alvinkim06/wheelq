@@ -1,0 +1,26 @@
+
+{% extends "emails/base.html" %}
+{% block title %}Payment Receipt - WheelQ{% endblock %}
+
+{% block content %}
+<h2>Payment Received!</h2>
+
+<p>Hello {{ customer_name }},</p>
+
+<p>We have successfully received your payment. Thank you!</p>
+
+<div class="details">
+    <h3>Payment Receipt</h3>
+    <p><strong>Receipt Number:</strong> {{ receipt_number }}</p>
+    <p><strong>Payment Date:</strong> {{ payment_date }}</p>
+    <p><strong>Description:</strong> {{ description }}</p>
+    <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+    <p><strong>Transaction Reference:</strong> {{ reference|default('N/A') }}</p>
+    <p><strong>Amount Paid:</strong> {{ amount }}</p>
+    <p><strong>Outstanding Balance:</strong> {{ balance|default('N/A') }}</p>
+</div>
+
+<p>Your payment has been recorded in our system. Please keep the attached receipt for your records.</p>
+
+<p>Thank you for choosing WheelQ!</p>
+{% endblock %}

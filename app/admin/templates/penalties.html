@@ -2,113 +2,820 @@
 {% block content %}
 
 <style>
-.penalty-container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 2rem;
+/* ========================================
+   PENALTIES DASHBOARD
+======================================== */
+
+.penalty-page {
+    max-width: 1450px;
+    margin: 0 auto;
+    padding: 24px;
+    color: #252b36;
 }
 
-.penalty-header {
+.penalty-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+}
+
+.penalty-heading h2 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 750;
+    color: #202633;
+}
+
+.penalty-heading p {
+    margin: 6px 0 0;
+    color: #89909c;
+    font-size: 13px;
+}
+
+.penalty-header-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff0ed;
+    color: #c62828;
+    font-size: 20px;
+}
+
+.penalty-heading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+/* ========================================
+   SUMMARY CARDS
+======================================== */
+
+.penalty-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.penalty-stat-card {
+    background: #fff;
+    border: 1px solid #edf0f4;
+    border-radius: 13px;
+    padding: 19px;
+    box-shadow: 0 3px 12px rgba(25, 35, 50, 0.035);
+}
+
+.penalty-stat-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.penalty-title {
-    font-size: 2rem;
-    color: #b30000;
+.penalty-stat-label {
+    font-size: 12px;
+    color: #858d99;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .45px;
 }
 
-.penalty-table {
-    margin-top: 1.5rem;
-    width: 100%;
-    border-collapse: collapse;
+.penalty-stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.penalty-stat-value {
+    font-size: 25px;
+    font-weight: 750;
+    color: #252b36;
+    margin-top: 12px;
+}
+
+.stat-total .penalty-stat-icon {
+    background: #fff0ed;
+    color: #c62828;
+}
+
+.stat-unpaid .penalty-stat-icon {
+    background: #fff5df;
+    color: #d28b00;
+}
+
+.stat-paid .penalty-stat-icon {
+    background: #e7f7ee;
+    color: #218653;
+}
+
+/* ========================================
+   SETTINGS PANEL
+======================================== */
+
+.penalty-settings-card,
+.penalty-table-card {
     background: #fff;
-    border-radius: 12px;
+    border: 1px solid #edf0f4;
+    border-radius: 14px;
+    box-shadow: 0 3px 14px rgba(25, 35, 50, 0.04);
+    margin-bottom: 23px;
     overflow: hidden;
 }
 
-.penalty-table th {
-    background: #b30000;
-    color: #fff;
-    padding: 14px;
+.penalty-settings-toggle {
+    width: 100%;
+    padding: 18px 21px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
 }
 
-.penalty-table td {
-    padding: 12px;
+.penalty-settings-toggle:hover {
+    background: #fafbfc;
 }
 
-.penalty-table tr:nth-child(even) {
-    background: #f9f9f9;
+.penalty-settings-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
-.badge {
-    padding: 6px 12px;
-    border-radius: 20px;
+.penalty-settings-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    background: #fff0ed;
+    color: #c62828;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 17px;
+}
+
+.penalty-settings-title strong {
+    display: block;
+    color: #252b36;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.penalty-settings-title small {
+    display: block;
+    color: #9299a5;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+.settings-toggle-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #7b8491;
+    font-size: 13px;
     font-weight: 600;
 }
 
-.badge.unpaid {
-    background: #ffcc00;
+.settings-chevron {
+    transition: transform .25s ease;
 }
 
-.badge.paid {
-    background: #28a745;
-    color: white;
+.penalty-settings-toggle[aria-expanded="true"] .settings-chevron {
+    transform: rotate(180deg);
 }
 
-.pay-btn {
-    background: #b30000;
-    color: white;
-    padding: 6px 14px;
+.penalty-settings-body {
+    display: none;
+    padding: 22px;
+    border-top: 1px solid #edf0f4;
+    background: #fcfcfd;
+}
+
+.penalty-settings-body.is-open {
+    display: block;
+}
+
+.penalty-settings-description {
+    color: #858d99;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.penalty-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 17px;
+}
+
+.penalty-form-group label {
+    display: block;
+    color: #444c59;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.penalty-form-group input {
+    width: 100%;
+    height: 43px;
+    border: 1px solid #dfe3e9;
+    border-radius: 8px;
+    padding: 0 12px;
+    outline: none;
+    background: #fff;
+    color: #303744;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.penalty-form-group input:focus {
+    border-color: #c62828;
+    box-shadow: 0 0 0 3px rgba(198, 40, 40, .08);
+}
+
+.penalty-form-group small {
+    display: block;
+    color: #9299a5;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.penalty-settings-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 22px;
+}
+
+.penalty-save-btn {
+    border: none;
+    border-radius: 8px;
+    background: #b71c1c;
+    color: #fff;
+    padding: 11px 19px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background .2s, transform .2s;
+}
+
+.penalty-save-btn:hover {
+    background: #941515;
+    transform: translateY(-1px);
+}
+
+/* ========================================
+   TABLE SECTION
+======================================== */
+
+.penalty-table-header {
+    padding: 20px 21px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid #edf0f4;
+    flex-wrap: wrap;
+}
+
+.penalty-table-heading h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 750;
+    color: #252b36;
+}
+
+.penalty-table-heading p {
+    margin: 5px 0 0;
+    color: #9299a5;
+    font-size: 12px;
+}
+
+.penalty-record-count {
+    background: #fff0ed;
+    color: #b71c1c;
+    padding: 6px 11px;
     border-radius: 20px;
-    text-decoration: none;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.penalty-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.penalty-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 760px;
+}
+
+.penalty-table thead th {
+    background: #f8f9fb;
+    color: #737d8b;
+    padding: 14px 18px;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: .45px;
+    font-weight: 750;
+    text-align: left;
+    white-space: nowrap;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.penalty-table tbody td {
+    padding: 16px 18px;
+    font-size: 13px;
+    color: #414957;
+    border-bottom: 1px solid #f0f2f5;
+    vertical-align: middle;
+}
+
+.penalty-table tbody tr {
+    transition: background .15s;
+}
+
+.penalty-table tbody tr:hover {
+    background: #fafbfc;
+}
+
+.penalty-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.penalty-client {
+    font-weight: 700;
+    color: #29313e;
+}
+
+.penalty-subtext {
+    display: block;
+    color: #9299a5;
+    font-size: 11px;
+    margin-top: 4px;
+}
+
+.penalty-amount {
+    font-weight: 750;
+    color: #29313e;
+    white-space: nowrap;
+}
+
+.penalty-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: capitalize;
+}
+
+.penalty-status.unpaid {
+    background: #fff3d8;
+    color: #a86b00;
+}
+
+.penalty-status.paid {
+    background: #e5f6ed;
+    color: #187647;
+}
+
+.penalty-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.penalty-pay-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    background: #b71c1c;
+    color: #fff !important;
+    text-decoration: none !important;
+    font-size: 11px;
+    font-weight: 700;
+    transition: background .2s;
+    white-space: nowrap;
+}
+
+.penalty-pay-btn:hover {
+    background: #941515;
+}
+
+.penalty-paid-label {
+    color: #218653;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.penalty-empty {
+    text-align: center;
+    padding: 55px 20px !important;
+}
+
+.penalty-empty i {
+    display: block;
+    font-size: 32px;
+    color: #c5cbd3;
+    margin-bottom: 12px;
+}
+
+.penalty-empty strong {
+    display: block;
+    color: #444c59;
+    font-size: 14px;
+}
+
+.penalty-empty span {
+    display: block;
+    margin-top: 5px;
+    color: #9299a5;
+    font-size: 12px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+
+@media (max-width: 768px) {
+    .penalty-page {
+        padding: 15px;
+    }
+
+    .penalty-stats {
+        grid-template-columns: 1fr;
+        gap: 11px;
+    }
+
+    .penalty-stat-card {
+        padding: 15px;
+    }
+
+    .penalty-stat-value {
+        font-size: 22px;
+    }
+
+    .penalty-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .penalty-settings-body {
+        padding: 16px;
+    }
+
+    .penalty-table-header {
+        padding: 16px;
+    }
+
+    .penalty-settings-toggle {
+        padding: 15px;
+    }
+
+    .settings-toggle-right > span {
+        display: none;
+    }
 }
 </style>
 
-<div class="penalty-container">
 
-    <div class="penalty-header">
-        <h1 class="penalty-title">Late Return Penalties</h1>
+<div class="penalty-page">
+
+    <!-- PAGE HEADER -->
+    <div class="penalty-page-header">
+
+        <div class="penalty-heading-wrap">
+            <div class="penalty-header-icon">
+                <i class="fas fa-clock"></i>
+            </div>
+
+            <div class="penalty-heading">
+                <h2>Late Return Penalties</h2>
+                <p>Manage overdue vehicle returns, penalty charges and payments.</p>
+            </div>
+        </div>
+
     </div>
 
-    <table class="penalty-table">
-        <thead>
-            <tr>
-                <th>Client</th>
-                <th>Car</th>
-                <th>Hours Late</th>
-                <th>Amount (KES)</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for p in penalties %}
-            <tr>
-                <td>{{ p.client_name }}</td>
-                <td>{{ p.registration_number }}</td>
-                <td>{{ "%.2f"|format(p.hours_late) }}</td>
-                <td>{{ p.penalty_amount }}</td>
-                <td>
-                    <span class="badge {{ p.status }}">
-                        {{ p.status }}
-                    </span>
-                </td>
-                <td>
-                    {% if p.status == "unpaid" %}
-                        <a href="{{ url_for('admin.pay_penalty', penalty_id=p.id) }}" class="pay-btn">
-                            Mark Paid
-                        </a>
+
+    <!-- SUMMARY CARDS -->
+    {% set unpaid_count = penalties|selectattr('status', 'equalto', 'unpaid')|list|length %}
+    {% set paid_count = penalties|selectattr('status', 'equalto', 'paid')|list|length %}
+
+    <div class="penalty-stats">
+
+        <div class="penalty-stat-card stat-total">
+            <div class="penalty-stat-top">
+                <span class="penalty-stat-label">Total Penalties</span>
+                <span class="penalty-stat-icon">
+                    <i class="fas fa-file-invoice-dollar"></i>
+                </span>
+            </div>
+            <div class="penalty-stat-value">{{ penalties|length }}</div>
+        </div>
+
+        <div class="penalty-stat-card stat-unpaid">
+            <div class="penalty-stat-top">
+                <span class="penalty-stat-label">Unpaid Penalties</span>
+                <span class="penalty-stat-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </span>
+            </div>
+            <div class="penalty-stat-value">{{ unpaid_count }}</div>
+        </div>
+
+        <div class="penalty-stat-card stat-paid">
+            <div class="penalty-stat-top">
+                <span class="penalty-stat-label">Paid Penalties</span>
+                <span class="penalty-stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </span>
+            </div>
+            <div class="penalty-stat-value">{{ paid_count }}</div>
+        </div>
+
+    </div>
+
+
+    <!-- COLLAPSIBLE PENALTY SETTINGS -->
+    <div class="penalty-settings-card">
+
+        <button
+            type="button"
+            class="penalty-settings-toggle"
+            id="penaltySettingsToggle"
+            aria-expanded="false"
+            aria-controls="penaltySettingsBody"
+        >
+
+            <div class="penalty-settings-title">
+                <div class="penalty-settings-icon">
+                    <i class="fas fa-sliders-h"></i>
+                </div>
+
+                <div>
+                    <strong>Penalty Settings</strong>
+                    <small>Configure late return billing rules and grace periods</small>
+                </div>
+            </div>
+
+            <div class="settings-toggle-right">
+                <span id="settingsToggleText">Show settings</span>
+                <i class="fas fa-chevron-down settings-chevron"></i>
+            </div>
+
+        </button>
+
+
+        <div class="penalty-settings-body" id="penaltySettingsBody">
+
+            <p class="penalty-settings-description">
+                Configure how much customers are charged when they return
+                vehicles after their scheduled return time.
+            </p>
+
+            <form method="POST">
+
+                {% if csrf_token is defined %}
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                {% endif %}
+
+                <div class="penalty-form-grid">
+
+                    <div class="penalty-form-group">
+                        <label for="penaltyRate">
+                            Penalty Rate (KSh)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="penaltyRate"
+                            name="rate"
+                            min="0.01"
+                            step="0.01"
+                            value="{{ setting.rate }}"
+                            required
+                        >
+
+                        <small>Amount charged per billing interval.</small>
+                    </div>
+
+
+                    <div class="penalty-form-group">
+                        <label for="penaltyInterval">
+                            Billing Interval (Minutes)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="penaltyInterval"
+                            name="interval_minutes"
+                            min="1"
+                            value="{{ setting.interval_minutes }}"
+                            required
+                        >
+
+                        <small>Examples: 30, 60 or 120 minutes.</small>
+                    </div>
+
+
+                    <div class="penalty-form-group">
+                        <label for="penaltyGrace">
+                            Grace Period (Minutes)
+                        </label>
+
+                        <input
+                            type="number"
+                            id="penaltyGrace"
+                            name="grace_period_minutes"
+                            min="0"
+                            value="{{ setting.grace_period_minutes }}"
+                            required
+                        >
+
+                        <small>Time allowed after the return deadline before charging.</small>
+                    </div>
+
+                </div>
+
+
+                <div class="penalty-settings-footer">
+                    <button type="submit" class="penalty-save-btn">
+                        <i class="fas fa-save"></i>
+                        Save Penalty Settings
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- PENALTY RECORDS -->
+    <div class="penalty-table-card">
+
+        <div class="penalty-table-header">
+
+            <div class="penalty-table-heading">
+                <h3>Penalty Records</h3>
+                <p>Review customer late returns and outstanding charges.</p>
+            </div>
+
+            <span class="penalty-record-count">
+                {{ penalties|length }} Records
+            </span>
+
+        </div>
+
+
+        <div class="penalty-table-wrapper">
+
+            <table class="penalty-table">
+
+                <thead>
+                    <tr>
+                        <th>Client</th>
+                        <th>Vehicle</th>
+                        <th>Hours Late</th>
+                        <th>Penalty Amount</th>
+                        <th>Payment Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% for p in penalties %}
+
+                    <tr>
+
+                        <td>
+                            <span class="penalty-client">
+                                {{ p.client_name }}
+                            </span>
+                        </td>
+
+
+                        <td>
+                            <strong>{{ p.registration_number }}</strong>
+                            <span class="penalty-subtext">Vehicle registration</span>
+                        </td>
+
+
+                        <td>
+                            {{ "%.2f"|format(p.hours_late) }}
+                            <span class="penalty-subtext">Hours overdue</span>
+                        </td>
+
+
+                        <td>
+                            <span class="penalty-amount">
+                                KSh {{ "{:,.2f}".format(p.penalty_amount|float) }}
+                            </span>
+                        </td>
+
+
+                        <td>
+                            <span class="penalty-status {{ p.status|lower }}">
+                                {{ p.status }}
+                            </span>
+                        </td>
+
+
+                        <td>
+
+                            {% if p.status == "unpaid" %}
+
+                                <a
+                                    href="{{ url_for('admin.pay_penalty', penalty_id=p.id) }}"
+                                    class="penalty-pay-btn"
+                                >
+                                    <i class="fas fa-check"></i>
+                                    Mark Paid
+                                </a>
+
+                            {% else %}
+
+                                <span class="penalty-paid-label">
+                                    <i class="fas fa-check-circle"></i>
+                                    Paid
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
                     {% else %}
-                        —
-                    {% endif %}
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+
+                    <tr>
+                        <td colspan="6" class="penalty-empty">
+                            <i class="fas fa-clipboard-check"></i>
+                            <strong>No penalty records found</strong>
+                            <span>Late return penalties will appear here when generated.</span>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
+
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+
+    const toggle = document.getElementById("penaltySettingsToggle");
+    const panel = document.getElementById("penaltySettingsBody");
+    const toggleText = document.getElementById("settingsToggleText");
+
+    if (!toggle || !panel) return;
+
+    toggle.addEventListener("click", function () {
+
+        const isOpen = panel.classList.toggle("is-open");
+
+        toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+
+        if (toggleText) {
+            toggleText.textContent = isOpen ? "Hide settings" : "Show settings";
+        }
+
+    });
+
+});
+</script>
 
 {% endblock %}

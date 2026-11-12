@@ -1000,12 +1000,606 @@
             }
         }
 
-    </style>
 
+/* =========================================================
+   MOBILE ADMIN NAVIGATION
+   Desktop layout remains unchanged.
+   ========================================================= */
+
+.admin-mobile-header,
+.sidebar-overlay,
+.sidebar-close-btn {
+    display: none;
+}
+
+/* Tablet and desktop */
+@media (max-width: 900px) and (min-width: 701px) {
+    .sidebar {
+        width: 220px;
+    }
+
+    .content {
+        margin-left: 220px;
+        padding: 25px;
+    }
+}
+
+/* Mobile and small tablets */
+@media (max-width: 700px) {
+
+    html,
+    body {
+        width: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+    }
+
+    .admin-container {
+        display: block;
+        min-height: 100vh;
+    }
+
+    .admin-mobile-header {
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+
+        display: flex;
+        align-items: center;
+        gap: 12px;
+
+        min-height: 64px;
+        padding: 10px 16px;
+
+        background: #111;
+        border-bottom: 3px solid #b30000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 5px;
+
+        flex-shrink: 0;
+        width: 42px;
+        height: 42px;
+        padding: 10px;
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 9px;
+        background: #222222;
+        cursor: pointer;
+    }
+
+    .mobile-menu-toggle span {
+        display: block;
+        width: 20px;
+        height: 2px;
+        border-radius: 2px;
+        background: #ffcc00;
+    }
+
+    .mobile-menu-toggle:focus-visible,
+    .sidebar-close-btn:focus-visible {
+        outline: 2px solid #ffcc00;
+        outline-offset: 3px;
+    }
+
+    .mobile-brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+
+        color: #ffffff;
+        text-decoration: none;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .mobile-brand strong {
+        color: #ffcc00;
+    }
+
+    .mobile-brand-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 35px;
+        height: 35px;
+
+        border-radius: 9px;
+        background: #b30000;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 800;
+    }
+
+    /* Off-canvas sidebar */
+    .sidebar {
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        inset: 0 auto 0 0;
+        width: min(290px, 86vw);
+        height: 100vh;
+        height: 100dvh;
+        max-height: 100dvh;
+
+        padding: 24px 15px;
+        padding-top: max(24px, env(safe-area-inset-top));
+
+        overflow-y: auto;
+        overscroll-behavior: contain;
+
+        transform: translateX(-105%);
+        visibility: hidden;
+        pointer-events: none;
+
+        z-index: 1100;
+
+        box-shadow: 12px 0 35px rgba(0, 0, 0, 0.28);
+
+        transition:
+            transform 0.25s ease,
+            visibility 0.25s ease;
+    }
+
+    .sidebar.is-open {
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    .sidebar-close-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        position: absolute;
+        top: 16px;
+        right: 14px;
+
+        width: 36px;
+        height: 36px;
+
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+
+        background: #292929;
+        color: #ffffff;
+        font-size: 26px;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .sidebar-logo {
+        padding-right: 40px;
+        margin-top: 12px;
+        margin-bottom: 28px;
+        text-align: left;
+        font-size: 22px;
+    }
+
+    /* Dark overlay */
+    .sidebar-overlay {
+        display: block;
+
+        position: fixed;
+        inset: 0;
+
+        background: rgba(0, 0, 0, 0.58);
+        backdrop-filter: blur(2px);
+
+        z-index: 1050;
+
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        z-index: 1050;
+        transition:
+            opacity 0.25s ease,
+            visibility 0.25s ease;
+    }
+
+    .sidebar-overlay.is-visible {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+    }
+
+    /* Navigation spacing */
+    
+
+/* Fix mobile sidebar header and menu spacing */
+.sidebar .sidebar-logo {
+    position: relative;
+    margin-top: 48px;
+    margin-bottom: 0;
+    padding: 8px 8px 18px;
+    padding-right: 42px;
+    line-height: 1.4;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sidebar .sidebar-menu {
+    display: block;
+    width: 100%;
+    margin-top: 20px;
+    padding: 0 0 24px;
+    list-style: none;
+}
+
+/* Force the entire UL below the heading */
+.sidebar ul.sidebar-menu {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    justify-content: flex-start;
+    position: relative;
+    flex: 0 0 auto;
+    float: none;
+    clear: both;
+    width: 100% !important;
+    max-width: 100%;
+    height: auto;
+    margin: 18px 0 0 !important;
+    padding: 0 0 24px !important;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+/* Every top-level menu item occupies its own row */
+.sidebar ul.sidebar-menu > li {
+    display: block !important;
+    position: relative;
+    float: none !important;
+    clear: both;
+    width: 100% !important;
+    max-width: 100%;
+    margin: 0 0 5px !important;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Display the full tab name */
+.sidebar ul.sidebar-menu > li > a {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100% !important;
+    max-width: 100%;
+    min-height: 46px;
+    margin: 0;
+    padding: 12px 10px !important;
+    box-sizing: border-box;
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    word-break: normal;
+    text-align: left;
+    line-height: 1.5;
+    border-radius: 8px;
+}
+
+/* Section labels stay under the heading and align left */
+.sidebar ul.sidebar-menu > li.section-title,
+.sidebar ul.sidebar-menu .section-title {
+    display: block !important;
+    width: 100%;
+    margin: 20px 0 8px !important;
+    padding: 0 8px;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* Nested links remain inside the sidebar */
+.sidebar ul.sidebar-menu .sub-nav {
+    display: block !important;
+    width: calc(100% - 10px);
+    margin: 5px 0 12px 10px !important;
+    padding: 0 0 0 8px;
+    box-sizing: border-box;
+}
+
+.sidebar ul.sidebar-menu .sub-nav li {
+    display: block;
+    width: 100%;
+    margin: 0 0 4px;
+}
+
+.sidebar ul.sidebar-menu .sub-nav a {
+    display: block;
+    width: 100%;
+    padding: 10px 8px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: left;
+    box-sizing: border-box;
+}
+
+/* Prevent text and icons from pushing links sideways */
+.sidebar ul.sidebar-menu a > span,
+.sidebar ul.sidebar-menu a > i {
+    flex-shrink: 0;
+}
+
+.sidebar ul.sidebar-menu a {
+    min-width: 0;
+}
+
+
+
+.sidebar .sidebar-menu > li {
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.sidebar .sidebar-menu > li > a {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 14px;
+    border-radius: 8px;
+}
+
+.sidebar .sidebar-menu .section-title {
+    margin: 20px 10px 8px;
+}
+
+.sidebar .sidebar-menu .sub-nav {
+    margin-top: 6px;
+    margin-bottom: 12px;
+}
+
+    .section-title {
+        margin: 24px 10px 8px;
+        font-size: 10px;
+    }
+
+    .sub-nav {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 6px;
+        margin: 5px 0 10px;
+        padding: 0;
+    }
+
+    .sub-nav a {
+        min-width: 0;
+        min-height: 38px;
+        padding: 8px 3px;
+        font-size: 10px;
+    }
+
+    /* Main page */
+    .content {
+        width: 100%;
+        min-width: 0;
+        min-height: calc(100vh - 64px);
+        margin-left: 0;
+        padding: 22px 16px;
+
+        overflow-x: auto;
+        overflow-wrap: anywhere;
+    }
+
+    .content h1 {
+        font-size: 23px;
+        line-height: 1.35;
+        margin-bottom: 20px;
+    }
+
+    .content h2 {
+        font-size: 19px;
+    }
+
+    /* Tables can scroll without stretching the screen */
+    .table-responsive {
+        max-width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table {
+        min-width: 600px;
+    }
+
+    .table thead th,
+    .table tbody td {
+        padding: 11px 12px;
+    }
+
+    /* Prevent oversized form controls */
+    .content input,
+    .content select,
+    .content textarea {
+        max-width: 100%;
+        font-size: 16px;
+    }
+
+    .content button,
+    .content .btn {
+        max-width: 100%;
+    }
+
+    /* Avoid hover movement on touch screens */
+    .card:hover {
+        transform: none;
+    }
+
+    .table tbody tr:hover {
+        transform: none;
+    }
+
+    /* Keep the page stationary while menu is open */
+    body.mobile-menu-open {
+        overflow: hidden;
+
+    }
+}
+
+/* Very narrow phones */
+@media (max-width: 380px) {
+    .admin-mobile-header {
+        padding: 9px 12px;
+        gap: 11px;
+    }
+
+    .mobile-brand {
+        font-size: 15px;
+    }
+
+    .content {
+        padding: 18px 12px;
+    }
+
+    .content h1 {
+        font-size: 21px;
+    }
+
+    .sidebar {
+        width: 88vw;
+    }
+}
+
+/* Respect accessibility preferences */
+@media (prefers-reduced-motion: reduce) {
+    .sidebar,
+    .sidebar-overlay {
+        transition: none;
+    }
+}
+
+
+/* FINAL MOBILE SIDEBAR LAYOUT FIX */
+@media (max-width: 700px) {
+    #admin-sidebar {
+        display: block !important;
+        width: min(290px, 86vw) !important;
+        padding: 24px 14px !important;
+        overflow-x: hidden !important;
+    }
+
+    #admin-sidebar .sidebar-logo {
+        display: block !important;
+        width: 100% !important;
+        margin: 42px 0 0 !important;
+        padding: 10px 4px 18px !important;
+        text-align: left !important;
+        clear: both !important;
+        border-bottom: 1px solid rgba(255,255,255,.15);
+    }
+
+    #admin-sidebar ul.sidebar-menu {
+        display: block !important;
+        position: static !important;
+        float: none !important;
+        width: 100% !important;
+        margin: 20px 0 0 !important;
+        padding: 0 !important;
+        list-style: none !important;
+        clear: both !important;
+    }
+
+    #admin-sidebar ul.sidebar-menu > li {
+        display: block !important;
+        float: none !important;
+        width: 100% !important;
+        margin: 0 0 6px !important;
+        padding: 0 !important;
+        clear: both !important;
+        text-align: left !important;
+    }
+
+    #admin-sidebar ul.sidebar-menu > li.section-title {
+        margin: 22px 0 8px !important;
+        padding: 0 8px !important;
+        color: #ffcc00;
+        font-size: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    #admin-sidebar ul.sidebar-menu > li > a {
+        display: block !important;
+        width: 100% !important;
+        min-height: 44px;
+        margin: 0 !important;
+        padding: 12px 10px !important;
+        color: #eee;
+        font-size: 13px;
+        line-height: 1.5;
+        text-align: left !important;
+        white-space: normal !important;
+        overflow-wrap: break-word;
+        box-sizing: border-box;
+        border-radius: 7px;
+    }
+
+    #admin-sidebar ul.sidebar-menu > li > a:hover {
+        color: #fff;
+        background: #292929;
+    }
+
+    #admin-sidebar ul.sidebar-menu .sub-nav {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        margin: 4px 0 10px !important;
+        padding: 0 0 0 10px !important;
+        gap: 4px !important;
+        border-left: 2px solid #b30000;
+        box-sizing: border-box;
+    }
+
+    #admin-sidebar ul.sidebar-menu .sub-nav a {
+        display: block !important;
+        width: 100% !important;
+        min-height: 40px;
+        padding: 11px 10px !important;
+        color: #ddd;
+        font-size: 12px;
+        text-align: left !important;
+        white-space: normal !important;
+        box-sizing: border-box;
+        border-radius: 6px;
+    }
+}
+
+</style>
 </head>
-
-
 <body>
+
+<!-- Mobile top navigation -->
+<header class="admin-mobile-header">
+    <button
+        type="button"
+        class="mobile-menu-toggle"
+        id="mobile-menu-toggle"
+        aria-label="Open navigation menu"
+        aria-controls="admin-sidebar"
+        aria-expanded="false"
+    >
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <a href="/admin" class="mobile-brand">
+        <span class="mobile-brand-mark">WQ</span>
+        <span>WheelQ <strong>Admin</strong></span>
+    </a>
+</header>
+
+<!-- Overlay shown when mobile navigation is open -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <div class="admin-container">
 
@@ -1014,8 +1608,13 @@
          SIDEBAR
          ========================================================= -->
 
-    <aside class="sidebar">
-
+<aside class="sidebar" id="admin-sidebar">
+    	<button
+        	type="button"
+        	class="sidebar-close-btn"
+        	id="sidebar-close"
+        	aria-label="Close navigation menu"
+	>&times;</button>
         <h2 class="sidebar-logo">
             WheelQ<span>Admin</span>
         </h2>
@@ -1064,6 +1663,13 @@
                 </a>
             </li>
 
+
+            <li>
+                <a href="{{ url_for('admin.client_blacklist_page') }}">
+                    <i class="fas fa-user-slash"></i>
+                    <span>Client Blacklist</span>
+                </a>
+            </li>
 
             <!-- Bookings -->
 
@@ -1132,7 +1738,9 @@
             </li>
 
 
-            <!-- Notifications -->
+             <li class="section-title">
+                Notifications
+            </li>
 
             <li>
                 <a href="{{ url_for('admin.notifications_page') }}">
@@ -1162,39 +1770,49 @@
             </li>
 
 
+            <li>
+            <a href="{{ url_for('admin.email_logs') }}">
+                Email History
+            </a>
+            </li>
+
             <!-- Reports -->
 
-            <!-- <li class="section-title">
+            <li class="section-title">
                 Reports & Analytics
             </li>
 
-            <li>
-                <a href="{{ url_for('admin.reports_dashboard') }}">
-                    Earnings & Expenses
-                </a>
-            </li> -->
+            <a href="{{ url_for('admin.reports_dashboard') }}">
+                <i class="fas fa-chart-line"></i>
+                Reports & Analytics
+            </a>
 
-
-            <!-- Account -->
-
-            <li class="section-title">
-                Account
-            </li>
-
-
-            {% if current_user_role == 'super_admin' %}
+                    <!-- Account -->
+            <li class="section-title">Account</li>
 
             <li>
-                <a href="{{ url_for('admin.register_admin') }}">
-                    Create Admin
+                <a href="{{ url_for('admin.my_account') }}">
+                    My Account
                 </a>
             </li>
 
+            {% if current_user_role == 'admin' %}
+            <li>
+                <a href="{{ url_for('admin.staff_management') }}">
+                    Staff Management
+                </a>
+            </li>
             {% endif %}
 
+            <!-- Logout -->
+            <li>
+                <a href="{{ url_for('admin.logout') }}" class="logout">
+                    Logout
+                </a>
+            </li>
 
             <!-- Logout -->
-
+<!-- 
             <li>
                 <a
                     href="/admin/logout"
@@ -1202,7 +1820,7 @@
                 >
                     Logout
                 </a>
-            </li>
+            </li> -->
 
 
         </ul>
@@ -1318,8 +1936,86 @@ setInterval(
     10000
 );
 
-</script>
 
+document.addEventListener("DOMContentLoaded", function () {
+    const sidebar = document.getElementById("admin-sidebar");
+    const toggle = document.getElementById("mobile-menu-toggle");
+    const close = document.getElementById("sidebar-close");
+    const overlay = document.getElementById("sidebar-overlay");
+
+    if (!sidebar || !toggle || !close || !overlay) {
+        return;
+    }
+
+    function isMobile() {
+        return window.matchMedia("(max-width: 700px)").matches;
+    }
+
+    function openMenu() {
+        if (!isMobile()) return;
+
+        sidebar.classList.add("is-open");
+        overlay.classList.add("is-visible");
+        document.body.classList.add("mobile-menu-open");
+
+        toggle.setAttribute("aria-expanded", "true");
+        toggle.setAttribute("aria-label", "Close navigation menu");
+
+        close.focus();
+    }
+
+    function closeMenu(returnFocus = false) {
+        sidebar.classList.remove("is-open");
+        overlay.classList.remove("is-visible");
+        document.body.classList.remove("mobile-menu-open");
+
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.setAttribute("aria-label", "Open navigation menu");
+
+        if (returnFocus && isMobile()) {
+            toggle.focus();
+        }
+    }
+
+    toggle.addEventListener("click", function () {
+        if (sidebar.classList.contains("is-open")) {
+            closeMenu();
+        } else {
+            openMenu();
+        }
+    });
+
+    close.addEventListener("click", function () {
+        closeMenu(true);
+    });
+
+    overlay.addEventListener("click", function () {
+        closeMenu(true);
+    });
+
+    sidebar.querySelectorAll("a").forEach(function (link) {
+        link.addEventListener("click", function () {
+            if (isMobile()) {
+                closeMenu();
+            }
+        });
+    });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" &&
+            sidebar.classList.contains("is-open")) {
+            closeMenu(true);
+        }
+    });
+
+    window.addEventListener("resize", function () {
+        if (!isMobile()) {
+            closeMenu();
+        }
+    });
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 </html>

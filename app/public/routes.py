@@ -2,13 +2,22 @@ import os
 from flask import Blueprint, render_template, request, redirect, flash, url_for, jsonify, current_app
 from flask_mail import Message
 from werkzeug.utils import secure_filename
-from app import db, mail
+from app import db, mail, cache
 from app.models import Car, Lease, Client, Notification, Booking, FinancialRecord, ContactMessage, AirportTransfer
 from datetime import datetime
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-
+from app.utils.cache import cache_get, cache_set
+from app.services.notification_service import (
+    notify_booking_created,
+    notify_financial_charge_created,
+    notify_payment_received,
+    notify_lease_created,
+    notify_lease_payment_received,
+    notify_penalty_awarded,
+    notify_airport_transfer_created
+)
 
 
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
@@ -29,34 +38,123 @@ def home():
 # Cars listing page
 @public.route("/cars")
 def cars():
+
+    cache_key = "wheelq:public:cars"
+
+    # -----------------------------------------------------
+    # Try Redis first
+    # -----------------------------------------------------
+
+    cached_cars = cache_get(cache_key)
+
+    if cached_cars is not None:
+        return render_template(
+            "cars.html",
+            cars=cached_cars
+        )
+
+    # -----------------------------------------------------
+    # Redis miss/unavailable -> use database
+    # -----------------------------------------------------
+
     cars = Car.query.all()
 
-    # Mapping database type to tab IDs
     type_map = {
-        'Saloon Car': 'saloon',
-        'SUV': 'suv',
-        'Classic Saloon': 'classic',
-        'Truck': 'truck',
-        '7 Seater': '7seater',
-        '14 Seater': '14seater'
+        "Saloon Car": "saloon",
+        "SUV": "suv",
+        "Classic Saloon": "classic",
+        "Truck": "truck",
+        "7 Seater": "7seater",
+        "14 Seater": "14seater"
     }
 
-    grouped = {tab_id: [] for tab_id in type_map.values()}
+    grouped = {
+        tab_id: []
+        for tab_id in type_map.values()
+    }
 
     for car in cars:
-        tab_id = type_map.get(car.type.strip(), None)
+
+        car_type = (car.type or "").strip()
+
+        tab_id = type_map.get(car_type)
+
         if tab_id:
-            grouped[tab_id].append(car)
+            grouped[tab_id].append({
+                "id": car.id,
+                "name": car.name,
+                "brand": car.brand,
+                "price": car.price,
+                "type": car.type,
+                "details": car.details,
+                "image": car.image,
+                "registration_number": car.registration_number,
+                "year": car.year,
+                "status": car.status,
+                "image_front": car.image_front,
+                "image_rear": car.image_rear,
+                "image_left": car.image_left,
+                "image_right": car.image_right,
+                "insurance_provider": car.insurance_provider,
+                "insurance_expiry": (
+                    car.insurance_expiry.isoformat()
+                    if car.insurance_expiry
+                    else None
+                )
+            })
 
-    return render_template("cars.html", cars=grouped)
+    # -----------------------------------------------------
+    # Store in Redis for 60 seconds
+    # -----------------------------------------------------
+
+    cache_set(
+        cache_key,
+        grouped,
+        timeout=60
+    )
+
+    return render_template(
+        "cars.html",
+        cars=grouped
+    )
 
 
+# Car details page
 
 # Car details page
 @public.route("/details/<int:car_id>")
 def car_details(car_id):
+    cache_key = f"wheelq:public:car:{car_id}"
+
+    # Try Redis first
+    cached_car = cache_get(cache_key)
+
+    if cached_car is not None:
+        return render_template("details.html", car=cached_car)
+
+    # Fall back to the database if the cache is empty
     car = Car.query.get_or_404(car_id)
-    return render_template("details.html", car=car)
+
+    car_data = {
+        "id": car.id,
+        "name": car.name,
+        "brand": car.brand,
+        "type": car.type,
+        "price": car.price,
+        "status": car.status,
+        "details": car.details,
+        "image": car.image,
+        "image_front": car.image_front,
+        "image_rear": car.image_rear,
+        "image_left": car.image_left,
+        "image_right": car.image_right,
+    }
+
+    # Cache for 60 seconds
+    cache_set(cache_key, car_data, timeout=60)
+
+    return render_template("details.html", car=car_data)
+
 
 
 # About page
@@ -232,6 +330,16 @@ def submit_lease():
     db.session.add(notification)
     db.session.commit()
 
+    db.session.add(lease)
+    db.session.commit()
+
+    try:
+        notify_lease_created(lease.id)
+    except Exception:
+        current_app.logger.exception(
+            "Lease email notification failed"
+        ) 
+
     flash("Lease request submitted successfully!", "success")
     return redirect(url_for("public.lease_page"))
 
@@ -341,6 +449,13 @@ def airport_transfer():
         db.session.add(transfer)
         db.session.commit()
 
+        try:
+            notify_airport_transfer_created(transfer.id)
+        except Exception:
+            current_app.logger.exception(
+                "Airport transfer email notification failed"
+            ) 
+
         flash(
             "Your airport transfer request has been submitted successfully. "
             "Our team will contact you to confirm the details.",
@@ -354,93 +469,7 @@ def airport_transfer():
     return render_template(
         "airport_transfer.html"
     )
-# @public.route("/mpesa/callback", methods=["POST"])
-# def mpesa_callback():
-#     data = request.get_json()
 
-#     stk = data["Body"]["stkCallback"]
-#     result = stk["ResultCode"]
-
-#     if result == 0:
-#         meta = stk["CallbackMetadata"]["Item"]
-#         amount = next(i["Value"] for i in meta if i["Name"] == "Amount")
-#         receipt = next(i["Value"] for i in meta if i["Name"] == "MpesaReceiptNumber")
-#         phone = next(i["Value"] for i in meta if i["Name"] == "PhoneNumber")
-
-#         reference = stk["MerchantRequestID"]
-#         booking_id = int(reference.split("-")[-1])
-
-#         booking = Booking.query.get(booking_id)
-
-#         transaction = Transaction(
-#             booking_id=booking.id,
-#             client_id=booking.client_id,
-#             amount=amount,
-#             receipt_number=receipt,
-#             phone=phone,
-#             status="success",
-#             payment_type="deposit" if amount < booking.total_amount else "full"
-#         )
-
-#         db.session.add(transaction)
-
-#         if amount < booking.total_amount:
-#             booking.payment_status = "deposit_paid"
-#         else:
-#             booking.payment_status = "paid"
-
-#         db.session.commit()
-
-#     return {"ResultCode": 0, "ResultDesc": "Accepted"}
-
-
-# @public.route("/book/<int:booking_id>/payment", methods=["GET", "POST"])
-# def booking_payment(booking_id):
-#     booking = Booking.query.get_or_404(booking_id)
-
-#     if request.method == "POST":
-#         phone = request.form.get("phone")
-#         amount = booking.car.price
-
-#         phone = phone.strip()
-#         if phone.startswith("0"):
-#             phone = "254" + phone[1:]
-#         elif phone.startswith("+"):
-#             phone =phone.replace("+", "")
-
-#         mpesa = MpesaDaraja(
-#             consumer_key="u7QYXEYKb3zh3sMwmCNIAAiHd7OFd7tmEjmxsL8PWlzmAluS",
-#             consumer_secret="qc3j8xBsEAXQF2BAJCoiE8FAuTf0lNOqoTWR4y4aGFtmzqvfmpSvnoCpwqJMs00A",
-#             shortcode="174379",
-#             passkey="bfb279f9aa9bdbcf158e97dd33f9d54e",
-#             callback_url="https://claude-saprophagous-dalia.ngrok-free.dev/mpesa/callback",
-#             environment="sandbox"
-
-#         )
-
-#         response = mpesa.stk_push(
-#             phone=phone,
-#             amount=amount,
-#             account_reference=f"BOOKING-{booking.id}",
-#             description="WheelQ Car Booking",
-#         )
-
-#         if response.get("ResponseCode") == "0":
-#             flash("Payment request sent. Enter PIN on your phone.", "success")
-#         else:
-#             flash("MPesa payment failed. Try again.", "danger")
-
-#     return render_template("public_payment.html", booking=booking)
-
-
-
-# @public.route("/payment/success/<int:booking_id>")
-# def payment_success(booking_id):
-#     booking = Booking.query.get_or_404(booking_id)
-#     return render_template("payment_success.html", booking=booking)
-
-
- 
 
     
     

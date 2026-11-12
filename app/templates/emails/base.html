@@ -1,0 +1,113 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WheelQ Tours & Car Hire{% endblock %}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #222;
+        }
+        .wrapper {
+            width: 100%;
+            padding: 30px 10px;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 620px;
+            margin: auto;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .header {
+            background: #171717;
+            color: #fff;
+            padding: 25px;
+            text-align: center;
+            border-bottom: 5px solid #f5c518;
+        }
+        .brand {
+            font-size: 27px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        .brand span {
+            color: #f5c518;
+        }
+        .content {
+            padding: 30px 25px;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+        .button {
+            display: inline-block;
+            background: #f5c518;
+            color: #171717 !important;
+            padding: 12px 22px;
+            text-decoration: none;
+            font-weight: bold;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .details {
+            background: #f7f7f7;
+            border-left: 4px solid #f5c518;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .details p {
+            margin: 7px 0;
+        }
+        .footer {
+            background: #171717;
+            color: #ccc;
+            text-align: center;
+            padding: 20px;
+            font-size: 12px;
+        }
+        .footer a {
+            color: #f5c518;
+            text-decoration: none;
+        }
+        .highlight {
+            color: #b30000;
+            font-weight: bold;
+        }
+        @media only screen and (max-width: 480px) {
+            .content { padding: 22px 16px; }
+            .brand { font-size: 23px; }
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="container">
+        <div class="header">
+            <div class="brand">WHEEL<span>Q</span></div>
+            <div>Tours & Car Hire</div>
+        </div>
+
+        <div class="content">
+            {% block content %}{% endblock %}
+        </div>
+
+        <div class="footer">
+            <p>Thank you for choosing WheelQ Tours & Car Hire.</p>
+            <p>
+                <a href="{{ website_url|default('https://wheelq.co.ke') }}">
+                    wheelq.co.ke
+                </a>
+            </p>
+            <p>This is an automated email. Please contact our team if you need assistance.</p>
+            <p>&copy; {{ current_year|default(2026) }} WheelQ Tours & Car Hire.</p>
+        </div>
+    </div>
+</div>
+</body>
+</html>

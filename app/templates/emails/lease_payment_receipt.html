@@ -1,0 +1,26 @@
+
+{% extends "emails/base.html" %}
+{% block title %}Lease Payment Receipt - WheelQ{% endblock %}
+
+{% block content %}
+<h2>Lease Payment Received</h2>
+
+<p>Hello {{ customer_name }},</p>
+
+<p>Your lease payment has been successfully recorded.</p>
+
+<div class="details">
+    <h3>Lease Payment Details</h3>
+    <p><strong>Receipt Number:</strong> {{ receipt_number }}</p>
+    <p><strong>Vehicle:</strong> {{ car_model }}</p>
+    <p><strong>Registration:</strong> {{ registration_number|default('N/A') }}</p>
+    <p><strong>Payment Date:</strong> {{ payment_date }}</p>
+    <p><strong>Payment Method:</strong> {{ payment_method }}</p>
+    <p><strong>Reference:</strong> {{ reference|default('N/A') }}</p>
+    <p><strong>Amount Paid:</strong> {{ amount }}</p>
+    <p><strong>Total Lease Amount:</strong> {{ total_amount }}</p>
+    <p><strong>Outstanding Balance:</strong> {{ balance }}</p>
+</div>
+
+<p>Thank you for your continued partnership with WheelQ.</p>
+{% endblock %}

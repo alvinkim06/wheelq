@@ -1,0 +1,235 @@
+{% extends "admin_base.html" %}
+
+{% block content %}
+
+<style>
+.blacklist-page {
+    color: var(--text-primary, #fff);
+}
+
+.blacklist-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.blacklist-header h2 {
+    margin: 0;
+    font-size: 24px;
+}
+
+.blacklist-header p {
+    color: #999;
+    margin-top: 6px;
+}
+
+.blacklist-table-wrap {
+    overflow-x: auto;
+    background: var(--card-bg, #171717);
+    border: 1px solid #303030;
+    border-radius: 12px;
+}
+
+.blacklist-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+.blacklist-table th,
+.blacklist-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid #303030;
+    vertical-align: top;
+}
+
+.blacklist-table th {
+    color: #facc15;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.blacklist-table td {
+    font-size: 13px;
+}
+
+.blacklist-status {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.status-active {
+    background: #7f1d1d;
+    color: #fecaca;
+}
+
+.status-removed {
+    background: #14532d;
+    color: #bbf7d0;
+}
+
+.blacklist-action textarea {
+    width: 220px;
+    min-height: 65px;
+    padding: 9px;
+    border-radius: 6px;
+    border: 1px solid #444;
+    background: #101010;
+    color: white;
+    margin-bottom: 7px;
+    resize: vertical;
+}
+
+.blacklist-action button {
+    background: #dc2626;
+    color: white;
+    border: 0;
+    border-radius: 6px;
+    padding: 9px 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.blacklist-action button:hover {
+    background: #b91c1c;
+}
+
+.empty-blacklist {
+    padding: 35px;
+    text-align: center;
+    color: #999;
+}
+</style>
+
+<div class="blacklist-page">
+
+    <div class="blacklist-header">
+        <div>
+            <h2>Client Blacklist</h2>
+            <p>Manage restricted clients and review blacklist history.</p>
+        </div>
+
+        <a href="{{ url_for('admin.clients_page') }}"
+           class="btn btn-secondary">
+            Back to Clients
+        </a>
+    </div>
+
+    <div class="blacklist-table-wrap">
+
+        {% if records %}
+
+        <table class="blacklist-table">
+            <thead>
+                <tr>
+                    <th>Client</th>
+                    <th>Blacklist Reason</th>
+                    <th>Blacklisted By</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Removal Details</th>
+                    {% if current_user_role == 'admin' %}
+                    <th>Action</th>
+                    {% endif %}
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>
+                        <strong>{{ record.client.name or 'Unnamed Client' }}</strong>
+                        <br>
+                        <small>ID: {{ record.client.id }}</small>
+                        <br>
+                        <small>{{ record.client.phone or '' }}</small>
+                    </td>
+
+                    <td>{{ record.reason }}</td>
+
+                    <td>
+                        {{ record.blacklisted_by_user.name
+                           if record.blacklisted_by_user else 'Unknown' }}
+                    </td>
+
+                    <td>
+                        {{ record.blacklisted_at.strftime('%d %b %Y %H:%M')
+                           if record.blacklisted_at else 'N/A' }}
+                    </td>
+
+                    <td>
+                        {% if record.is_active %}
+                        <span class="blacklist-status status-active">
+                            BLACKLISTED
+                        </span>
+                        {% else %}
+                        <span class="blacklist-status status-removed">
+                            REMOVED
+                        </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if record.removed_at %}
+                            <strong>
+                                {{ record.removed_by_user.name
+                                   if record.removed_by_user else 'Unknown' }}
+                            </strong>
+                            <br>
+                            <small>
+                                {{ record.removed_at.strftime('%d %b %Y %H:%M') }}
+                            </small>
+                            <br>
+                            {{ record.removal_reason }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </td>
+
+                    {% if current_user_role == 'admin' %}
+                    <td>
+                        {% if record.is_active %}
+                        <form method="POST"
+                              action="{{ url_for('admin.unblacklist_client', client_id=record.client_id) }}"
+                              class="blacklist-action"
+                              onsubmit="return confirm('Remove this client from the blacklist?');">
+
+                            <textarea name="removal_reason"
+                                      placeholder="Reason for removing..."
+                                      required></textarea>
+
+                            <button type="submit">
+                                Remove Blacklist
+                            </button>
+                        </form>
+                        {% else %}
+                            <small>Completed</small>
+                        {% endif %}
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+
+        <div class="empty-blacklist">
+            <h3>No blacklist records</h3>
+            <p>There are currently no clients in the blacklist history.</p>
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -12,12 +12,35 @@
     <p><strong>Area of Residence:</strong> {{ client.area_of_residence }}</p>
     <p><strong>Area of Usage:</strong> {{ client.area_of_usage  }}</p>
     {% for i in range(1, 4) %}
-    <h2>Emergency Contact {{ i }}</h2>
-    <p><strong>Name:</strong> {{ client.emergency_contact1_name }}</p>
-    <p><strong>Phone Number:</strong> {{ client.emergency_contact1_phone }}</p>
-    <p><strong>Relationship:</strong> {{ client.emergency_contact1_relationship }}</p>
-    <p><strong>ID Number:</strong> {{ client.emergency_contact1_area }}</p>
+        {% set contact_name = client|attr('emergency_contact' ~ i ~ '_name') %}
+        {% set contact_phone = client|attr('emergency_contact' ~ i ~ '_phone') %}
+        {% set contact_relationship = client|attr('emergency_contact' ~ i ~ '_relationship') %}
+        {% set contact_area = client|attr('emergency_contact' ~ i ~ '_area') %}
+
+        {% if contact_name or contact_phone %}
+            <h2>Emergency Contact {{ i }}</h2>
+            <p><strong>Name:</strong> {{ contact_name or 'N/A' }}</p>
+            <p><strong>Phone Number:</strong> {{ contact_phone or 'N/A' }}</p>
+            <p><strong>Relationship:</strong> {{ contact_relationship or 'N/A' }}</p>
+            <p><strong>Area:</strong> {{ contact_area or 'N/A' }}</p>
+        {% endif %}
     {% endfor %}
+
+    {% if blacklist %}
+    <div class="alert alert-danger">
+        <strong>BLACKLISTED CLIENT</strong>
+        <p>Reason: {{ blacklist.reason }}</p>
+        <p>
+            Blacklisted by:
+            {{ blacklist.blacklisted_by_user.name
+            if blacklist.blacklisted_by_user else 'Unknown' }}
+        </p>
+        <p>
+            Date:
+            {{ blacklist.blacklisted_at.strftime('%d %b %Y %H:%M') }}
+        </p>
+    </div>
+    {% endif %}
 
 
 
@@ -53,7 +76,237 @@
         </div>
         {% endif %}
 
+
+
+        <!-- ADDITIONAL CLIENT RECORDS -->
+        <div class="client-records-section">
+
+            <h2>Additional Client Records</h2>
+
+            <div class="upload-record-card">
+
+                <h3>Upload M-Pesa Statement</h3>
+
+                <form method="POST"
+                    enctype="multipart/form-data"
+                    action="{{ url_for('admin.upload_client_document', client_id=client.id) }}">
+
+                    <input type="hidden" name="document_type"
+                        value="mpesa_statement">
+
+                    <div class="form-group">
+                        <label>M-Pesa Statement PDF</label>
+                        <input type="file"
+                            name="mpesa_statement"
+                            accept=".pdf,application/pdf"
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Existing PDF Password</label>
+                        <input type="password"
+                            name="mpesa_password"
+                            autocomplete="new-password"
+                            required>
+                    </div>
+
+                    <button type="submit" class="record-btn">
+                        Upload Statement
+                    </button>
+                </form>
+
+                <p class="record-note">
+                    The existing M-Pesa PDF password is verified during upload
+                    and is not stored by WheelQ.
+                </p>
+            </div>
+
+            <div class="upload-record-card">
+
+                <h3>Upload Social Media Screenshots</h3>
+
+                <form method="POST"
+                    enctype="multipart/form-data"
+                    action="{{ url_for('admin.upload_client_document', client_id=client.id) }}">
+
+                    <input type="hidden" name="document_type"
+                        value="social_media">
+
+                    <div class="form-group">
+                        <label>Social Media Platform</label>
+                        <select name="platform" required>
+                            <option value="">Select platform</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="TikTok">TikTok</option>
+                            <option value="WhatsApp">WhatsApp</option>
+                            <option value="X">X</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Screenshots</label>
+                        <input type="file"
+                            name="social_media_screenshots"
+                            accept=".jpg,.jpeg,.png,.webp"
+                            multiple
+                            required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea name="description"
+                                rows="3"
+                                placeholder="Optional description"></textarea>
+                    </div>
+
+                    <button type="submit" class="record-btn">
+                        Upload Screenshots
+                    </button>
+                </form>
+            </div>
+
+            <h3>Uploaded Records</h3>
+
+            {% if documents %}
+
+                <div class="records-grid">
+
+                    {% for doc in documents %}
+
+                        <div class="record-item">
+
+                            {% if doc.document_type == 'mpesa_statement' %}
+
+                                <div class="record-icon">PDF</div>
+                                <h4>M-Pesa Statement</h4>
+
+                                <p>{{ doc.original_filename }}</p>
+
+                                <form method="POST"
+                                    action="{{ url_for('admin.view_client_document', document_id=doc.id) }}">
+
+                                    <label>Enter Existing PDF Password</label>
+
+                                    <input type="password"
+                                        name="mpesa_password"
+                                        required
+                                        autocomplete="new-password">
+
+                                    <button type="submit" class="record-btn">
+                                        Verify & View Statement
+                                    </button>
+                                </form>
+
+                            {% elif doc.document_type == 'social_media' %}
+
+                                <div class="record-icon">IMG</div>
+
+                                <h4>{{ doc.platform or 'Social Media' }}</h4>
+
+                                <p>{{ doc.description or 'No description' }}</p>
+
+                                <p>{{ doc.original_filename }}</p>
+
+                                <a class="record-btn"
+                                href="{{ url_for('admin.view_client_document', document_id=doc.id) }}"
+                                target="_blank">
+                                    View Screenshot
+                                </a>
+
+                            {% endif %}
+
+                            <small>
+                                Uploaded:
+                                {{ doc.uploaded_at.strftime('%d %b %Y %H:%M') }}
+                            </small>
+
+                            <small>
+                                By:
+                                {{ doc.uploaded_by_user.name
+                                if doc.uploaded_by_user else 'Unknown' }}
+                            </small>
+
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
+            {% else %}
+
+                <p>No additional client records have been uploaded.</p>
+
+            {% endif %}
+
+        </div>
+
+
     </div>
+
+ <div class="card mt-4">
+    <div class="card-header">
+        <h5>Financial History</h5>
+    </div>
+
+    <div class="card-body table-responsive">
+
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Charged</th>
+                    <th>Received</th>
+                    <th>Cancelled</th>
+                    <th>Remaining</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for charge in financial_charges %}
+                <tr>
+                    <td>{{ charge.created_at.strftime('%d %b %Y') }}</td>
+
+                    <td>{{ charge.category|title }}</td>
+
+                    <td>{{ charge.description }}</td>
+
+                    <td>KSh {{ "{:,.2f}".format(charge.amount_charged|float) }}</td>
+
+                    <td>KSh {{ "{:,.2f}".format(charge.amount_received|float) }}</td>
+
+                    <td>KSh {{ "{:,.2f}".format(charge.amount_cancelled|float) }}</td>
+
+                    <td>KSh {{ "{:,.2f}".format(charge.amount_remaining|float) }}</td>
+
+                    <td>
+                        {% if charge.payment_status == 'paid' %}
+                            <span class="badge bg-success">Paid</span>
+                        {% elif charge.payment_status == 'partially_paid' %}
+                            <span class="badge bg-warning text-dark">Partially paid</span>
+                        {% elif charge.payment_status == 'cancelled' %}
+                            <span class="badge bg-secondary">Cancelled</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unpaid</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="8" class="text-center">
+                        No financial records found.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>   
 </div>
 
 <style>
@@ -111,6 +364,91 @@
     font-weight: 600;
     margin-bottom: 8px;
     color: #333;
+}
+
+.client-records-section {
+    margin-top: 35px;
+}
+
+.upload-record-card {
+    background: #f8f8f8;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border: 1px solid #e5e5e5;
+}
+
+.upload-record-card h3 {
+    color: #b30000;
+    margin-bottom: 18px;
+}
+
+.upload-record-card .form-group {
+    margin-bottom: 15px;
+}
+
+.upload-record-card input,
+.upload-record-card select,
+.upload-record-card textarea,
+.record-item input {
+    width: 100%;
+    padding: 11px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    box-sizing: border-box;
+}
+
+.record-btn {
+    display: inline-block;
+    background: #b30000;
+    color: white;
+    padding: 11px 18px;
+    border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.record-btn:hover {
+    background: #850000;
+}
+
+.record-note {
+    color: #666;
+    font-size: 13px;
+    margin-top: 12px;
+}
+
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 20px;
+}
+
+.record-item {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.record-icon {
+    background: #b30000;
+    color: white;
+    width: 45px;
+    padding: 12px 0;
+    text-align: center;
+    border-radius: 8px;
+    font-weight: bold;
+}
+
+.record-item small {
+    color: #777;
 }
 </style>
 {% endblock %}

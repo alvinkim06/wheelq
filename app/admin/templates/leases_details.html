@@ -1,11 +1,17 @@
+
 {% extends "admin_base.html" %}
 
 {% block content %}
 
 <style>
-    /* =========================================
-       LEASE DETAILS PAGE
-    ========================================= */
+    :root {
+        --wheelq-yellow: #f5c518;
+        --wheelq-black: #171717;
+        --wheelq-red: #b30000;
+        --wheelq-green: #198754;
+        --wheelq-danger: #dc3545;
+        --wheelq-border: #eeeeee;
+    }
 
     .lease-details-container {
         max-width: 1250px;
@@ -13,37 +19,31 @@
         padding: 0 20px;
     }
 
-
-    /* =========================================
-       HEADER
-    ========================================= */
-
+    /* Header */
     .lease-details-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
         margin-bottom: 25px;
         padding-bottom: 18px;
-        border-bottom: 2px solid #f2c94c;
+        border-bottom: 2px solid var(--wheelq-yellow);
     }
 
     .lease-details-header h2 {
         margin: 0;
-        color: #b30000;
+        color: var(--wheelq-red);
         font-size: 30px;
         font-weight: 700;
     }
 
-    .header-actions {
+    .header-actions,
+    .bottom-actions {
         display: flex;
         gap: 10px;
         flex-wrap: wrap;
     }
-
-
-    /* =========================================
-       BUTTONS
-    ========================================= */
 
     .lease-btn {
         display: inline-flex;
@@ -56,58 +56,24 @@
         font-weight: 600;
         border: none;
         cursor: pointer;
-        transition: 0.3s ease;
+        transition: .2s ease;
         white-space: nowrap;
     }
 
-    .back-btn {
-        background: #333;
-        color: #ffffff;
+    .back-btn { background: #333; color: white; }
+    .edit-btn { background: #0d6efd; color: white; }
+    .approve-btn { background: var(--wheelq-green); color: white; }
+    .reject-btn { background: var(--wheelq-danger); color: white; }
+
+    .lease-btn:hover {
+        color: white;
+        transform: translateY(-2px);
+        text-decoration: none;
+        opacity: .9;
     }
 
-    .back-btn:hover {
-        background: #555;
-        color: #ffffff;
-    }
-
-    .edit-btn {
-        background: #0d6efd;
-        color: #ffffff;
-    }
-
-    .edit-btn:hover {
-        background: #084298;
-        color: #ffffff;
-    }
-
-    .approve-btn {
-        background: #198754;
-        color: #ffffff;
-    }
-
-    .approve-btn:hover {
-        background: #146c43;
-        color: #ffffff;
-    }
-
-    .reject-btn {
-        background: #dc3545;
-        color: #ffffff;
-    }
-
-    .reject-btn:hover {
-        background: #b02a37;
-        color: #ffffff;
-    }
-
-
-    /* =========================================
-       STATUS
-    ========================================= */
-
-    .status-section {
-        margin-bottom: 25px;
-    }
+    /* Status */
+    .status-section { margin-bottom: 25px; }
 
     .status-badge {
         display: inline-flex;
@@ -119,31 +85,12 @@
         text-transform: capitalize;
     }
 
-    .status-approved {
-        background: #d1e7dd;
-        color: #0f5132;
-    }
+    .status-approved { background: #d1e7dd; color: #0f5132; }
+    .status-pending { background: #fff3cd; color: #664d03; }
+    .status-rejected { background: #f8d7da; color: #842029; }
+    .status-other { background: #e2e3e5; color: #41464b; }
 
-    .status-pending {
-        background: #fff3cd;
-        color: #664d03;
-    }
-
-    .status-rejected {
-        background: #f8d7da;
-        color: #842029;
-    }
-
-    .status-other {
-        background: #e2e3e5;
-        color: #41464b;
-    }
-
-
-    /* =========================================
-       INFORMATION GRID
-    ========================================= */
-
+    /* Information cards */
     .details-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -151,38 +98,33 @@
         margin-bottom: 30px;
     }
 
-    .details-card {
-        background: #ffffff;
+    .details-card,
+    .gallery-section {
+        background: white;
         border-radius: 14px;
         padding: 25px;
-        border: 1px solid #eeeeee;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--wheelq-border);
+        box-shadow: 0 4px 15px rgba(0,0,0,.06);
     }
 
-    .details-card h3 {
+    .details-card h3,
+    .gallery-section h3 {
         margin: 0 0 20px;
         padding-bottom: 12px;
-        border-bottom: 2px solid #f2c94c;
-        color: #b30000;
+        border-bottom: 2px solid var(--wheelq-yellow);
+        color: var(--wheelq-red);
         font-size: 20px;
     }
-
-
-    /* =========================================
-       DETAIL ROWS
-    ========================================= */
 
     .detail-row {
         display: grid;
         grid-template-columns: 180px 1fr;
         gap: 15px;
         padding: 12px 0;
-        border-bottom: 1px solid #eeeeee;
+        border-bottom: 1px solid var(--wheelq-border);
     }
 
-    .detail-row:last-child {
-        border-bottom: none;
-    }
+    .detail-row:last-child { border-bottom: none; }
 
     .detail-label {
         font-weight: 700;
@@ -191,21 +133,14 @@
 
     .detail-value {
         color: #222;
-        word-break: break-word;
+        overflow-wrap: anywhere;
     }
 
-
-    /* =========================================
-       NOTES
-    ========================================= */
-
-    .notes-card {
-        grid-column: 1 / -1;
-    }
+    .notes-card { grid-column: 1 / -1; }
 
     .notes-content {
         background: #fffbea;
-        border-left: 4px solid #f2c94c;
+        border-left: 4px solid var(--wheelq-yellow);
         padding: 15px;
         border-radius: 8px;
         color: #444;
@@ -213,32 +148,10 @@
         min-height: 50px;
     }
 
-    .no-data {
-        color: #888;
-        font-style: italic;
-    }
+    .no-data { color: #888; font-style: italic; }
 
-
-    /* =========================================
-       IMAGE GALLERY
-    ========================================= */
-
-    .gallery-section {
-        background: #ffffff;
-        border-radius: 14px;
-        padding: 25px;
-        border: 1px solid #eeeeee;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
-    }
-
-    .gallery-section h3 {
-        margin: 0 0 20px;
-        color: #b30000;
-        font-size: 22px;
-        padding-bottom: 12px;
-        border-bottom: 2px solid #f2c94c;
-    }
+    /* Image gallery */
+    .gallery-section { margin-bottom: 30px; }
 
     .gallery-grid {
         display: grid;
@@ -251,13 +164,7 @@
         padding: 12px;
         border-radius: 12px;
         text-align: center;
-        border: 1px solid #eeeeee;
-        transition: 0.3s ease;
-    }
-
-    .gallery-item:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        border: 1px solid var(--wheelq-border);
     }
 
     .gallery-item h4 {
@@ -272,12 +179,10 @@
         object-fit: cover;
         border-radius: 10px;
         display: block;
-        transition: transform 0.25s ease;
+        transition: transform .25s ease;
     }
 
-    .gallery-item img:hover {
-        transform: scale(1.03);
-    }
+    .gallery-item img:hover { transform: scale(1.03); }
 
     .no-image {
         height: 220px;
@@ -290,503 +195,664 @@
         font-size: 14px;
     }
 
+    /* Investor finance panel */
+    .investor-finance {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        border: 1px solid #e9ecef;
+        border-radius: 16px;
+        overflow: hidden;
+        background: white;
+        box-shadow: 0 5px 22px rgba(0,0,0,.06);
+    }
 
-    /* =========================================
-       BOTTOM ACTIONS
-    ========================================= */
-
-    .bottom-actions {
+    .investor-finance-header {
+        background: var(--wheelq-black);
+        color: white;
+        padding: 22px 25px;
+        border-bottom: 4px solid var(--wheelq-yellow);
         display: flex;
-        justify-content: flex-end;
-        gap: 12px;
+        justify-content: space-between;
+        align-items: center;
         flex-wrap: wrap;
+        gap: 12px;
+    }
+
+    .investor-finance-header h4 {
+        margin: 0;
+        font-size: 19px;
+        font-weight: 700;
+    }
+
+    .investor-finance-header p {
+        margin: 5px 0 0;
+        color: #bdbdbd;
+        font-size: 13px;
+    }
+
+    .investor-approved-label {
+        background: var(--wheelq-yellow);
+        color: var(--wheelq-black);
+        padding: 8px 13px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .investor-finance-body { padding: 25px; }
+
+    .investor-stat {
+        height: 100%;
+        padding: 20px;
+        border: 1px solid #ededed;
+        border-radius: 12px;
+        background: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .investor-stat::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: var(--wheelq-yellow);
+    }
+
+    .investor-stat.paid::before { background: var(--wheelq-green); }
+    .investor-stat.balance::before { background: var(--wheelq-danger); }
+
+    .investor-stat-label {
+        color: #777;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .6px;
+        margin-bottom: 10px;
+    }
+
+    .investor-stat-value {
+        font-size: 23px;
+        font-weight: 800;
+        color: var(--wheelq-black);
+        margin: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .investor-stat.paid .investor-stat-value { color: var(--wheelq-green); }
+    .investor-stat.balance .investor-stat-value { color: var(--wheelq-danger); }
+
+    .investor-section-title {
+        font-size: 16px;
+        font-weight: 750;
+        color: #222;
+        margin-bottom: 18px;
+    }
+
+    .investor-payment-form {
+        background: #fafafa;
+        border: 1px solid #ededed;
+        border-radius: 12px;
+        padding: 22px;
+    }
+
+    .investor-payment-form label {
+        font-size: 13px;
+        font-weight: 650;
+        color: #444;
+        margin-bottom: 7px;
+    }
+
+    .investor-payment-form .form-control {
+        min-height: 44px;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        box-shadow: none;
+    }
+
+    .investor-payment-form .form-control:focus {
+        border-color: var(--wheelq-yellow);
+        box-shadow: 0 0 0 3px rgba(245,197,24,.15);
+    }
+
+    .investor-submit-btn {
+        background: var(--wheelq-yellow);
+        color: var(--wheelq-black);
+        border: none;
+        border-radius: 8px;
+        padding: 12px 22px;
+        font-weight: 750;
+        transition: .2s ease;
+        cursor: pointer;
+    }
+
+    .investor-submit-btn:hover {
+        background: #e0b000;
+        transform: translateY(-1px);
+    }
+
+    .investor-history {
+        border: 1px solid #ededed;
+        border-radius: 12px;
+        overflow-x: auto;
+    }
+
+    .investor-history table {
+        margin-bottom: 0;
+        min-width: 650px;
+    }
+
+    .investor-history thead th {
+        background: var(--wheelq-black);
+        color: white;
+        padding: 14px;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+        border: none;
+        white-space: nowrap;
+    }
+
+    .investor-history tbody td {
+        padding: 14px;
+        vertical-align: middle;
+        font-size: 13px;
+        color: #444;
+    }
+
+    .investor-history tbody tr:hover { background: #fffdf3; }
+
+    .investor-amount {
+        font-weight: 750;
+        color: var(--wheelq-green) !important;
+        white-space: nowrap;
+    }
+
+    .investor-method {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
+        background: #f1f1f1;
+        color: #444;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .investor-empty {
+        padding: 30px 15px !important;
+        text-align: center;
+        color: #888 !important;
+    }
+
+    .investor-paid-notice {
+        padding: 15px 18px;
+        border-radius: 9px;
+        background: #eaf7ef;
+        border: 1px solid #c9ead5;
+        color: #176b39;
+        font-weight: 650;
+        font-size: 14px;
+    }
+
+    .payment-progress {
+        height: 10px;
+        border-radius: 20px;
+        background: #eee;
+        overflow: hidden;
+    }
+
+    .payment-progress-bar {
+        height: 100%;
+        background: var(--wheelq-green);
+        border-radius: 20px;
+    }
+
+    /* Actions */
+    .bottom-actions {
+        justify-content: flex-end;
         padding: 20px 0;
     }
 
-
-    /* =========================================
-       RESPONSIVE
-    ========================================= */
-
     @media (max-width: 1000px) {
-
-        .gallery-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .details-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .notes-card {
-            grid-column: auto;
-        }
+        .gallery-grid { grid-template-columns: 1fr 1fr; }
+        .details-grid { grid-template-columns: 1fr; }
+        .notes-card { grid-column: auto; }
     }
 
-
     @media (max-width: 650px) {
-
-        .lease-details-container {
-            padding: 0 10px;
-        }
-
+        .lease-details-container { padding: 0 10px; }
         .lease-details-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 15px;
         }
-
-        .header-actions {
-            width: 100%;
-        }
-
-        .header-actions .lease-btn {
-            flex: 1;
-        }
-
-        .details-card {
-            padding: 18px;
-        }
-
+        .header-actions { width: 100%; }
+        .header-actions .lease-btn { flex: 1; }
+        .details-card { padding: 18px; }
         .detail-row {
             grid-template-columns: 1fr;
             gap: 5px;
         }
-
-        .gallery-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .bottom-actions {
-            flex-direction: column;
-        }
-
-        .bottom-actions .lease-btn {
-            width: 100%;
-        }
+        .gallery-grid { grid-template-columns: 1fr; }
+        .investor-finance-body { padding: 16px; }
+        .investor-finance-header { padding: 18px; }
+        .investor-stat { padding: 16px; }
+        .investor-stat-value { font-size: 20px; }
+        .bottom-actions { flex-direction: column; }
+        .bottom-actions .lease-btn { width: 100%; }
     }
 </style>
 
 
 <div class="lease-details-container">
 
-
-    <!-- =========================================
-         PAGE HEADER
-    ========================================= -->
-
+    <!-- PAGE HEADER -->
     <div class="lease-details-header">
-
         <div>
-            <h2>
-                Lease Details
-            </h2>
+            <h2>Lease Details</h2>
         </div>
 
-
         <div class="header-actions">
-
-            <a
-                href="{{ url_for('admin.leases_page') }}"
-                class="lease-btn back-btn"
-            >
+            <a href="{{ url_for('admin.leases_page') }}"
+               class="lease-btn back-btn">
                 ← Back to Leases
             </a>
 
-
-            <a
-                href="{{ url_for('admin.edit_lease', lease_id=lease.id) }}"
-                class="lease-btn edit-btn"
-            >
+            <a href="{{ url_for('admin.edit_lease', lease_id=lease.id) }}"
+               class="lease-btn edit-btn">
                 Edit Lease
             </a>
-
         </div>
-
     </div>
 
-
-    <!-- =========================================
-         STATUS
-    ========================================= -->
-
+    <!-- STATUS -->
     <div class="status-section">
 
         {% if lease.status == "approved" %}
-
-            <span class="status-badge status-approved">
-                ✓ Approved
-            </span>
+            <span class="status-badge status-approved">✓ Approved</span>
 
         {% elif lease.status == "pending" %}
-
-            <span class="status-badge status-pending">
-                ⏳ Pending
-            </span>
+            <span class="status-badge status-pending">⏳ Pending</span>
 
         {% elif lease.status == "rejected" %}
-
-            <span class="status-badge status-rejected">
-                ✕ Rejected
-            </span>
+            <span class="status-badge status-rejected">✕ Rejected</span>
 
         {% else %}
-
             <span class="status-badge status-other">
                 {{ lease.status|capitalize }}
             </span>
-
         {% endif %}
 
     </div>
 
-
-    <!-- =========================================
-         DETAILS
-    ========================================= -->
-
+    <!-- INVESTOR AND VEHICLE INFORMATION -->
     <div class="details-grid">
 
-
-        <!-- INVESTOR INFORMATION -->
-
         <div class="details-card">
-
-            <h3>
-                Investor Information
-            </h3>
-
+            <h3>Investor Information</h3>
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Full Name
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.owner_name or "N/A" }}
-                </div>
-
+                <div class="detail-label">Full Name</div>
+                <div class="detail-value">{{ lease.owner_name or "N/A" }}</div>
             </div>
-
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Email
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.email or "N/A" }}
-                </div>
-
+                <div class="detail-label">Email</div>
+                <div class="detail-value">{{ lease.email or "N/A" }}</div>
             </div>
-
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Phone
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.phone or "N/A" }}
-                </div>
-
+                <div class="detail-label">Phone</div>
+                <div class="detail-value">{{ lease.phone or "N/A" }}</div>
             </div>
-
 
             {% if lease.created_at %}
-
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Submitted On
-                </div>
-
+                <div class="detail-label">Submitted On</div>
                 <div class="detail-value">
                     {{ lease.created_at.strftime("%d %B %Y, %H:%M") }}
                 </div>
-
             </div>
-
             {% endif %}
-
         </div>
-
-
-        <!-- VEHICLE INFORMATION -->
 
         <div class="details-card">
-
-            <h3>
-                Vehicle Information
-            </h3>
-
+            <h3>Vehicle Information</h3>
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Car Model
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.car_model or "N/A" }}
-                </div>
-
+                <div class="detail-label">Car Model</div>
+                <div class="detail-value">{{ lease.car_model or "N/A" }}</div>
             </div>
-
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Car Year
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.car_year or "N/A" }}
-                </div>
-
+                <div class="detail-label">Car Year</div>
+                <div class="detail-value">{{ lease.car_year or "N/A" }}</div>
             </div>
-
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Registration
-                </div>
-
-                <div class="detail-value">
-                    {{ lease.car_plate or "N/A" }}
-                </div>
-
+                <div class="detail-label">Registration</div>
+                <div class="detail-value">{{ lease.car_plate or "N/A" }}</div>
             </div>
-
 
             <div class="detail-row">
-
-                <div class="detail-label">
-                    Lease ID
-                </div>
-
-                <div class="detail-value">
-                    #{{ lease.id }}
-                </div>
-
+                <div class="detail-label">Lease ID</div>
+                <div class="detail-value">#{{ lease.id }}</div>
             </div>
-
         </div>
 
-
-        <!-- NOTES -->
-
         <div class="details-card notes-card">
-
-            <h3>
-                Additional Notes
-            </h3>
-
+            <h3>Additional Notes</h3>
 
             {% if lease.notes %}
-
-                <div class="notes-content">
-                    {{ lease.notes }}
-                </div>
-
+                <div class="notes-content">{{ lease.notes }}</div>
             {% else %}
-
                 <div class="notes-content no-data">
                     No additional notes were provided for this lease.
                 </div>
-
             {% endif %}
-
         </div>
 
     </div>
 
-
-    <!-- =========================================
-         VEHICLE IMAGE GALLERY
-    ========================================= -->
-
+    <!-- VEHICLE IMAGE GALLERY -->
     <div class="gallery-section">
-
-        <h3>
-            Vehicle Images
-        </h3>
-
+        <h3>Vehicle Images</h3>
 
         <div class="gallery-grid">
 
-
-            <!-- FRONT -->
-
             <div class="gallery-item">
-
-                <h4>
-                    Front View
-                </h4>
-
+                <h4>Front View</h4>
                 {% if lease.image_front %}
-
-                    <img
-                        src="{{ url_for('static', filename='uploads/' ~ lease.image_front) }}"
-                        alt="Front view of {{ lease.car_model }}"
-                    >
-
+                    <img src="{{ url_for('static', filename='uploads/' ~ lease.image_front) }}"
+                         alt="Front view of {{ lease.car_model }}">
                 {% else %}
-
-                    <div class="no-image">
-                        No front image available
-                    </div>
-
+                    <div class="no-image">No front image available</div>
                 {% endif %}
-
             </div>
 
-
-            <!-- REAR -->
-
             <div class="gallery-item">
-
-                <h4>
-                    Rear View
-                </h4>
-
+                <h4>Rear View</h4>
                 {% if lease.image_rear %}
-
-                    <img
-                        src="{{ url_for('static', filename='uploads/' ~ lease.image_rear) }}"
-                        alt="Rear view of {{ lease.car_model }}"
-                    >
-
+                    <img src="{{ url_for('static', filename='uploads/' ~ lease.image_rear) }}"
+                         alt="Rear view of {{ lease.car_model }}">
                 {% else %}
-
-                    <div class="no-image">
-                        No rear image available
-                    </div>
-
+                    <div class="no-image">No rear image available</div>
                 {% endif %}
-
             </div>
 
-
-            <!-- LEFT -->
-
             <div class="gallery-item">
-
-                <h4>
-                    Left Side
-                </h4>
-
+                <h4>Left Side</h4>
                 {% if lease.image_left %}
-
-                    <img
-                        src="{{ url_for('static', filename='uploads/' ~ lease.image_left) }}"
-                        alt="Left side of {{ lease.car_model }}"
-                    >
-
+                    <img src="{{ url_for('static', filename='uploads/' ~ lease.image_left) }}"
+                         alt="Left side of {{ lease.car_model }}">
                 {% else %}
-
-                    <div class="no-image">
-                        No left-side image available
-                    </div>
-
+                    <div class="no-image">No left-side image available</div>
                 {% endif %}
-
             </div>
-
-
-            <!-- RIGHT -->
 
             <div class="gallery-item">
-
-                <h4>
-                    Right Side
-                </h4>
-
+                <h4>Right Side</h4>
                 {% if lease.image_right %}
-
-                    <img
-                        src="{{ url_for('static', filename='uploads/' ~ lease.image_right) }}"
-                        alt="Right side of {{ lease.car_model }}"
-                    >
-
+                    <img src="{{ url_for('static', filename='uploads/' ~ lease.image_right) }}"
+                         alt="Right side of {{ lease.car_model }}">
                 {% else %}
-
-                    <div class="no-image">
-                        No right-side image available
-                    </div>
-
+                    <div class="no-image">No right-side image available</div>
                 {% endif %}
-
             </div>
-
 
         </div>
-
     </div>
 
+    <!-- INVESTOR FINANCIAL MANAGEMENT -->
+    {% if lease.status == "approved" %}
 
-    <!-- =========================================
-         ACTIONS
-    ========================================= -->
+    {% set agreed = lease.agreed_amount|float %}
+    {% set paid = lease.amount_paid|float %}
+    {% set progress = (paid / agreed * 100) if agreed > 0 else 0 %}
+    {% set progress = [progress, 100]|min %}
 
+    <div class="investor-finance">
+
+        <div class="investor-finance-header">
+            <div>
+                <h4>Investor Financial Management</h4>
+                <p>Manage lease obligations and investor payments</p>
+            </div>
+
+            <span class="investor-approved-label">APPROVED LEASE</span>
+        </div>
+
+        <div class="investor-finance-body">
+
+            <!-- FINANCIAL SUMMARY -->
+            <div class="row mb-4">
+
+                <div class="col-md-4 mb-3">
+                    <div class="investor-stat">
+                        <div class="investor-stat-label">Agreed Amount</div>
+                        <h3 class="investor-stat-value">
+                            KSh {{ "{:,.2f}".format(lease.agreed_amount|float) }}
+                        </h3>
+                        <small class="text-muted">Total company obligation</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="investor-stat paid">
+                        <div class="investor-stat-label">Total Paid</div>
+                        <h3 class="investor-stat-value">
+                            KSh {{ "{:,.2f}".format(lease.amount_paid|float) }}
+                        </h3>
+                        <small class="text-muted">Payments already made</small>
+                    </div>
+                </div>
+
+                <div class="col-md-4 mb-3">
+                    <div class="investor-stat balance">
+                        <div class="investor-stat-label">Outstanding Balance</div>
+                        <h3 class="investor-stat-value">
+                            KSh {{ "{:,.2f}".format(lease.outstanding_amount|float) }}
+                        </h3>
+                        <small class="text-muted">Remaining company obligation</small>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- PAYMENT PROGRESS -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2">
+                    <strong style="font-size:13px;">Payment Progress</strong>
+                    <strong style="font-size:13px;">
+                        {{ "%.1f"|format(progress) }}%
+                    </strong>
+                </div>
+               
+                <div class="payment-progress">
+                    <div class="payment-progress-bar"
+                         style="width: {{ [progress, 100]|min }}%; border-radius: 20px;"
+                         role="progressbar"
+                         aria-valuenow="{{ progress }}"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- RECORD PAYMENT -->
+            <h5 class="investor-section-title">
+                <i class="fas fa-money-bill-wave mr-2"></i>
+                Record Investor Payment
+            </h5>
+
+            {% if lease.outstanding_amount > 0 %}
+
+            <div class="investor-payment-form">
+                <form method="POST"
+                      action="{{ url_for('admin.add_lease_payment', lease_id=lease.id) }}">
+
+                    <div class="row">
+
+                        <div class="col-md-6 form-group">
+                            <label>Payment Amount (KSh)</label>
+                            <input type="number"
+                                   name="amount"
+                                   class="form-control"
+                                   min="0.01"
+                                   max="{{ lease.outstanding_amount }}"
+                                   step="0.01"
+                                   placeholder="Enter payment amount"
+                                   required>
+
+                            <small class="text-muted">
+                                Maximum payable: KSh
+                                {{ "{:,.2f}".format(lease.outstanding_amount|float) }}
+                            </small>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label>Payment Method</label>
+                            <select name="payment_method"
+                                    class="form-control"
+                                    required>
+                                <option value="">Select payment method</option>
+                                <option value="mpesa">M-PESA</option>
+                                <option value="bank">Bank Transfer</option>
+                                <option value="cash">Cash</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label>Transaction Reference</label>
+                            <input type="text"
+                                   name="reference"
+                                   class="form-control"
+                                   placeholder="e.g. M-PESA transaction code">
+                        </div>
+
+                        <div class="col-md-6 form-group">
+                            <label>Payment Notes</label>
+                            <input type="text"
+                                   name="notes"
+                                   class="form-control"
+                                   placeholder="Optional payment description">
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="investor-submit-btn">
+                        <i class="fas fa-check-circle mr-1"></i>
+                        Record Payment
+                    </button>
+
+                </form>
+            </div>
+
+            {% else %}
+
+            <div class="investor-paid-notice mb-4">
+                <i class="fas fa-check-circle mr-2"></i>
+                This investor has been fully paid. No outstanding balance remains.
+            </div>
+
+            {% endif %}
+
+            <hr class="my-4">
+
+            <!-- PAYMENT HISTORY -->
+            <h5 class="investor-section-title">
+                <i class="fas fa-history mr-2"></i>
+                Investor Payment History
+            </h5>
+
+            <div class="investor-history">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Amount Paid</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for payment in lease.payments|sort(attribute='created_at', reverse=True) %}
+                        <tr>
+                            <td>
+                                {{ payment.created_at.strftime('%d %b %Y, %I:%M %p') if payment.created_at else '-' }}
+                            </td>
+
+                            <td class="investor-amount">
+                                KSh {{ "{:,.2f}".format(payment.amount|float) }}
+                            </td>
+
+                            <td>
+                                <span class="investor-method">
+                                    {{ payment.payment_method or 'Other' }}
+                                </span>
+                            </td>
+
+                            <td>{{ payment.reference or '-' }}</td>
+                            <td>{{ payment.notes or '-' }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="investor-empty">
+                                <i class="fas fa-receipt fa-2x mb-2 d-block"></i>
+                                No investor payments have been recorded yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    {% endif %}
+
+    <!-- PAGE ACTIONS -->
     <div class="bottom-actions">
 
-
         {% if lease.status != "approved" %}
-
-        <a
-            href="{{ url_for(
-                'admin.update_lease_status',
-                lease_id=lease.id,
-                status='approved'
-            ) }}"
-            class="lease-btn approve-btn"
-        >
+        <a href="{{ url_for('admin.update_lease_status',
+                            lease_id=lease.id,
+                            status='approved') }}"
+           class="lease-btn approve-btn">
             ✓ Approve Lease
         </a>
-
         {% endif %}
-
 
         {% if lease.status != "rejected" %}
-
-        <a
-            href="{{ url_for(
-                'admin.update_lease_status',
-                lease_id=lease.id,
-                status='rejected'
-            ) }}"
-            class="lease-btn reject-btn"
-            onclick="return confirm('Are you sure you want to reject this lease?');"
-        >
+        <a href="{{ url_for('admin.update_lease_status',
+                            lease_id=lease.id,
+                            status='rejected') }}"
+           class="lease-btn reject-btn"
+           onclick="return confirm('Are you sure you want to reject this lease?');">
             ✕ Reject Lease
         </a>
-
         {% endif %}
 
-
-        <a
-            href="{{ url_for('admin.edit_lease', lease_id=lease.id) }}"
-            class="lease-btn edit-btn"
-        >
+        <a href="{{ url_for('admin.edit_lease', lease_id=lease.id) }}"
+           class="lease-btn edit-btn">
             Edit Lease
         </a>
 
-
-        <a
-            href="{{ url_for('admin.leases_page') }}"
-            class="lease-btn back-btn"
-        >
+        <a href="{{ url_for('admin.leases_page') }}"
+           class="lease-btn back-btn">
             Back to Leases
         </a>
 
     </div>
 
 </div>
-
 
 {% endblock %}

@@ -1,0 +1,26 @@
+
+{% extends "emails/base.html" %}
+{% block title %}Penalty Notice - WheelQ{% endblock %}
+
+{% block content %}
+<h2 class="highlight">Vehicle Return Penalty Notice</h2>
+
+<p>Hello {{ customer_name }},</p>
+
+<p>Our records indicate that a late-return penalty has been applied to your booking.</p>
+
+<div class="details">
+    <h3>Penalty Details</h3>
+    <p><strong>Booking Reference:</strong> {{ booking_reference }}</p>
+    <p><strong>Vehicle:</strong> {{ car_name }}</p>
+    <p><strong>Registration:</strong> {{ registration_number }}</p>
+    <p><strong>Expected Return:</strong> {{ expected_return }}</p>
+    <p><strong>Hours Late:</strong> {{ hours_late }}</p>
+    <p><strong>Penalty Amount:</strong> {{ amount }}</p>
+    <p><strong>Payment Status:</strong> {{ payment_status|default('Unpaid') }}</p>
+</div>
+
+<p>Please contact our team if you believe this penalty has been applied incorrectly.</p>
+
+<p>Thank you for your understanding.</p>
+{% endblock %}

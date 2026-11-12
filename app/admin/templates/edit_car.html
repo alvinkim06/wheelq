@@ -1,0 +1,948 @@
+{% extends "admin_base.html" %}
+
+{% block title %}Edit Vehicle | WheelQ{% endblock %}
+
+{% block content %}
+
+<style>
+    :root {
+        --wq-bg: #f4f6fa;
+        --wq-card: #ffffff;
+        --wq-dark: #171c2b;
+        --wq-muted: #8490a5;
+        --wq-yellow: #ffc928;
+        --wq-border: #e9edf3;
+        --wq-radius: 14px;
+    }
+
+    .edit-vehicle {
+        color: var(--wq-dark);
+        padding: 12px 5px 35px;
+    }
+
+    .edit-vehicle * {
+        box-sizing: border-box;
+    }
+
+    .edit-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 28px;
+        flex-wrap: wrap;
+    }
+
+    .edit-header h2 {
+        font-size: 25px;
+        font-weight: 800;
+        margin: 0;
+        letter-spacing: -.6px;
+    }
+
+    .edit-header p {
+        color: var(--wq-muted);
+        margin: 6px 0 0;
+        font-size: 13px;
+    }
+
+    .wq-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border-radius: 9px;
+        padding: 11px 17px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: .2s ease;
+    }
+
+    .wq-btn-back {
+        background: white;
+        border: 1px solid var(--wq-border);
+        color: var(--wq-dark);
+    }
+
+    .wq-btn-back:hover {
+        background: #f0f2f6;
+        color: var(--wq-dark);
+    }
+
+    .wq-btn-save {
+        background: var(--wq-yellow);
+        color: #171717;
+        width: 100%;
+        padding: 14px;
+        font-size: 14px;
+    }
+
+    .wq-btn-save:hover {
+        background: #efb900;
+        transform: translateY(-1px);
+    }
+
+    .edit-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 22px;
+        align-items: start;
+    }
+
+    .edit-main {
+        min-width: 0;
+    }
+
+    .wq-card {
+        background: var(--wq-card);
+        border: 1px solid var(--wq-border);
+        border-radius: var(--wq-radius);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .wq-card-header {
+        padding: 19px 22px;
+        border-bottom: 1px solid var(--wq-border);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .wq-card-icon {
+        width: 37px;
+        height: 37px;
+        border-radius: 10px;
+        background: #fff6d9;
+        color: #c18b00;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-shrink: 0;
+        font-size: 17px;
+    }
+
+    .wq-card-header h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 800;
+    }
+
+    .wq-card-header p {
+        margin: 3px 0 0;
+        color: var(--wq-muted);
+        font-size: 11px;
+    }
+
+    .wq-card-body {
+        padding: 23px;
+    }
+
+    .wq-form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 19px;
+    }
+
+    .wq-field {
+        min-width: 0;
+    }
+
+    .wq-field.full {
+        grid-column: 1 / -1;
+    }
+
+    .wq-field label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #384258;
+    }
+
+    .wq-field input,
+    .wq-field select,
+    .wq-field textarea {
+        width: 100%;
+        border: 1px solid #e1e6ee;
+        border-radius: 9px;
+        padding: 12px 13px;
+        font-size: 13px;
+        color: var(--wq-dark);
+        background: #fbfcfe;
+        outline: none;
+        transition: .2s;
+    }
+
+    .wq-field input:focus,
+    .wq-field select:focus,
+    .wq-field textarea:focus {
+        border-color: var(--wq-yellow);
+        box-shadow: 0 0 0 3px rgba(255, 201, 40, .15);
+        background: white;
+    }
+
+    .wq-field textarea {
+        resize: vertical;
+        min-height: 105px;
+    }
+
+    .wq-help {
+        font-size: 11px;
+        color: var(--wq-muted);
+        display: block;
+        margin-top: 7px;
+    }
+
+    .image-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+    }
+
+    .image-upload {
+        border: 1px solid var(--wq-border);
+        border-radius: 11px;
+        padding: 13px;
+        background: #fbfcfe;
+        min-width: 0;
+    }
+
+    .image-upload-title {
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 11px;
+        color: #384258;
+    }
+
+    .image-preview {
+        height: 145px;
+        border-radius: 8px;
+        background: #edf0f5;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        margin-bottom: 12px;
+        position: relative;
+    }
+
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .image-placeholder {
+        color: #a1aabd;
+        font-size: 12px;
+        text-align: center;
+    }
+
+    .image-placeholder span {
+        display: block;
+        font-size: 28px;
+        margin-bottom: 7px;
+    }
+
+    .image-upload input[type="file"] {
+        width: 100%;
+        font-size: 11px;
+        color: #667085;
+    }
+
+    .image-upload input[type="file"]::file-selector-button {
+        border: 0;
+        background: #fff1bd;
+        color: #765500;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        margin-right: 8px;
+        cursor: pointer;
+    }
+
+    .insurance-box {
+        background: #fffdf6;
+        border: 1px solid #f5e8b9;
+        border-radius: 12px;
+        padding: 18px;
+    }
+
+    .document-current {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 13px;
+        border: 1px solid #dcefe3;
+        background: #f2fbf5;
+        border-radius: 9px;
+        margin-bottom: 18px;
+    }
+
+    .document-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        font-weight: 700;
+        color: #237344;
+    }
+
+    .document-icon {
+        width: 38px;
+        height: 38px;
+        background: #dff4e6;
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 19px;
+    }
+
+    .document-download {
+        background: white;
+        border: 1px solid #b9dec7;
+        color: #237344;
+        border-radius: 7px;
+        padding: 8px 12px;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .document-download:hover {
+        background: #e5f7eb;
+        color: #165d34;
+    }
+
+    .document-missing {
+        background: #fff7e5;
+        color: #936400;
+        border: 1px solid #f3dfaa;
+        border-radius: 9px;
+        padding: 13px;
+        font-size: 12px;
+        margin-bottom: 18px;
+    }
+
+    .document-upload {
+        border: 1px dashed #e5c55b;
+        border-radius: 10px;
+        background: white;
+        padding: 18px;
+        text-align: center;
+    }
+
+    .document-upload .upload-icon {
+        font-size: 27px;
+        margin-bottom: 8px;
+    }
+
+    .document-upload input {
+        display: block;
+        width: 100%;
+        margin-top: 12px;
+        font-size: 11px;
+    }
+
+    .document-upload p {
+        color: var(--wq-muted);
+        font-size: 11px;
+        margin: 5px 0 0;
+    }
+
+    .summary-card {
+        position: sticky;
+        top: 20px;
+    }
+
+    .summary-image {
+        height: 165px;
+        background: #edf0f5;
+        overflow: hidden;
+    }
+
+    .summary-image img {
+        height: 100%;
+        width: 100%;
+        object-fit: cover;
+    }
+
+    .summary-content {
+        padding: 20px;
+    }
+
+    .summary-content h5 {
+        font-size: 16px;
+        font-weight: 800;
+        margin: 0 0 5px;
+    }
+
+    .summary-registration {
+        color: var(--wq-muted);
+        font-size: 11px;
+        margin-bottom: 19px;
+    }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--wq-border);
+        font-size: 12px;
+    }
+
+    .summary-item span:first-child {
+        color: var(--wq-muted);
+    }
+
+    .summary-item strong {
+        text-align: right;
+    }
+
+    .summary-price {
+        font-size: 21px;
+        font-weight: 800;
+        color: #198754;
+    }
+
+    .status-pill {
+        display: inline-block;
+        border-radius: 20px;
+        background: #e9f8ef;
+        color: #198754;
+        padding: 6px 11px;
+        font-size: 10px;
+        font-weight: 800;
+    }
+
+    .summary-actions {
+        padding: 0 20px 20px;
+    }
+
+    .summary-note {
+        background: #f8f9fc;
+        padding: 14px;
+        border-radius: 9px;
+        color: #737f94;
+        font-size: 11px;
+        line-height: 1.7;
+        margin-top: 17px;
+    }
+
+    .required {
+        color: #dc3545;
+    }
+
+    @media(max-width: 1050px) {
+        .edit-grid {
+            grid-template-columns: minmax(0, 1fr) 260px;
+        }
+    }
+
+    @media(max-width: 800px) {
+        .edit-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .summary-card {
+            position: static;
+        }
+    }
+
+    @media(max-width: 550px) {
+        .edit-vehicle {
+            padding: 5px 0 25px;
+        }
+
+        .edit-header h2 {
+            font-size: 21px;
+        }
+
+        .wq-card-body {
+            padding: 16px;
+        }
+
+        .wq-card-header {
+            padding: 15px;
+        }
+
+        .wq-form-grid,
+        .image-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .wq-btn-back {
+            width: 100%;
+        }
+    }
+</style>
+
+
+<div class="edit-vehicle">
+
+    <!-- PAGE HEADER -->
+    <div class="edit-header">
+        <div>
+            <h2>Edit Vehicle</h2>
+            <p>Manage your fleet, update vehicle information and insurance records.</p>
+        </div>
+
+        <a href="{{ url_for('admin.cars_page') }}" class="wq-btn wq-btn-back">
+            ← Back to Vehicles
+        </a>
+    </div>
+
+
+    <form method="POST"
+          enctype="multipart/form-data"
+          action="{{ url_for('admin.edit_car', car_id=car.id) }}">
+
+        <div class="edit-grid">
+
+            <!-- MAIN FORM -->
+            <div class="edit-main">
+
+                <!-- VEHICLE INFORMATION -->
+                <div class="wq-card">
+
+                    <div class="wq-card-header">
+                        <div class="wq-card-icon">🚘</div>
+                        <div>
+                            <h5>Vehicle Information</h5>
+                            <p>Basic information about this vehicle</p>
+                        </div>
+                    </div>
+
+                    <div class="wq-card-body">
+
+                        <div class="wq-form-grid">
+
+                            <div class="wq-field">
+                                <label>Vehicle Name <span class="required">*</span></label>
+                                <input type="text"
+                                       name="name"
+                                       value="{{ car.name or '' }}"
+                                       placeholder="e.g. Toyota Prado TX"
+                                       required>
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Vehicle Brand</label>
+                                <input type="text"
+                                       name="brand"
+                                       value="{{ car.brand or '' }}"
+                                       placeholder="e.g. Toyota">
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Registration Number</label>
+                                <input type="text"
+                                       name="registration_number"
+                                       value="{{ car.registration_number or '' }}"
+                                       placeholder="e.g. KDA 123A"
+                                       style="text-transform:uppercase;">
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Manufacturing Year</label>
+                                <input type="number"
+                                       name="year"
+                                       value="{{ car.year or '' }}"
+                                       min="1900"
+                                       max="2100"
+                                       placeholder="e.g. 2022">
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Daily Rental Price (KSh) <span class="required">*</span></label>
+                                <input type="number"
+                                       name="price"
+                                       value="{{ car.price or 0 }}"
+                                       min="0"
+                                       required>
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Vehicle Type</label>
+                                <select name="type">
+                                    <option value="">Select vehicle type</option>
+                                    {% for type in ['SUV', 'Sedan', 'Hatchback', 'Luxury', 'Van', 'Pickup', 'Minibus', 'Other'] %}
+                                    <option value="{{ type }}"
+                                        {% if car.type == type %}selected{% endif %}>
+                                        {{ type }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="wq-field">
+                                <label>Availability Status</label>
+                                <select name="status">
+                                    {% for status in ['available', 'booked', 'maintenance', 'unavailable'] %}
+                                    <option value="{{ status }}"
+                                        {% if car.status == status %}selected{% endif %}>
+                                        {{ status.replace('_', ' ')|title }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="wq-field full">
+                                <label>Vehicle Description</label>
+                                <textarea name="details"
+                                          placeholder="Describe the vehicle, its features, specifications and other important information...">{{ car.details or '' }}</textarea>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- VEHICLE IMAGES -->
+                <div class="wq-card">
+
+                    <div class="wq-card-header">
+                        <div class="wq-card-icon">📸</div>
+                        <div>
+                            <h5>Vehicle Gallery</h5>
+                            <p>Update the main image and individual vehicle views</p>
+                        </div>
+                    </div>
+
+                    <div class="wq-card-body">
+
+                        <p class="wq-help" style="margin-top:0;margin-bottom:18px;">
+                            Select a new image only when you want to replace an existing one.
+                        </p>
+
+                        <div class="image-grid">
+
+                            {% set images = [
+                                ('image', 'Main Vehicle Image', car.image),
+                                ('image_front', 'Front View', car.image_front),
+                                ('image_rear', 'Rear View', car.image_rear),
+                                ('image_left', 'Left Side View', car.image_left),
+                                ('image_right', 'Right Side View', car.image_right)
+                            ] %}
+
+                            {% for field, label, current_image in images %}
+
+                            <div class="image-upload">
+
+                                <div class="image-upload-title">{{ label }}</div>
+
+                                <div class="image-preview"
+                                     id="preview-box-{{ field }}">
+
+                                    {% if current_image %}
+                                    <img
+                                        src="{{ url_for('static', filename='uploads/' ~ current_image) }}"
+                                        alt="{{ label }}"
+                                        id="preview-{{ field }}">
+                                    {% else %}
+                                    <div class="image-placeholder" id="placeholder-{{ field }}">
+                                        <span>🖼️</span>
+                                        No image uploaded
+                                    </div>
+                                    <img id="preview-{{ field }}"
+                                         src=""
+                                         alt="{{ label }}"
+                                         style="display:none;">
+                                    {% endif %}
+
+                                </div>
+
+                                <input type="file"
+                                       name="{{ field }}"
+                                       accept="image/*"
+                                       onchange="previewVehicleImage(this, '{{ field }}')">
+
+                                <span class="wq-help">Image formats only</span>
+
+                            </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- INSURANCE INFORMATION -->
+                <div class="wq-card">
+
+                    <div class="wq-card-header">
+                        <div class="wq-card-icon">🛡️</div>
+                        <div>
+                            <h5>Insurance Information</h5>
+                            <p>Manage insurance provider, expiry date and certificate</p>
+                        </div>
+                    </div>
+
+                    <div class="wq-card-body">
+
+                        <div class="insurance-box">
+
+                            <div class="wq-form-grid">
+
+                                <div class="wq-field">
+                                    <label>Insurance Provider</label>
+                                    <input type="text"
+                                           name="insurance_provider"
+                                           value="{{ car.insurance_provider or '' }}"
+                                           placeholder="e.g. Jubilee Insurance">
+                                </div>
+
+                                <div class="wq-field">
+                                    <label>Insurance Expiry Date</label>
+                                    <input type="date"
+                                           name="insurance_expiry"
+                                           value="{{ car.insurance_expiry.strftime('%Y-%m-%d') if car.insurance_expiry else '' }}">
+                                </div>
+
+                            </div>
+
+                            <hr style="border-color:#eadfae;margin:22px 0;">
+
+                            <label style="font-size:12px;font-weight:800;display:block;margin-bottom:12px;">
+                                Insurance Certificate / Document
+                            </label>
+
+                            {% if car.insurance_document %}
+
+                            <div class="document-current">
+
+                                <div class="document-info">
+                                    <div class="document-icon">📄</div>
+                                    <div>
+                                        <div>Insurance document uploaded</div>
+                                        <small style="font-weight:400;">Existing certificate available</small>
+                                    </div>
+                                </div>
+
+                                <a href="{{ url_for('admin.download_insurance_document', car_id=car.id) }}"
+                                   class="document-download">
+                                    ↓ Download
+                                </a>
+
+                            </div>
+
+                            {% else %}
+
+                            <div class="document-missing">
+                                ⚠ No insurance certificate has been uploaded for this vehicle.
+                            </div>
+
+                            {% endif %}
+
+                            <div class="document-upload">
+
+                                <div class="upload-icon">📁</div>
+
+                                <strong style="font-size:13px;">
+                                    Upload Insurance Certificate
+                                </strong>
+
+                                <p>Choose a new document to upload or replace the existing one.</p>
+
+                                <input type="file"
+                                       name="insurance_document"
+                                       id="insurance_document"
+                                       accept=".jpg,.jpeg,.png,.webp,.pdf">
+
+                                <p id="insurance-file-name">
+                                    PDF, JPG, JPEG, PNG and WEBP supported.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <!-- BOTTOM SAVE BUTTON -->
+                <div class="wq-card">
+                    <div class="wq-card-body">
+
+                        <button type="submit" class="wq-btn wq-btn-save">
+                            ✓ &nbsp; Save Vehicle Changes
+                        </button>
+
+                        <p class="wq-help" style="text-align:center;margin-top:12px;">
+                            Review your changes before saving.
+                        </p>
+
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT SUMMARY PANEL -->
+            <div class="edit-sidebar">
+
+                <div class="wq-card summary-card">
+
+                    <div class="summary-image">
+                        {% if car.image %}
+                        <img src="{{ url_for('static', filename='uploads/' ~ car.image) }}"
+                             alt="{{ car.name }}"
+                             id="summary-car-image">
+                        {% else %}
+                        <div class="image-placeholder" style="padding-top:55px;">
+                            <span>🚘</span>
+                            No main vehicle image
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="summary-content">
+
+                        <h5>{{ car.name }}</h5>
+
+                        <div class="summary-registration">
+                            {{ car.registration_number or 'Registration not provided' }}
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Brand</span>
+                            <strong>{{ car.brand or 'Not specified' }}</strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Year</span>
+                            <strong>{{ car.year or 'Not specified' }}</strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Vehicle Type</span>
+                            <strong>{{ car.type or 'Not specified' }}</strong>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Daily Rental Rate</span>
+                            <strong class="summary-price">
+                                KSh {{ "{:,.0f}".format(car.price or 0) }}
+                            </strong>
+                        </div>
+
+                        <div class="summary-item" style="border-bottom:none;">
+                            <span>Status</span>
+                            <strong>
+                                <span class="status-pill">
+                                    {{ (car.status or 'available')|replace('_', ' ')|title }}
+                                </span>
+                            </strong>
+                        </div>
+
+                    </div>
+
+                    <div class="summary-actions">
+
+                        <button type="submit" class="wq-btn wq-btn-save">
+                            Save Changes
+                        </button>
+
+                        <a href="{{ url_for('admin.cars_page') }}"
+                           class="wq-btn wq-btn-back"
+                           style="width:100%;margin-top:9px;">
+                            Cancel
+                        </a>
+
+                        <div class="summary-note">
+                            <strong>Vehicle management</strong><br>
+                            Keep vehicle information, images and insurance records accurate to ensure smooth fleet management.
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<script>
+    // Vehicle image previews
+    function previewVehicleImage(input, field) {
+        const preview = document.getElementById('preview-' + field);
+        const placeholder = document.getElementById('placeholder-' + field);
+
+        if (!input.files || !input.files[0]) {
+            return;
+        }
+
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            alert('Please select a valid image file.');
+            input.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+
+            if (placeholder) {
+                placeholder.style.display = 'none';
+            }
+
+            // Update summary image when main image changes
+            if (field === 'image') {
+                const summaryImage = document.getElementById('summary-car-image');
+
+                if (summaryImage) {
+                    summaryImage.src = e.target.result;
+                }
+            }
+        };
+
+        reader.readAsDataURL(file);
+    }
+
+
+    // Insurance document filename preview
+    document.getElementById('insurance_document').addEventListener('change', function() {
+        const file = this.files[0];
+        const display = document.getElementById('insurance-file-name');
+
+        if (!file) {
+            display.textContent = 'PDF, JPG, JPEG, PNG and WEBP supported.';
+            return;
+        }
+
+        const allowed = ['pdf', 'jpg', 'jpeg', 'png', 'webp'];
+        const extension = file.name.split('.').pop().toLowerCase();
+
+        if (!allowed.includes(extension)) {
+            alert('Unsupported document format. Please upload PDF, JPG, JPEG, PNG or WEBP.');
+            this.value = '';
+            display.textContent = 'PDF, JPG, JPEG, PNG and WEBP supported.';
+            return;
+        }
+
+        display.textContent = 'Selected: ' + file.name;
+    });
+</script>
+
+{% endblock %}

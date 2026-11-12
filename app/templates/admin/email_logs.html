@@ -1,0 +1,134 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}Email History{% endblock %}
+
+{% block content %}
+
+<style>
+.email-page {
+    padding: 25px;
+}
+
+.email-page h1 {
+    color: #b30000;
+    font-weight: 700;
+}
+
+.email-table-wrapper {
+    overflow-x: auto;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eee;
+    box-shadow: 0 4px 15px rgba(0,0,0,.06);
+}
+
+.email-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: collapse;
+}
+
+.email-table th {
+    background: #171717;
+    color: #f5c518;
+    text-align: left;
+    padding: 14px;
+}
+
+.email-table td {
+    padding: 13px;
+    border-bottom: 1px solid #eee;
+    font-size: 13px;
+}
+
+.email-status {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 11px;
+}
+
+.sent { background: #e4f5e9; color: #16834a; }
+.pending { background: #fff4ce; color: #8a6500; }
+.failed { background: #ffe0e0; color: #b30000; }
+
+.retry-btn {
+    background: #b30000;
+    color: white;
+    border: 0;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+</style>
+
+<div class="email-page">
+
+    <h1>Email History</h1>
+
+    <p>Monitor customer and administrator email notifications.</p>
+
+    <div class="email-table-wrapper">
+        <table class="email-table">
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Recipient</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Attempts</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for email in emails %}
+                <tr>
+                    <td>{{ email.event_type }}</td>
+                    <td>
+                        {{ email.recipients|join(', ') }}
+                    </td>
+                    <td>{{ email.subject }}</td>
+                    <td>
+                        <span class="email-status {{ email.status }}">
+                            {{ email.status|upper }}
+                        </span>
+                    </td>
+                    <td>{{ email.attempts }}</td>
+                    <td>
+                        {{ email.created_at.strftime('%d %b %Y %H:%M') }}
+                    </td>
+                    <td>
+                        {% if email.status != 'sent' %}
+                        <form method="POST"
+                              action="{{ url_for('admin.retry_email_log', email_id=email.id) }}">
+                            {% if csrf_token is defined %}
+                            <input type="hidden"
+                                   name="csrf_token"
+                                   value="{{ csrf_token() }}">
+                            {% endif %}
+                            <button class="retry-btn" type="submit">
+                                Retry
+                            </button>
+                        </form>
+                        {% else %}
+                            Sent
+                        {% endif %}
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align:center;padding:40px;">
+                        No email records yet.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+{% endblock %}

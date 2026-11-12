@@ -1,18 +1,425 @@
+
 {% extends "admin_base.html" %}
+
 {% block content %}
-<h1 class="page-title">Booking Details</h1>
+<style>
+    .booking-page {
+        color: #f5f5f5;
+        padding: 10px 0 35px;
+    }
 
-<div class="info-box">
-    <h3>{{ booking.client_name }}</h3>
-    <p>Email: {{ booking.client_email }}</p>
-    <p>Phone: {{ booking.client_phone }}</p>
-    <p>Car: {{ booking.car.name }}</p>
-    <p>Hire Dates: {{ booking.hire_start }} → {{ booking.hire_end }}</p>
-    <p>Status: {{ booking.status }}</p>
+    .booking-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-bottom: 24px;
+    }
 
-    {% if booking.status == "pending" %}
-        <a href="/admin/bookings/approve/{{ booking.id }}" class="btn-primary">Approve Booking</a>
-    {% endif %}
+    .booking-header h1 {
+        margin: 0;
+        font-size: 26px;
+        font-weight: 800;
+    }
+
+    .booking-subtitle {
+        color: #aaa;
+        margin-top: 6px;
+        font-size: 13px;
+    }
+
+    .booking-card {
+        background: #171717;
+        border: 1px solid #303030;
+        border-radius: 13px;
+        padding: 22px;
+        margin-bottom: 20px;
+    }
+
+    .booking-card h3 {
+        color: #ffc928;
+        font-size: 16px;
+        font-weight: 800;
+        margin: 0 0 18px;
+    }
+
+    .booking-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+        gap: 18px;
+    }
+
+    .booking-field small {
+        display: block;
+        color: #999;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: .5px;
+        margin-bottom: 6px;
+    }
+
+    .booking-field strong {
+        display: block;
+        color: #f5f5f5;
+        font-size: 14px;
+        overflow-wrap: anywhere;
+    }
+
+    .booking-status {
+        display: inline-block;
+        padding: 6px 11px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        background: #333;
+        color: #eee;
+    }
+
+    .status-paid, .status-completed, .status-active {
+        background: #123d2b;
+        color: #72e5a8;
+    }
+
+    .status-pending, .status-unpaid {
+        background: #493716;
+        color: #ffd36b;
+    }
+
+    .status-cancelled, .status-incomplete {
+        background: #4a2020;
+        color: #ff9999;
+    }
+
+    .booking-table-wrap {
+        overflow-x: auto;
+    }
+
+    .booking-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 650px;
+    }
+
+    .booking-table th {
+        text-align: left;
+        color: #ffc928;
+        font-size: 11px;
+        text-transform: uppercase;
+        padding: 12px;
+        border-bottom: 1px solid #383838;
+        white-space: nowrap;
+    }
+
+    .booking-table td {
+        padding: 13px 12px;
+        color: #e5e5e5;
+        font-size: 13px;
+        border-bottom: 1px solid #292929;
+        vertical-align: middle;
+    }
+
+    .booking-table tr:last-child td {
+        border-bottom: 0;
+    }
+
+    .empty-state {
+        color: #999;
+        padding: 16px 0;
+        font-size: 13px;
+    }
+
+    .booking-actions {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .booking-btn {
+        display: inline-block;
+        border: 0;
+        border-radius: 7px;
+        padding: 10px 15px;
+        font-size: 12px;
+        font-weight: 800;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .booking-btn-primary {
+        background: #ffc928;
+        color: #171717;
+    }
+
+    .booking-btn-secondary {
+        background: #303030;
+        color: #fff;
+    }
+
+    .money {
+        font-weight: 800;
+        white-space: nowrap;
+    }
+
+    @media(max-width: 600px) {
+        .booking-card {
+            padding: 16px;
+        }
+
+        .booking-header h1 {
+            font-size: 21px;
+        }
+    }
+</style>
+
+{% macro status_badge(value) %}
+    {% set normalized = (value or 'unknown')|lower|replace(' ', '-') %}
+    <span class="booking-status status-{{ normalized }}">
+        {{ (value or 'Unknown')|replace('_', ' ')|title }}
+    </span>
+{% endmacro %}
+
+<div class="booking-page">
+
+    <div class="booking-header">
+        <div>
+            <h1>Booking Details</h1>
+            <div class="booking-subtitle">
+                Booking #{{ booking.id }} · Complete booking, vehicle and financial information
+            </div>
+        </div>
+
+        <a href="{{ url_for('admin.bookings_page') }}"
+           class="booking-btn booking-btn-secondary">
+            Back to Bookings
+        </a>
+    </div>
+
+    <!-- BOOKING STATUS -->
+    <div class="booking-card">
+        <h3>Booking Overview</h3>
+
+        <div class="booking-grid">
+            <div class="booking-field">
+                <small>Booking Reference</small>
+                <strong>#{{ booking.id }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Booking Status</small>
+                {{ status_badge(booking.status) }}
+            </div>
+
+            <div class="booking-field">
+                <small>Payment Status</small>
+                {{ status_badge(booking.payment_status) }}
+            </div>
+
+            <div class="booking-field">
+                <small>Booking Amount</small>
+                <strong class="money">
+                    KSh {{ "%.2f"|format(booking.amount or 0) }}
+                </strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Created On</small>
+                <strong>
+                    {{ booking.created_at.strftime('%d %b %Y, %H:%M') if booking.created_at else 'Not available' }}
+                </strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- CLIENT -->
+    <div class="booking-card">
+        <h3>Client Information</h3>
+
+        <div class="booking-grid">
+            <div class="booking-field">
+                <small>Client Name</small>
+                <strong>{{ booking.client_name or (booking.client.name if booking.client else 'Not available') }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Email Address</small>
+                <strong>{{ booking.client_email or (booking.client.email if booking.client else 'Not available') }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Phone Number</small>
+                <strong>{{ booking.client_phone or (booking.client.phone if booking.client else 'Not available') }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- VEHICLE -->
+    <div class="booking-card">
+        <h3>Vehicle Information</h3>
+
+        {% if booking.car %}
+        <div class="booking-grid">
+            <div class="booking-field">
+                <small>Vehicle</small>
+                <strong>{{ booking.car.name or 'Not available' }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Registration Number</small>
+                <strong>{{ booking.car.registration_number or 'Not available' }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Vehicle ID</small>
+                <strong>{{ booking.car.id }}</strong>
+            </div>
+        </div>
+        {% else %}
+            <div class="empty-state">No vehicle is currently linked to this booking.</div>
+        {% endif %}
+    </div>
+
+    <!-- HIRE PERIOD -->
+    <div class="booking-card">
+        <h3>Hire Schedule</h3>
+
+        <div class="booking-grid">
+            <div class="booking-field">
+                <small>Pickup Date</small>
+                <strong>{{ booking.pickup_date.strftime('%d %b %Y') if booking.pickup_date else 'Not available' }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Pickup Time</small>
+                <strong>{{ booking.pickup_time.strftime('%H:%M') if booking.pickup_time else 'Not available' }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Expected Return Date</small>
+                <strong>{{ booking.dropoff_date.strftime('%d %b %Y') if booking.dropoff_date else 'Not available' }}</strong>
+            </div>
+
+            <div class="booking-field">
+                <small>Expected Return Time</small>
+                <strong>{{ booking.dropoff_time.strftime('%H:%M') if booking.dropoff_time else 'Not available' }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <!-- FINANCIAL CHARGES -->
+    <div class="booking-card">
+        <h3>Financial Charges</h3>
+
+        {% if financial_charges %}
+        <div class="booking-table-wrap">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Charge</th>
+                        <th>Description</th>
+                        <th>Amount</th>
+                        <th>Received</th>
+                        <th>Outstanding</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for charge in financial_charges %}
+                    <tr>
+                        <td>{{ charge.category|replace('_', ' ')|title }}</td>
+                        <td>{{ charge.description or '—' }}</td>
+                        <td class="money">KSh {{ "%.2f"|format(charge.amount_charged or 0) }}</td>
+                        <td class="money">KSh {{ "%.2f"|format(charge.amount_received or 0) }}</td>
+                        <td class="money">KSh {{ "%.2f"|format(charge.amount_remaining or 0) }}</td>
+                        <td>{{ status_badge(charge.payment_status) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state">No financial charges have been recorded for this booking.</div>
+        {% endif %}
+    </div>
+
+    <!-- DAMAGE CHARGES -->
+    <div class="booking-card">
+        <h3>Vehicle Damage Charges</h3>
+
+        {% if damage_charges %}
+        <div class="booking-table-wrap">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Description</th>
+                        <th>Notes</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                        <th>Recorded On</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for damage in damage_charges %}
+                    <tr>
+                        <td>{{ damage.description or 'Vehicle damage' }}</td>
+                        <td>{{ damage.notes or '—' }}</td>
+                        <td class="money">KSh {{ "%.2f"|format(damage.amount or 0) }}</td>
+                        <td>{{ status_badge(damage.status) }}</td>
+                        <td>{{ damage.created_at.strftime('%d %b %Y, %H:%M') if damage.created_at else '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state">No damage charges recorded for this booking.</div>
+        {% endif %}
+    </div>
+
+    <!-- LATE PENALTIES -->
+    <div class="booking-card">
+        <h3>Late Return Penalties</h3>
+
+        {% if penalties %}
+        <div class="booking-table-wrap">
+            <table class="booking-table">
+                <thead>
+                    <tr>
+                        <th>Expected Return</th>
+                        <th>Actual Return</th>
+                        <th>Minutes Late</th>
+                        <th>Chargeable Minutes</th>
+                        <th>Penalty</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for penalty in penalties %}
+                    <tr>
+                        <td>{{ penalty.expected_return_at.strftime('%d %b %Y, %H:%M') if penalty.expected_return_at else '—' }}</td>
+                        <td>{{ penalty.actual_return_at.strftime('%d %b %Y, %H:%M') if penalty.actual_return_at else '—' }}</td>
+                        <td>{{ penalty.minutes_late if penalty.minutes_late is not none else '—' }}</td>
+                        <td>{{ penalty.chargeable_minutes if penalty.chargeable_minutes is not none else '—' }}</td>
+                        <td class="money">KSh {{ "%.2f"|format(penalty.amount or 0) }}</td>
+                        <td>{{ status_badge(penalty.status) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <div class="empty-state">No late-return penalties recorded for this booking.</div>
+        {% endif %}
+    </div>
+
+    <div class="booking-actions">
+        <a href="{{ url_for('admin.bookings_page') }}"
+           class="booking-btn booking-btn-secondary">
+            Back to Bookings
+        </a>
+    </div>
+
 </div>
-
 {% endblock %}

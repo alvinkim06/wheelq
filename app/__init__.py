@@ -9,7 +9,7 @@ from flask_mail import Mail
 from flask_jwt_extended import JWTManager
 from flask_login import LoginManager
 
-from app.extensions import db, scheduler
+from app.extensions import db, scheduler, cache
 from app.tasks.late_returns import check_late_returns
 from app.config import Config
 
@@ -68,7 +68,7 @@ def create_app():
     jwt.init_app(app)
     mail.init_app(app)
     login_manager.init_app(app)
-
+    cache.init_app(app)
     # Register blueprints
     from app.public.routes import public
     from app.admin.routes import admin

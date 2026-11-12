@@ -1,0 +1,22 @@
+
+{% extends "emails/base.html" %}
+{% block title %}Invoice - WheelQ{% endblock %}
+
+{% block content %}
+<h2>Hello {{ customer_name }},</h2>
+
+<p>Please find your invoice for the following service attached to this email.</p>
+
+<div class="details">
+    <h3>Invoice Details</h3>
+    <p><strong>Invoice Number:</strong> {{ invoice_number }}</p>
+    <p><strong>Description:</strong> {{ description }}</p>
+    <p><strong>Date:</strong> {{ invoice_date }}</p>
+    <p><strong>Amount:</strong> {{ amount }}</p>
+    <p><strong>Payment Status:</strong> {{ payment_status }}</p>
+</div>
+
+<p>Please retain this invoice for your records and complete payment according to the agreed terms.</p>
+
+<p>Thank you for doing business with WheelQ.</p>
+{% endblock %}

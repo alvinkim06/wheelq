@@ -1,0 +1,346 @@
+
+{% extends "admin_base.html" %}
+
+{% block title %}{{ page_title }} | WheelQ Admin{% endblock %}
+
+{% block content %}
+<style>
+    :root {
+        --wq-yellow: #f5c518;
+        --wq-black: #171717;
+        --wq-red: #b30000;
+        --wq-bg: #f4f5f7;
+        --wq-muted: #777;
+    }
+
+    .transaction-page {
+        max-width: 1050px;
+        margin: 25px auto;
+        padding: 0 18px 45px;
+    }
+
+    .transaction-heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+    }
+
+    .transaction-heading h2 {
+        font-weight: 800;
+        color: var(--wq-black);
+        margin: 0;
+    }
+
+    .transaction-heading p {
+        color: var(--wq-muted);
+        margin: 6px 0 0;
+    }
+
+    .back-btn {
+        color: var(--wq-black);
+        background: white;
+        border: 1px solid #ddd;
+        padding: 10px 17px;
+        border-radius: 9px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .form-card {
+        background: white;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0,0,0,.07);
+        border: 1px solid #ececec;
+    }
+
+    .form-card-header {
+        background: var(--wq-black);
+        color: white;
+        padding: 23px 28px;
+        border-bottom: 5px solid var(--wq-yellow);
+    }
+
+    .form-card-header h4 {
+        font-weight: 800;
+        margin: 0;
+    }
+
+    .form-card-header p {
+        color: #ccc;
+        margin: 6px 0 0;
+        font-size: 13px;
+    }
+
+    .form-card-body {
+        padding: 30px;
+    }
+
+    .form-section-title {
+        font-size: 13px;
+        font-weight: 800;
+        color: var(--wq-red);
+        text-transform: uppercase;
+        letter-spacing: .7px;
+        margin: 8px 0 20px;
+    }
+
+    .form-label {
+        font-weight: 700;
+        font-size: 13px;
+        color: #333;
+        margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+        min-height: 47px;
+        border: 1px solid #dedede;
+        border-radius: 9px;
+        padding: 10px 13px;
+        background-color: #fff;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--wq-yellow);
+        box-shadow: 0 0 0 3px rgba(245,197,24,.17);
+    }
+
+    textarea.form-control {
+        min-height: 100px;
+    }
+
+    .type-selector {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    .type-option {
+        border: 2px solid #e5e5e5;
+        border-radius: 11px;
+        padding: 17px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        transition: .2s;
+    }
+
+    .type-option:has(input:checked) {
+        border-color: var(--wq-yellow);
+        background: #fffbea;
+    }
+
+    .type-option input {
+        accent-color: var(--wq-yellow);
+        width: 18px;
+        height: 18px;
+    }
+
+    .type-option strong {
+        display: block;
+        color: var(--wq-black);
+    }
+
+    .type-option small {
+        color: var(--wq-muted);
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid #eee;
+        flex-wrap: wrap;
+    }
+
+    .btn-wheelq {
+        background: var(--wq-yellow);
+        border: 0;
+        color: var(--wq-black);
+        font-weight: 800;
+        padding: 12px 24px;
+        border-radius: 9px;
+    }
+
+    .btn-wheelq:hover {
+        background: #dfb000;
+        color: var(--wq-black);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #333;
+        border: 0;
+        padding: 12px 22px;
+        border-radius: 9px;
+        font-weight: 700;
+        text-decoration: none;
+    }
+
+    @media(max-width: 600px) {
+        .form-card-body { padding: 20px 16px; }
+        .type-selector { grid-template-columns: 1fr; }
+        .form-actions > * { width: 100%; text-align: center; }
+    }
+</style>
+
+<div class="transaction-page">
+
+    <div class="transaction-heading">
+        <div>
+            <h2>{{ page_title }}</h2>
+            <p>Manage WheelQ business income and expenses.</p>
+        </div>
+
+        <a href="{{ url_for('admin.earnings_expenses') }}" class="back-btn">
+            ← Back to Financial Dashboard
+        </a>
+    </div>
+
+    <div class="form-card">
+
+        <div class="form-card-header">
+            <h4>{{ "Update Transaction" if form_mode == "edit" else "Record a New Transaction" }}</h4>
+            <p>Enter accurate transaction details for your financial records.</p>
+        </div>
+
+        <div class="form-card-body">
+
+            <form method="POST"
+                  action="{{ url_for('admin.edit_manual_financial_entry', entry_id=entry.id) if form_mode == 'edit' else url_for('admin.add_manual_financial_entry') }}">
+
+                {# If Flask-WTF CSRF is enabled, include your CSRF token here. #}
+
+                <div class="form-section-title">01 · Transaction type</div>
+
+                <div class="type-selector mb-4">
+
+                    <label class="type-option">
+                        <input type="radio"
+                               name="entry_type"
+                               value="earning"
+                               required
+                               {% if (entry and entry.entry_type == 'earning') or not entry %}checked{% endif %}>
+                        <span>
+                            <strong>＋ Income / Earning</strong>
+                            <small>Money received by WheelQ</small>
+                        </span>
+                    </label>
+
+                    <label class="type-option">
+                        <input type="radio"
+                               name="entry_type"
+                               value="expense"
+                               required
+                               {% if entry and entry.entry_type == 'expense' %}checked{% endif %}>
+                        <span>
+                            <strong>− Expense</strong>
+                            <small>Money spent by WheelQ</small>
+                        </span>
+                    </label>
+
+                </div>
+
+                <div class="form-section-title">02 · Transaction details</div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <label class="form-label">Category *</label>
+                        <select name="category" class="form-select" id="category" required>
+                            <option value="">Select category</option>
+
+                            {% set categories = [
+                                'Car Hire', 'Booking Income', 'Airport Transfer',
+                                'Other Income', 'Fuel', 'Vehicle Maintenance',
+                                'Repairs', 'Insurance', 'Rent', 'Salaries',
+                                'Utilities', 'Marketing', 'Licences',
+                                'Investor Payout', 'Other Expense'
+                            ] %}
+
+                            {% for category in categories %}
+                                <option value="{{ category }}"
+                                    {% if entry and entry.category == category %}selected{% endif %}>
+                                    {{ category }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Amount (KSh) *</label>
+                        <input type="number"
+                               name="amount"
+                               class="form-control"
+                               min="0.01"
+                               step="0.01"
+                               placeholder="e.g. 15000"
+                               value="{{ entry.amount if entry else '' }}"
+                               required>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Description *</label>
+                        <textarea name="description"
+                                  class="form-control"
+                                  maxlength="255"
+                                  placeholder="Describe what this transaction is for..."
+                                  required>{{ entry.description if entry else '' }}</textarea>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Transaction date *</label>
+                        <input type="date"
+                               name="transaction_date"
+                               class="form-control"
+                               value="{{ entry.transaction_date.strftime('%Y-%m-%d') if entry else today_date }}"
+                               required>
+                    </div>
+
+                    <div class="col-md-6">
+                        <label class="form-label">Payment method</label>
+                        <select name="payment_method" class="form-select">
+                            <option value="">Select payment method</option>
+                            {% for method in ['M-Pesa', 'Cash', 'Bank Transfer', 'Card', 'Paystack', 'Other'] %}
+                                <option value="{{ method }}"
+                                    {% if entry and entry.payment_method == method %}selected{% endif %}>
+                                    {{ method }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">Reference number (optional)</label>
+                        <input type="text"
+                               name="reference"
+                               class="form-control"
+                               maxlength="100"
+                               placeholder="Receipt number, transaction code, etc."
+                               value="{{ entry.reference if entry and entry.reference else '' }}">
+                    </div>
+
+                </div>
+
+                <div class="form-actions">
+                    <a href="{{ url_for('admin.earnings_expenses') }}" class="btn-cancel">
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn-wheelq">
+                        {{ "Save Changes" if form_mode == "edit" else "Save Transaction" }}
+                        →
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

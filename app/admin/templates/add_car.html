@@ -163,33 +163,35 @@
 
 
         <!-- INSURANCE -->
-        <div class="form-section">
+<div class="form-section">
+    <h3>Insurance Details</h3>
 
-            <h3>Insurance Details</h3>
+    <label for="insurance_provider">Insurance Provider</label>
+    <input
+        type="text"
+        id="insurance_provider"
+        name="insurance_provider"
+        placeholder="e.g. ABC Insurance"
+    >
 
-            <label for="insurance_provider">
-                Insurance Provider
-            </label>
+    <label for="insurance_expiry">Insurance Expiry Date</label>
+    <input
+        type="date"
+        id="insurance_expiry"
+        name="insurance_expiry"
+    >
 
-            <input
-                type="text"
-                id="insurance_provider"
-                name="insurance_provider"
-                placeholder="e.g. ABC Insurance"
-            >
+    <label for="insurance_document">Insurance Certificate / Document</label>
+    <input
+        type="file"
+        id="insurance_document"
+        name="insurance_document"
+        accept=".jpg,.jpeg,.png,.webp,.pdf"
+    >
 
+    <small>Accepted formats: JPG, PNG, WEBP and PDF.</small>
+</div>
 
-            <label for="insurance_expiry">
-                Insurance Expiry Date
-            </label>
-
-            <input
-                type="date"
-                id="insurance_expiry"
-                name="insurance_expiry"
-            >
-
-        </div>
 
 
         <!-- IMAGES -->

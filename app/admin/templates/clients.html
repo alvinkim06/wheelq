@@ -89,8 +89,24 @@
                                 {{ (c.name or 'C')[:1]|upper }}
                             </div>
                             <div class="client-name">
-                                <strong>{{ c.name or 'Unnamed Client' }}</strong>
+                               <strong>
+                                    {{ c.name or 'Unnamed Client' }}
+
+                                    {% if c.is_blacklisted %}
+                                        <span class="blacklisted-badge"
+                                            title="{{ c.blacklist_reason }}">
+                                            BLACKLISTED
+                                        </span>
+                                    {% endif %}
+                                </strong>
+
                                 <span>Client ID: {{ c.id }}</span>
+
+                                {% if c.is_blacklisted %}
+                                    <small class="blacklist-reason">
+                                        Reason: {{ c.blacklist_reason }}
+                                    </small>
+                                {% endif %}
                             </div>
                         </div>
                     </td>
@@ -107,26 +123,73 @@
                         <span class="booking-count">{{ c.total or 0 }}</span>
                     </td>
 
-                    <td>
-                        <div class="client-actions">
+                    
+                  <td>
+                    <div class="client-actions">
 
-                            {% if c.total == 0 or c.has_incomplete_booking %}
-                                <a href="{{ url_for('admin.create_booking', client_id=c.id) }}"
-                                class="btn-create-booking">
-                                    + Create Booking
-                                </a>
-                            {% endif %}
-                            <a href="{{ url_for('admin.client_details', client_id=c.id) }}"
-                               class="btn-client-details">
-                                Details
+                        {% if c.can_create_booking %}
+                            <a href="{{ url_for('admin.create_booking', client_id=c.id) }}"
+                            class="btn-create-booking">
+                                + Create Booking
+                            </a>
+                        {% endif %}
+
+                        <a href="{{ url_for('admin.client_details', client_id=c.id) }}"
+                        class="btn-client-details">
+                            Details
+                        </a>
+
+                        <a href="{{ url_for('admin.edit_client', client_id=c.id) }}"
+                        class="btn-client-edit">
+                            Edit
+                        </a>
+
+                        {% if current_user_role == 'admin' %}
+
+                        {% if c.is_blacklisted %}
+
+                            <a href="{{ url_for('admin.client_blacklist_page') }}"
+                            class="btn btn-secondary">
+                                View Blacklist
                             </a>
 
-                            <a href="{{ url_for('admin.edit_client', client_id=c.id) }}"
-                               class="btn-client-edit">
-                                Edit
-                            </a>
-                        </div>
-                    </td>
+                        {% else %}
+
+                            <form method="POST"
+                                action="{{ url_for('admin.blacklist_client', client_id=c.id) }}"
+                                onsubmit="return confirm('Blacklist this client?');">
+
+                                <textarea name="reason"
+                                        placeholder="Reason for blacklisting..."
+                                        required
+                                        rows="2"
+                                        style="width:180px;max-width:100%;"></textarea>
+
+                                <button type="submit"
+                                        class="btn btn-danger">
+                                    Blacklist Client
+                                </button>
+                            </form>
+
+                        {% endif %}
+
+                    {% endif %}
+			
+			<form method="POST"
+      				action="{{ url_for('admin.delete_client', client_id=c.id) }}"
+      				class="delete-client-form"
+     				onsubmit="return confirm(
+          			'Are you sure you want to delete {{ c.name|e }}? The client record will be removed, but their bookings and financial records will be preserved.'
+      					);">
+
+    				<button type="submit" class="btn-client-delete">
+        				Delete
+    				</button>
+
+			</form>
+                    </div>
+                </td>
+                
                 </tr>
                 {% else %}
                 <tr>
@@ -537,6 +600,47 @@
     gap: 8px;
 }
 
+
+.delete-client-form {
+    display: inline-flex;
+    margin: 0;
+    padding: 0;
+}
+
+.btn-client-delete {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-height: 36px;
+    padding: 8px 13px;
+
+    border: 1px solid #dc2626;
+    border-radius: 7px;
+
+    background: #dc2626;
+    color: #ffffff;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+.btn-client-delete:hover {
+    background: #b91c1c;
+    border-color: #b91c1c;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(220, 38, 38, 0.20);
+}
+
+.btn-client-delete:active {
+    transform: translateY(0);
+}
+
 .btn-client-details,
 .btn-client-edit {
     display: inline-flex;
@@ -719,6 +823,25 @@
         padding: 13px 15px;
         font-size: 10px;
     }
+}
+
+.blacklisted-badge {
+    display: inline-block;
+    background: #dc2626;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 800;
+    margin-left: 7px;
+    letter-spacing: .5px;
+}
+
+.blacklist-reason {
+    display: block;
+    color: #dc2626;
+    font-size: 11px;
+    margin-top: 5px;
 }
 </style>
 
