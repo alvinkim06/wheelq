@@ -16,9 +16,93 @@ depends_on = None
 
 def upgrade():
 
-    # The four financial tables and their indexes were already
-    # created by the previous partially completed upgrade.
-    # Do not create them again.
+    # Create the financial tables before adding references to them.
+    op.create_table(
+        "financial_charges",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("client_id", sa.Integer(), nullable=True),
+        sa.Column("booking_id", sa.Integer(), nullable=True),
+        sa.Column("category", sa.String(30), nullable=False),
+        sa.Column("description", sa.String(255), nullable=False),
+        sa.Column("amount_charged", sa.Numeric(12, 2), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=False),
+        sa.Column("created_by", sa.Integer(), nullable=True),
+        sa.Column("status", sa.String(30), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["client_id"], ["client.id"],
+            name="fk_financial_charges_client_id", ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["booking_id"], ["booking.id"],
+            name="fk_financial_charges_booking_id", ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by"], ["admin_user.id"],
+            name="fk_financial_charges_created_by"
+        ),
+    )
+    op.create_index("ix_financial_charges_client_id", "financial_charges", ["client_id"])
+    op.create_index("ix_financial_charges_booking_id", "financial_charges", ["booking_id"])
+    op.create_index("ix_financial_charges_category", "financial_charges", ["category"])
+
+    op.create_table(
+        "financial_payments",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("charge_id", sa.Integer(), nullable=False),
+        sa.Column("amount", sa.Numeric(12, 2), nullable=False),
+        sa.Column("payment_method", sa.String(50), nullable=False),
+        sa.Column("reference", sa.String(100), nullable=True),
+        sa.Column("status", sa.String(20), nullable=False),
+        sa.Column("received_at", sa.DateTime(), nullable=True),
+        sa.Column("recorded_by", sa.Integer(), nullable=True),
+        sa.Column("notes", sa.Text(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["charge_id"], ["financial_charges.id"],
+            name="fk_financial_payments_charge_id", ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["recorded_by"], ["admin_user.id"],
+            name="fk_financial_payments_recorded_by"
+        ),
+        sa.UniqueConstraint("reference", name="uq_financial_payments_reference"),
+    )
+    op.create_index("ix_financial_payments_charge_id", "financial_payments", ["charge_id"])
+
+    op.create_table(
+        "financial_adjustments",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("charge_id", sa.Integer(), nullable=False),
+        sa.Column("amount", sa.Numeric(12, 2), nullable=False),
+        sa.Column("adjustment_type", sa.String(30), nullable=False),
+        sa.Column("reason", sa.Text(), nullable=False),
+        sa.Column("status", sa.String(20), nullable=False),
+        sa.Column("created_at", sa.DateTime(), nullable=True),
+        sa.Column("created_by", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["charge_id"], ["financial_charges.id"],
+            name="fk_financial_adjustments_charge_id", ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by"], ["admin_user.id"],
+            name="fk_financial_adjustments_created_by"
+        ),
+    )
+    op.create_index("ix_financial_adjustments_charge_id", "financial_adjustments", ["charge_id"])
+
+    op.create_table(
+        "penalty_settings",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("rate", sa.Numeric(12, 2), nullable=False),
+        sa.Column("interval_minutes", sa.Integer(), nullable=False),
+        sa.Column("grace_period_minutes", sa.Integer(), nullable=False),
+        sa.Column("is_active", sa.Boolean(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), nullable=True),
+        sa.Column("updated_by", sa.Integer(), nullable=True),
+        sa.ForeignKeyConstraint(
+            ["updated_by"], ["admin_user.id"],
+            name="fk_penalty_settings_updated_by"
+        ),
+    )
 
     # Extend existing damage charges.
     with op.batch_alter_table("damage_charge") as batch_op:

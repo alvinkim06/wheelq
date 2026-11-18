@@ -574,7 +574,7 @@
                                 <label>Vehicle Type</label>
                                 <select name="type">
                                     <option value="">Select vehicle type</option>
-                                    {% for type in ['SUV', 'Sedan', 'Hatchback', 'Luxury', 'Van', 'Pickup', 'Minibus', 'Other'] %}
+                                    {% for type in ['Saloon Car', 'SUV', 'Classic Saloon', 'Truck', '7 Seater', '14 Seater'] %}
                                     <option value="{{ type }}"
                                         {% if car.type == type %}selected{% endif %}>
                                         {{ type }}

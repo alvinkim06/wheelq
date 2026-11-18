@@ -49,3 +49,6 @@ class Config:
         "redis://127.0.0.1:6379/0"
     )
     CACHE_DEFAULT_TIMEOUT = 300
+    CACHE_OPTIONS = {
+        "protocol": 2
+    }

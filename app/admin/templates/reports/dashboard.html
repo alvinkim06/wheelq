@@ -992,7 +992,7 @@
      data-labels='{{ labels|tojson|forceescape }}'
      data-earnings='{{ earnings_series|tojson|forceescape }}'
      data-expenses='{{ expenses_series|tojson|forceescape }}'
-     data-labels='{{ payment_methods.keys()|list|tojson|forceescape }}'
+     data-payment-labels='{{ payment_methods.keys()|list|tojson|forceescape }}'
      data-values='{{ payment_methods.values()|list|map("float")|list|tojson|forceescape }}'>
 </div>
 
@@ -1020,7 +1020,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const expenses = JSON.parse(paymentData.dataset.expenses);
     
 
-    const paymentLabels = JSON.parse(paymentData.dataset.labels);
+    const paymentLabels = JSON.parse(paymentData.dataset.paymentLabels);
     const paymentValues = JSON.parse(paymentData.dataset.values);
 
     if (typeof Chart === "undefined") return;

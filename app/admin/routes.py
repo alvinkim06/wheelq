@@ -352,20 +352,53 @@ def delete_insurance_document(filename):
     if os.path.isfile(file_path):
         os.remove(file_path)
 
-def save_file(field_name):
-    file = request.files.get(field_name)
-
-    if not file or file.filename == '':
+def save_public_upload(file, allowed_extensions=None):
+    """
+    Save a public image/document using a unique filename.
+    Returns only the filename stored in the database.
+    """
+    if not file or not file.filename:
         return None
 
-    upload_folder = current_app.config['UPLOAD_FOLDER']
+    filename = secure_filename(file.filename)
+
+    if not filename or "." not in filename:
+        raise ValueError("Invalid uploaded filename.")
+
+    extension = filename.rsplit(".", 1)[1].lower()
+
+    allowed = (
+        allowed_extensions
+        if allowed_extensions is not None
+        else ALLOWED_EXTENSIONS
+    )
+
+    if extension not in allowed:
+        raise ValueError("Uploaded file type is not allowed.")
+
+    upload_folder = current_app.config.get("UPLOAD_FOLDER")
+
+    if not upload_folder:
+        upload_folder = os.path.join(
+            current_app.static_folder,
+            "uploads"
+        )
+
     os.makedirs(upload_folder, exist_ok=True)
 
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(upload_folder, filename)
+    stored_filename = f"{uuid.uuid4().hex}.{extension}"
+    file_path = os.path.join(upload_folder, stored_filename)
 
     file.save(file_path)
-    return filename
+
+    return stored_filename
+
+
+def save_file(field_name):
+    return save_public_upload(
+        request.files.get(field_name),
+        ALLOWED_EXTENSIONS
+    )
 
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -1381,32 +1414,45 @@ def add_car():
         ).strip().upper()
 
         price = request.form.get("price", type=int)
-        car_type = request.form.get("type")
+        car_type = request.form.get("type", "").strip()
         details = request.form.get("details")
 
-        # Use the same upload directory throughout the app.
-        upload_folder = os.path.join(
-            current_app.static_folder, "uploads"
+        valid_car_types = (
+            "Saloon Car", "SUV", "Classic Saloon",
+            "Truck", "7 Seater", "14 Seater"
         )
-        os.makedirs(upload_folder, exist_ok=True)
 
-        def save_image(file):
-            if file and file.filename:
-                if not allowed_file(file.filename):
-                    flash("Image file type not allowed.", "danger")
-                    return None
+        if car_type not in valid_car_types:
+            flash("Please select one of the supported vehicle categories.", "danger")
+            return render_template("add_car.html", leases=leases)
 
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(upload_folder, filename))
-                return filename
+        image_extensions = {"png", "jpg", "jpeg", "gif", "webp"}
 
-            return None
+        try:
+            image = save_public_upload(
+                request.files.get("image"),
+                image_extensions
+            )
+            image_front = save_public_upload(
+                request.files.get("image_front"),
+                image_extensions
+            )
+            image_rear = save_public_upload(
+                request.files.get("image_rear"),
+                image_extensions
+            )
+            image_left = save_public_upload(
+                request.files.get("image_left"),
+                image_extensions
+            )
+            image_right = save_public_upload(
+                request.files.get("image_right"),
+                image_extensions
+            )
 
-        image = save_image(request.files.get("image"))
-        image_front = save_image(request.files.get("image_front"))
-        image_rear = save_image(request.files.get("image_rear"))
-        image_left = save_image(request.files.get("image_left"))
-        image_right = save_image(request.files.get("image_right"))
+        except ValueError as error:
+            flash(str(error), "danger")
+            return redirect(url_for("admin.add_car"))
 
         insurance_provider = request.form.get("insurance_provider")
         insurance_expiry_str = request.form.get("insurance_expiry")
@@ -1471,26 +1517,46 @@ def edit_car(car_id):
             or None
         )
         car.price = request.form.get("price", type=int) or 0
-        car.type = request.form.get("type")
+        car_type = request.form.get("type", "").strip()
+
+        valid_car_types = (
+            "Saloon Car", "SUV", "Classic Saloon",
+            "Truck", "7 Seater", "14 Seater"
+        )
+
+        if car_type not in valid_car_types:
+            flash("Please select one of the supported vehicle categories.", "danger")
+            return redirect(url_for("admin.edit_car", car_id=car.id))
+
+        car.type = car_type
         car.details = request.form.get("details")
 
-        image = request.files.get("image")
+        image_extensions = {"png", "jpg", "jpeg", "gif", "webp"}
 
-        if image and image.filename:
-            if not allowed_file(image.filename):
-                flash("Image file type not allowed.", "danger")
-                return redirect(
-                    url_for("admin.edit_car", car_id=car.id)
-                )
+        try:
+            for field_name in (
+                "image",
+                "image_front",
+                "image_rear",
+                "image_left",
+                "image_right"
+            ):
+                uploaded_file = request.files.get(field_name)
 
-            filename = secure_filename(image.filename)
-            upload_folder = os.path.join(
-                current_app.static_folder, "uploads"
-            )
-            os.makedirs(upload_folder, exist_ok=True)
+                if uploaded_file and uploaded_file.filename:
+                    setattr(
+                        car,
+                        field_name,
+                        save_public_upload(
+                            uploaded_file,
+                            image_extensions
+                        )
+                    )
 
-            image.save(os.path.join(upload_folder, filename))
-            car.image = filename
+        except ValueError as error:
+            db.session.rollback()
+            flash(str(error), "danger")
+            return redirect(url_for("admin.edit_car", car_id=car.id))
 
         new_insurance_document = None
         old_insurance_document = None
@@ -1852,20 +1918,32 @@ def edit_client(client_id):
         client.area_of_residence = data.get('area_of_residence')
         client.area_of_usage = data.get('area_of_usage')
 
-        # Update files if uploaded
-        def update_file(field_name, current_path):
-            f = files.get(field_name)
-            if f:
-                filename = secure_filename(f.filename)
-                path = os.path.join('static/uploads', filename)
-                f.save(path)
-                return path
-            return current_path
+        # Update public client identification files only when replacements
+        # are actually uploaded. Existing filenames remain unchanged otherwise.
+        try:
+            client.id_front = (
+                save_public_upload(files.get("id_front"), ALLOWED_EXTENSIONS)
+                or client.id_front
+            )
+            client.id_back = (
+                save_public_upload(files.get("id_back"), ALLOWED_EXTENSIONS)
+                or client.id_back
+            )
+            client.drivers_license = (
+                save_public_upload(
+                    files.get("drivers_license"),
+                    ALLOWED_EXTENSIONS
+                )
+                or client.drivers_license
+            )
+            client.passport = (
+                save_public_upload(files.get("passport"), ALLOWED_EXTENSIONS)
+                or client.passport
+            )
 
-        client.id_front = update_file('id_front', client.id_front)
-        client.id_back = update_file('id_back', client.id_back)
-        client.drivers_license = update_file('drivers_license', client.drivers_license)
-        client.passport = update_file('passport', client.passport)
+        except ValueError as error:
+            flash(str(error), "danger")
+            return redirect(url_for("admin.clients_page"))
 
         # Emergency contacts
         for i in range(1, 4):
@@ -2610,48 +2688,24 @@ def add_lease():
             )
             return redirect(url_for("admin.leases_page"))
 
-        upload_folder = os.path.join(
-            current_app.root_path,
-            "static",
-            "uploads"
-        )
-
-        os.makedirs(upload_folder, exist_ok=True)
-
-        def save_image(file):
-
-            if file and file.filename:
-
-                if not allowed_file(file.filename):
-                    raise ValueError(
-                        "One of the uploaded image files is not allowed."
-                    )
-
-                filename = secure_filename(file.filename)
-
-                file.save(
-                    os.path.join(upload_folder, filename)
-                )
-
-                return filename
-
-            return None
+        image_extensions = {"png", "jpg", "jpeg", "gif", "webp"}
 
         try:
-            image_front = save_image(
-                request.files.get("image_front")
+            image_front = save_public_upload(
+                request.files.get("image_front"),
+                image_extensions
             )
-
-            image_rear = save_image(
-                request.files.get("image_rear")
+            image_rear = save_public_upload(
+                request.files.get("image_rear"),
+                image_extensions
             )
-
-            image_left = save_image(
-                request.files.get("image_left")
+            image_left = save_public_upload(
+                request.files.get("image_left"),
+                image_extensions
             )
-
-            image_right = save_image(
-                request.files.get("image_right")
+            image_right = save_public_upload(
+                request.files.get("image_right"),
+                image_extensions
             )
 
         except ValueError as error:
@@ -2695,9 +2749,7 @@ def add_lease():
                 "Could not save the investor lease. Please try again.",
                 "danger"
             )
-
-        db.session.add(leases_page)
-        db.session.commit()
+            return redirect(url_for("admin.leases_page"))
 
         try:
             notify_lease_created(lease.id)
@@ -2750,6 +2802,34 @@ def edit_lease(lease_id):
         lease.car_plate = request.form.get("car_plate", "").strip()
         lease.status = request.form.get("status", lease.status)
         lease.notes = request.form.get("notes", "").strip()
+
+        image_extensions = {"png", "jpg", "jpeg", "gif", "webp"}
+
+        try:
+            for field_name in (
+                "image_front",
+                "image_rear",
+                "image_left",
+                "image_right"
+            ):
+                uploaded_file = request.files.get(field_name)
+
+                if uploaded_file and uploaded_file.filename:
+                    setattr(
+                        lease,
+                        field_name,
+                        save_public_upload(
+                            uploaded_file,
+                            image_extensions
+                        )
+                    )
+
+        except ValueError as error:
+            db.session.rollback()
+            flash(str(error), "danger")
+            return redirect(
+                url_for("admin.edit_lease", lease_id=lease.id)
+            )
 
         try:
             db.session.commit()
@@ -3158,6 +3238,10 @@ def activate_booking(booking_id):
 
     try:
         booking.status = "active"
+
+        if booking.car:
+            booking.car.status = "booked"
+
         db.session.commit()
 
         flash("Vehicle successfully released to the client.", "success")
@@ -3181,6 +3265,10 @@ def active_bookings():
 def deactivate_booking(booking_id):
     booking = Booking.query.get_or_404(booking_id)
     booking.status = "completed"
+
+    if booking.car:
+        booking.car.status = "available"
+
     db.session.commit()
     flash("Booking deactivated", "info")
     return redirect(url_for("admin.active_bookings"))
@@ -3394,6 +3482,10 @@ def return_vehicle(booking_id):
                 db.session.add(penalty)
 
             booking.status = "completed"
+
+            if booking.car:
+                booking.car.status = "available"
+
             db.session.commit()
 
             if result["amount"] > 0:
@@ -4236,7 +4328,7 @@ def reports_dashboard():
         unread_enquiries=unread_enquiries,
         replied_enquiries=replied_enquiries,
 
-        chart_labels=chart_labels,
+        labels=chart_labels,
         earnings_series=earnings_series,
         expenses_series=expenses_series,
 
@@ -4479,7 +4571,7 @@ def earnings_expenses():
         period=period,
         start_date=start_date,
         end_date=end_date,
-        labels=labels,
+        labels=bucket_keys,
         earnings_series=earnings_series,
         expenses_series=expenses_series,
         total_earnings=total_earnings,

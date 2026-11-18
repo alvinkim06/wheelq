@@ -35,6 +35,7 @@ REDIS_SOCKET_CONNECT_TIMEOUT = float(
 redis_client = redis.Redis.from_url(
     REDIS_URL,
     decode_responses=True,
+    protocol=2,
     socket_timeout=REDIS_SOCKET_TIMEOUT,
     socket_connect_timeout=REDIS_SOCKET_CONNECT_TIMEOUT,
     health_check_interval=30,
